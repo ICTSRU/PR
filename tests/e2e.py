@@ -32,6 +32,7 @@ LIBS = {
     'jspdf.umd.min.js': ('jspdf/dist/jspdf.umd.min.js', 'application/javascript'),
     'qrcode.min.js': ('qrcode-generator/qrcode.js', 'application/javascript'),
     'lucide.min.js': ('lucide/dist/umd/lucide.min.js', 'application/javascript'),
+    'pdf-lib.min.js': ('pdf-lib/dist/pdf-lib.min.js', 'application/javascript'),
 }
 def router(route):
     u = route.request.url
@@ -157,6 +158,16 @@ with sync_playwright() as p:
     last.screenshot(path=f'{OUT}/05-verify.png', full_page=True)
     d = page_as(br, OWNER, 'dash'); d.wait_for_selector('.tiles')
     d.screenshot(path=f'{OUT}/06-dashboard.png', full_page=True)
+    # v1.6 — PDF preview from the dashboard, with attachments merged
+    env({'as': REQ, 'call': {'action': 'ping'}})
+    d.click('#dashBody table.reg tbody tr .btn:has-text("معاينة")'); d.wait_for_selector('#pvPages .pvpg img', timeout=120000)
+    n = d.locator('#pvPages .pvpg').count()
+    ok(n >= 3, f'dashboard «معاينة» shows the official form + DoA + certificate ({n} pages)')
+    d.screenshot(path=f'{OUT}/11-preview.png')
+    with d.expect_download() as dl: d.click('#pvDl')
+    pth = dl.value.path(); data = open(pth, 'rb').read()
+    ok(data[:5] == b'%PDF-', 'preview PDF downloads (' + dl.value.suggested_filename + ')')
+    d.click('#dlgPdf .dlg-h button:has-text("إغلاق")')
 
     print('\nB · rejection at signer 2 in the UI')
     r = env({'as': REQ, 'call': {'action': 'save', 'data': {'meta': {'dept': 'إدارة المرافق', 'subject': 'توريد أثاث مكتبي', 'supplier': 'مؤسسة الأثاث'}, 'consumables': [{'desc': 'مكاتب إدارية', 'unit': 'قطعة', 'qty': 20, 'price': 3500}]}, 'managerEmail': MGR}})

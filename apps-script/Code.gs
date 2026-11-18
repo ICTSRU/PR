@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- *  POFlow v1.5 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
+ *  POFlow v1.6 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
  *  Purchase Order Approval & Digital Signature Platform
  *  Built on SRU Secure Access Kit v1.4 — access limited to @sr.edu.sa accounts
  *  E-signature logic = the ICTD Policy Platform model (v3.4), applied to a sequential PO workflow:
@@ -29,7 +29,7 @@
 const APP_NAME       = 'منصة أوامر الشراء';
 const APP_NAME_EN    = 'POFlow — Purchase Order Approval & Digital Signature Platform';
 const APP_SHORT      = 'POFlow';
-const APP_VERSION    = '1.5';
+const APP_VERSION    = '1.6';
 const ALLOWED_DOMAIN = 'sr.edu.sa';
 const FAVICON_URL    = 'https://ictsru.github.io/ITOC/assets/itoc-logo.png';
 const TZ             = 'Asia/Riyadh';

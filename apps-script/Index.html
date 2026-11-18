@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="1.5">
+<meta name="version" content="1.6">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -156,6 +156,13 @@ dialog::backdrop{background:rgba(36,20,54,.45)}
 #msPrev{max-height:110px;display:none;margin-top:6px;border:1px solid var(--border)}
 #pvImg{max-width:100%;max-height:220px;display:block;margin:0 auto;user-select:none;-webkit-user-drag:none}
 .chip{display:inline-block;border-radius:10px;padding:0 8px;background:var(--ok-bg);color:var(--ok);font-size:.76rem}.chip.lk{background:var(--bad-bg);color:var(--bad)}
+dialog.wide{width:min(980px,97vw);max-height:94vh}
+.pvmeta{padding:8px 14px;background:var(--purple-light);font-size:.85rem;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.pvbody{background:#e9e5f0;padding:14px;max-height:calc(94vh - 110px);overflow:auto;display:flex;flex-direction:column;align-items:center;gap:14px}
+.pvpg{margin:0;width:min(794px,100%)}.pvpg img{width:100%;display:block;background:#fff;box-shadow:0 4px 18px rgba(36,20,54,.18)}
+.pvpg figcaption{text-align:center;font-size:.78rem;color:var(--muted);margin-top:4px}
+.pvatt{display:flex;align-items:center;gap:5px;font-size:.82rem;background:rgba(255,255,255,.14);border-radius:4px;padding:2px 8px;cursor:pointer}.pvatt input{width:auto}
+@media (max-width:700px){#dlgPdf .dlg-h{flex-wrap:wrap}}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--purple-dark);color:#fff;padding:10px 18px;border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;opacity:0;pointer-events:none;transition:opacity .2s;max-width:92vw}
 .toast.on{opacity:1}
 .drop{border:2px dashed rgba(80,30,140,.35);border-radius:var(--radius);padding:22px;text-align:center;color:var(--muted);cursor:pointer}
@@ -263,7 +270,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.5</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.6</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
@@ -348,6 +355,18 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
   </div>
 </dialog>
 
+<dialog id="dlgPdf" class="wide">
+  <div class="dlg-h"><i data-lucide="file-search" class="icon"></i><span class="grow" id="pvTitle2">معاينة أمر الشراء</span>
+    <label class="pvatt" id="pvAttWrap" hidden><input type="checkbox" id="pvAtt" onchange="pvRender()"> تضمين المرفقات (<span id="pvAttN">0</span>)</label>
+    <button class="btn sm" id="pvDl" onclick="pvDownload()"><i data-lucide="file-down" class="icon"></i>تنزيل PDF</button>
+    <button class="btn sm" id="pvOpen" onclick="pvOpen()"><i data-lucide="external-link" class="icon"></i>فتح</button>
+    <button class="btn sm" id="pvOrig" onclick="pvOriginal()" hidden title="الملف المؤرشف الموقّع كما صدر"><i data-lucide="badge-check" class="icon"></i>النسخة المعتمدة المؤرشفة</button>
+    <button class="btn sm" id="pvGo" onclick="dlgPdf.close();go('po/'+PV.d.meta.id)"><i data-lucide="file-text" class="icon"></i>فتح الطلب</button>
+    <button class="btn sm" onclick="dlgPdf.close()"><i data-lucide="x" class="icon"></i>إغلاق</button></div>
+  <div class="pvmeta" id="pvMeta"></div>
+  <div class="pvbody" id="pvPages"></div>
+</dialog>
+
 <dialog id="dlgPrev">
   <div class="dlg-h"><i data-lucide="eye" class="icon"></i><span class="grow" id="pvTitle">معاينة التوقيع</span></div>
   <div class="dlg-b"><div class="hint">تُغلق المعاينة تلقائيًا خلال 15 ثانية.</div><img id="pvImg" alt="" draggable="false">
@@ -356,7 +375,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <script>
 /* =========================================================
-   POFlow v1.5 — Purchase Order Approval & Digital Signature Platform
+   POFlow v1.6 — Purchase Order Approval & Digital Signature Platform
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -427,10 +446,11 @@ const go = h => { if (location.hash === '#' + h) route(); else location.hash = h
 function poTable(items, opt) {
   opt = opt || {};
   if (!items.length) return `<div class="empty">${opt.empty || 'لا توجد طلبات.'}</div>`;
-  return `<div style="overflow-x:auto"><table class="reg"><thead><tr><th>رقم الطلب</th><th>الرقم التسلسلي</th><th>الموضوع</th><th>الجهة الطالبة</th><th>الإجمالي</th><th>الحالة</th><th>المسؤول الحالي</th><th>${opt.dateCol || 'آخر تحديث'}</th></tr></thead><tbody>` +
+  return `<div style="overflow-x:auto"><table class="reg"><thead><tr><th>رقم الطلب</th><th>الرقم التسلسلي</th><th>الموضوع</th><th>الجهة الطالبة</th><th>الإجمالي</th><th>الحالة</th><th>المسؤول الحالي</th><th>${opt.dateCol || 'آخر تحديث'}</th><th style="width:1%">PDF</th></tr></thead><tbody>` +
     items.map(x => `<tr class="click" onclick="go('po/${esc(x.id)}')"><td><b class="en">${esc(x.id)}</b> <span class="hint">v${esc(x.version)}</span></td><td class="en">${esc(x.serial || '—')}</td>
       <td>${esc(x.subject)}</td><td>${esc(x.dept)}</td><td class="num">${fmtN(x.total)} <span class="hint">${esc(x.currency)}</span></td><td>${stChip(x.status)}${overdue(x) ? ' <span class="st st-rejected" title="تجاوز المدة المستهدفة">⏰ متأخر</span>' : ''}</td>
-      <td>${x.current ? esc(x.current.name || x.current.email) + `<div class="hint">${esc(x.current.title || '')}</div>` : '—'}</td><td class="hint">${esc(fmtDT(opt.dateKey ? x[opt.dateKey] : x.updatedAt))}</td></tr>`).join('') + '</tbody></table></div>';
+      <td>${x.current ? esc(x.current.name || x.current.email) + `<div class="hint">${esc(x.current.title || '')}</div>` : '—'}</td><td class="hint">${esc(fmtDT(opt.dateKey ? x[opt.dateKey] : x.updatedAt))}</td>
+      <td><button class="btn sm" onclick="event.stopPropagation();previewPO('${esc(x.id)}')" title="معاينة أمر الشراء PDF بالنموذج الرسمي مع كل الإضافات"><i data-lucide="file-search" class="icon"></i>معاينة</button></td></tr>`).join('') + '</tbody></table></div>';
 }
 function overdue(x) {
   if (!['req_sign', 'signing'].includes(x.status) || !x.current) return false;
@@ -676,7 +696,7 @@ ROUTES.sign = async function () {
    ${!SIG.mine.length && P.sign ? `<div class="banner warn"><i data-lucide="triangle-alert" class="icon"></i><div>لم تسجّل توقيعك المشفّر بعد. <a href="javascript:void 0" onclick="openSigs()">سجّله من «توقيعاتي»</a> قبل أول توقيع، وشاهد <a class="howto" target="_blank" rel="noopener" href="${esc(HOWTO)}">كيفية التوقيع</a>.</div></div>` : ''}
    <div class="card"><h3 class="s" style="margin-top:0">مطلوب منك الآن (${mine.length})</h3>${mine.length ? mine.map(x => `<div class="banner warn" style="justify-content:space-between;align-items:center">
      <div><b class="en">${esc(x.id)}</b> · ${esc(x.subject)} — ${esc(x.dept)} · <span class="num">${fmtN(x.total)} ${esc(x.currency)}</span><div class="hint">خطوتك: ${esc(x.current.title)}${x.current.email !== ME ? ' — بالنيابة عن ' + esc(x.current.email) : ''} · منذ ${esc(fmtDT(x.current.since))}${x.targetDate ? ' · الموعد المستهدف ' + esc(x.targetDate) : ''}</div></div>
-     <a class="btn primary" href="#po/${esc(x.id)}"><i data-lucide="pen-line" class="icon"></i>فتح للتوقيع</a></div>`).join('') : '<div class="empty">لا توجد طلبات بانتظار توقيعك.</div>'}</div>
+     <span class="toolbar"><button class="btn" onclick="previewPO('${esc(x.id)}')"><i data-lucide="file-search" class="icon"></i>معاينة PDF</button><a class="btn primary" href="#po/${esc(x.id)}"><i data-lucide="pen-line" class="icon"></i>فتح للتوقيع</a></span></div>`).join('') : '<div class="empty">لا توجد طلبات بانتظار توقيعك.</div>'}</div>
    <div class="card"><h3 class="s" style="margin-top:0">طلبات شاركتَ فيها</h3>${poTable(done, { empty: '—' })}</div>`;
 };
 
@@ -1376,22 +1396,112 @@ function certPage(d, vt) {
    <p class="en" style="font-size:8.5px;text-align:left">Signed electronically on POFlow (ICTD — ITOC). Each signer was authenticated with a university Google account and the PIN of an encrypted personal signature; every action is in the audit trail. This is a documented simple electronic signature, not a qualified digital signature.</p>
    <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(m.id)} v${esc(m.version)}</span></span><span class="mono">${vt ? esc(vt.id) : ''}</span><span class="pn"></span></div></div>`;
 }
-async function generatePdfB64(preview, vt) {
-  await pdfFonts(); const { JsPDF } = await loadPdfLibs(); if (vt) await loadQrLib();
-  const d = CUR.d, host = document.createElement('div'); host.className = 'fdoc-host'; document.body.appendChild(host);
+/** v1.6: summary page used in previews before the final approval (instead of the signature certificate). */
+function summaryPage(d) {
+  const m = d.meta, sg = d.steps.filter(s => s.kind !== 'inform'), ST = { pending: 'بانتظار دوره', current: '⏳ الإجراء الحالي', signed: '✔ تم التوقيع', rejected: '✖ مرفوض' };
+  const hist = (d.history || []).slice(-16);
+  return `<div class="fpage"><div class="f-h2" style="font-size:14px">ملخص المعاملة · <span class="en">Transaction Summary</span> — نسخة معاينة</div>
+   <table class="f-tbl f-cert"><tr><th style="width:24%">أمر الشراء</th><td>${esc(m.subject)} — <span class="mono">${esc(m.id)}</span> · الإصدار ${esc(m.version)}${m.serial ? ' · الرقم التسلسلي <span class="mono">' + esc(m.serial) + '</span>' : ''}</td></tr>
+    <tr><th>الحالة</th><td><b>${esc(SA[m.status] || m.status)}</b>${m.targetDate ? ' · الموعد المستهدف ' + esc(m.targetDate) : ''}</td></tr>
+    <tr><th>الجهة الطالبة</th><td>${esc(m.dept)} · مقدم الطلب: ${esc(m.requester)} <span class="en">${esc(m.requesterEmail)}</span></td></tr>
+    <tr><th>المورد</th><td>${esc(m.supplier)} ${m.supplierContact ? '· ' + esc(m.supplierContact) : ''}</td></tr>
+    <tr><th>الإجمالي التقديري</th><td><b class="en">${fmtN(sum(d.consumables) + sum(d.assets))} ${esc(m.currency)}</b> (المستهلكات ${fmtN(sum(d.consumables))} · الأصول ${fmtN(sum(d.assets))})</td></tr>
+    ${m.notes ? `<tr><th>ملاحظات</th><td style="white-space:pre-line">${esc(m.notes)}</td></tr>` : ''}${m.terms ? `<tr><th>الشروط</th><td style="white-space:pre-line">${esc(m.terms)}</td></tr>` : ''}
+    ${m.returnNote && m.status === 'returned' ? `<tr><th>ملاحظة الإعادة</th><td>${esc(m.returnNote)}</td></tr>` : ''}</table>
+   <table class="f-tbl f-cert"><tr><th>#</th><th>الصفة / موضع التوقيع</th><th>الموقّع</th><th>الحالة</th><th>التاريخ</th></tr>
+    ${sg.map((s, i) => { const g = s.sig || {}; return `<tr><td>${i + 1}</td><td><b>${esc(s.title)}</b><br>${esc((s.slots || []).map(slotAr).join('، '))}</td><td><b>${esc(g.signerName || s.name || '')}</b><br><span class="en">${esc(g.by || s.email)}</span>${g.onBehalfOf ? '<br>بالنيابة عن <span class="en">' + esc(g.onBehalfOf) + '</span>' : ''}</td><td>${esc(ST[s.state] || s.state)}${s.reason ? '<br>السبب: ' + esc(s.reason) : ''}</td><td>${esc(fmtDT(g.at || s.rejectedAt || s.since))}</td></tr>`; }).join('') || '<tr><td colspan="5">لم يُحدَّد مسار التوقيعات بعد</td></tr>'}
+    ${d.steps.filter(s => s.kind === 'inform').map(s => `<tr><td>—</td><td><b>${esc(s.title)}</b><br>يعلم</td><td>${esc(s.name || '')} <span class="en">${esc(s.email)}</span></td><td>يُبلَّغ عند الاعتماد</td><td></td></tr>`).join('')}</table>
+   ${(d.attachments || []).length ? `<table class="f-tbl f-cert"><tr><th>#</th><th>المرفق</th><th>النوع</th><th>البصمة SHA-256</th></tr>${d.attachments.map((a, i) => `<tr><td>${i + 1}</td><td>${esc(a.name)}</td><td>${esc(KIND_AR[a.kind] || a.kind)}</td><td class="mono">${esc(String(a.sha).slice(0, 32))}…</td></tr>`).join('')}</table>` : ''}
+   <table class="f-tbl f-cert"><tr><th colspan="3">سجل الإجراءات</th></tr>${hist.map(h => `<tr><td style="width:22%">${esc(fmtDT(h.at))}</td><td style="width:24%">${esc(ACT_AR[h.action] || h.action)}</td><td>${esc(h.note)} <span class="en">${esc(h.by)}</span></td></tr>`).join('')}</table>
+   <p style="font-size:9.5px;color:#9a5b00"><b>نسخة معاينة</b> — ليست النسخة النهائية المعتمدة. تصدر النسخة المعتمدة مع شهادة التوقيع ورمز التحقق بعد اكتمال جميع التوقيعات.</p>
+   <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(m.id)} v${esc(m.version)}</span></span><span>${esc(fmtDT(new Date()))}</span><span class="pn"></span></div></div>`;
+}
+/** Shared renderer — the official form + items appendix + DoA matrix + certificate (final) or summary (preview). Returns {b64, images}. */
+async function renderPdf(d, opt) {
+  opt = opt || {};
+  await pdfFonts(); const { JsPDF } = await loadPdfLibs(); if (opt.vt) await loadQrLib();
+  const host = document.createElement('div'); host.className = 'fdoc-host'; document.body.appendChild(host);
   try {
-    host.innerHTML = formPage(d, { pdf: true, wmk: preview }) + appendixPages(d).join('') + doaPage(d) + certPage(d, vt);
+    host.innerHTML = formPage(d, { pdf: true, wmk: opt.preview }) + appendixPages(d).join('') + doaPage(d) + (opt.vt ? certPage(d, opt.vt) : summaryPage(d));
     const pages = [...host.querySelectorAll('.fpage')];
-    pages.forEach((pg, i) => { const pn = pg.querySelector('.f-foot span:last-child'); if (pn) pn.textContent = 'صفحة ' + (i + 1) + ' من ' + pages.length; if (preview && !pg.querySelector('.f-wmk')) pg.insertAdjacentHTML('beforeend', '<div class="f-wmk">نسخة معاينة</div>'); });
+    pages.forEach((pg, i) => { const pn = pg.querySelector('.f-foot span:last-child'); if (pn) pn.textContent = 'صفحة ' + (i + 1) + ' من ' + pages.length; if (opt.preview && !pg.querySelector('.f-wmk')) pg.insertAdjacentHTML('beforeend', '<div class="f-wmk">نسخة معاينة</div>'); });
     await Promise.all([...host.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const css = (window.PDF_CAIRO_CSS || '') + '\n' + pdfCss();
-    const pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
-    for (let i = 0; i < pages.length; i++) { const c = await renderPageCanvas(pages[i], css); if (i) pdf.addPage(); pdf.addImage(c.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297); }
-    pdf.setProperties({ title: d.meta.id + ' v' + d.meta.version + ' — ' + d.meta.subject, subject: 'Purchase Requisition', creator: 'POFlow v' + (BOOT.version || '1.0') });
-    return pdf.output('datauristring').split(',')[1];
+    const pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }), images = [];
+    for (let i = 0; i < pages.length; i++) {
+      const c = await renderPageCanvas(pages[i], css), url = c.toDataURL('image/jpeg', 0.92);
+      if (i) pdf.addPage(); pdf.addImage(url, 'JPEG', 0, 0, 210, 297); images.push(url);
+      if (opt.onPage) opt.onPage(i + 1, pages.length);
+    }
+    pdf.setProperties({ title: d.meta.id + ' v' + d.meta.version + ' — ' + d.meta.subject, subject: 'Purchase Requisition', creator: 'POFlow v' + (BOOT.version || '') });
+    return { b64: pdf.output('datauristring').split(',')[1], images };
   } finally { host.remove(); }
 }
+async function generatePdfB64(preview, vt) { return (await renderPdf(CUR.d, { preview, vt })).b64; }
+/** v1.6: appends the PDF / image attachments to a rendered PDF (pdf-lib, in the browser). */
+function loadPdfLib() { return window.PDFLib ? Promise.resolve() : loadScript(CDN + '/pdf-lib/1.17.1/pdf-lib.min.js'); }
+async function mergeAttachments(b64, d, onStep) {
+  await loadPdfLib();
+  const out = await PDFLib.PDFDocument.load(fromB64(b64)), added = [], skipped = [];
+  for (const [k, a] of (d.attachments || []).entries()) {
+    if (!/^(application\/pdf|image\/(png|jpeg))$/.test(a.mime)) { skipped.push(a.name); continue; }
+    if (onStep) onStep(k + 1, d.attachments.length, a.name);
+    try {
+      const r = await call({ action: 'attachment', id: d.meta.id, attId: a.id }), bytes = fromB64(r.b64);
+      if (a.mime === 'application/pdf') {
+        const src = await PDFLib.PDFDocument.load(bytes, { ignoreEncryption: true });
+        (await out.copyPages(src, src.getPageIndices())).forEach(pg => out.addPage(pg));
+      } else {
+        const img = a.mime === 'image/png' ? await out.embedPng(bytes) : await out.embedJpg(bytes), W = 595.28, H = 841.89, sc = Math.min(1, (W - 40) / img.width, (H - 40) / img.height);
+        out.addPage([W, H]).drawImage(img, { x: (W - img.width * sc) / 2, y: (H - img.height * sc) / 2, width: img.width * sc, height: img.height * sc });
+      }
+      added.push(a.name);
+    } catch (e) { skipped.push(a.name); }
+  }
+  return { b64: toB64(await out.save()), added, skipped };
+}
+
+/* ---------- v1.6: «معاينة PDF» from the dashboard, the lists and the PO page ---------- */
+const PV = { d: null, b64: '', name: '', final: null, busy: false };
+async function previewPO(id) {
+  if (PV.busy) return;
+  PV.busy = true; dlgPdf.showModal(); $('#pvPages').innerHTML = '<div class="loading">جارٍ تجهيز المعاينة…</div>'; $('#pvMeta').innerHTML = ''; $('#pvAtt').checked = false; pvButtons(false);
+  try {
+    let d, final = null;
+    if (CUR && CUR.d && CUR.d.meta.id === id && CUR.latest) { d = CUR.d; final = CUR.final; }
+    else { const r = await call({ action: 'get', id }); d = r.data; final = r.final; }
+    PV.d = d; PV.final = final;
+    const atts = (d.attachments || []), mergeable = atts.filter(a => /^(application\/pdf|image\/(png|jpeg))$/.test(a.mime)).length;
+    $('#pvTitle2').innerHTML = `معاينة أمر الشراء <span class="en">${esc(d.meta.id)}</span> <span class="hint" style="color:#d9cdee">v${esc(d.meta.version)}</span>`;
+    $('#pvMeta').innerHTML = `${stChip(d.meta.status)} <span>${esc(d.meta.subject)}</span> · <span>${esc(d.meta.dept)}</span> · <b class="num">${fmtN(sum(d.consumables) + sum(d.assets))} ${esc(d.meta.currency)}</b>
+      ${final ? ` · <span class="st st-approved">نسخة معتمدة — رمز التحقق <span class="mono">${esc(final.verifyId)}</span></span>` : ' · <span class="st st-req_sign">نسخة معاينة</span>'}`;
+    $('#pvAttWrap').hidden = !mergeable; $('#pvAttN').textContent = mergeable;
+    $('#pvOrig').hidden = !final;
+    await pvRender();
+  } catch (e) { $('#pvPages').innerHTML = `<div class="banner bad">${esc(e.message)}</div>`; }
+  PV.busy = false;
+}
+async function pvRender() {
+  const d = PV.d; pvButtons(false);
+  const box = $('#pvPages'); box.innerHTML = '<div class="loading" id="pvProg">جارٍ إنشاء الصفحات…</div>';
+  let vt = null;
+  if (PV.final) { try { vt = await call({ action: 'vtoken', id: d.meta.id }); } catch (e) { vt = null; } }
+  const r = await renderPdf(d, { preview: !PV.final, vt, onPage: (i, n) => { const p = $('#pvProg'); if (p) p.textContent = 'جارٍ إنشاء الصفحة ' + i + ' من ' + n + '…'; } });
+  PV.b64 = r.b64; PV.name = d.meta.id + '-v' + d.meta.version + (PV.final ? '' : '-preview') + '.pdf';
+  let note = '';
+  if ($('#pvAtt').checked) {
+    const m = await mergeAttachments(r.b64, d, (i, n, nm) => { const p = $('#pvProg'); if (p) p.textContent = 'جارٍ إضافة المرفق ' + i + ' من ' + n + ': ' + nm; });
+    PV.b64 = m.b64; PV.name = PV.name.replace('.pdf', '-with-attachments.pdf');
+    note = `<div class="banner info no-print">أُضيفت ${m.added.length} مرفقات إلى نهاية ملف PDF${m.added.length ? ': ' + m.added.map(esc).join('، ') : ''}${m.skipped.length ? ' · لم يُضمَّن: ' + m.skipped.map(esc).join('، ') : ''}.</div>`;
+  }
+  box.innerHTML = note + r.images.map((u, i) => `<figure class="pvpg"><img src="${u}" alt="صفحة ${i + 1}"><figcaption>صفحة ${i + 1} من ${r.images.length}</figcaption></figure>`).join('');
+  pvButtons(true); icons();
+}
+function pvButtons(on) { ['#pvDl', '#pvOpen', '#pvAtt', '#pvGo'].forEach(q => { const b = $(q); if (b) b.disabled = !on; }); }
+function pvDownload() { if (PV.b64) saveB64(PV.b64, PV.name); }
+function pvOpen() { if (PV.b64) saveB64(PV.b64, PV.name, 'application/pdf', true); }
+async function pvOriginal() { try { const r = await call({ action: 'finalPdf', id: PV.d.meta.id, version: PV.d.meta.version }); saveB64(r.b64, r.name); } catch (e) { toast(e.message); } }
 async function finalizeFlow(auto) {
   if (SIG.busy || CUR.final || CUR.d.meta.status !== 'approved') return;
   if (!auto && !confirm('إصدار النسخة النهائية الموقّعة بصيغة PDF وأرشفتها وإرسالها إلى إدارة المشتريات والجهة الطالبة والموقّعين؟')) return;
@@ -1414,7 +1524,7 @@ function saveB64(b64, name, mime, open) {
   const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
 }
 async function downloadFinal() { try { const r = await call({ action: 'finalPdf', id: CUR.d.meta.id, version: CUR.d.meta.version }); saveB64(r.b64, r.name); } catch (e) { toast(e.message); } }
-async function previewPdf() { toast('جارٍ إنشاء معاينة PDF…'); try { saveB64(await generatePdfB64(true), CUR.d.meta.id + '-v' + CUR.d.meta.version + '-preview.pdf'); } catch (e) { toast(e.message); } }
+function previewPdf() { previewPO(CUR.d.meta.id); }
 
 /* ---------- init ---------- */
 (function init() {
