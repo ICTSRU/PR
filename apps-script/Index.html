@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="1.6">
+<meta name="version" content="1.7">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -133,6 +133,7 @@ table.items input{padding:4px 6px}
 .tot{font-weight:800;color:var(--purple-dark)}
 .doa{font-size:.82rem;background:var(--purple-light);border-radius:var(--radius);padding:6px 10px;margin-top:6px}
 .steprow{display:grid;grid-template-columns:30px 1fr 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:#fff}
+@keyframes flashIn{from{background:#fff4c2}to{background:#fff}}.steprow input.flash{animation:flashIn 1.2s ease-out}
 .steprow .ti{grid-column:2 / 5}.steprow .nmi{grid-column:2}.steprow .emi{grid-column:3 / 5}
 .steprow.locked{background:#f6f4f9;opacity:.85}
 .steprow .n{width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;display:grid;place-items:center;font-weight:800;font-family:Arial,sans-serif;font-size:.8rem}
@@ -270,7 +271,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.6</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.7</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
@@ -375,7 +376,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <script>
 /* =========================================================
-   POFlow v1.6 — Purchase Order Approval & Digital Signature Platform
+   POFlow v1.7 — Purchase Order Approval & Digital Signature Platform
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -843,7 +844,7 @@ ROUTES.route = async function (id) {
   renderSteps(); fitPaper(); icons();
   ['#rtSerial', '#rtNote'].forEach(q => { const el = $(q); if (el) el.oninput = previewRoute; });
 };
-function posLookup(title) { return (SET.POSITIONS || []).find(p => p.title === title) || {}; }
+function posLookup(title) { const t = String(title || '').trim(); return (SET.POSITIONS || []).find(p => String(p.title || '').trim() === t) || {}; }
 function suggestSteps(d) {
   const req = d.steps.find(s => s.phase === 'requester') || {}, rank = t => ({ 'الجهة الطالبة': 0, 'مدير إدارة المستودعات': 1, 'مدير إدارة المرافق': 1, 'مدير إدارة المشتريات': 2, 'الإدارة المالية': 3, 'الرئيس التنفيذي للخدمات المشتركة': 5, 'مدير الشركة': 6 })[t] ?? 4;
   const C = [], A = [], I = [];
@@ -869,14 +870,25 @@ function renderSteps() {
     <input class="ti" list="dlPos" data-s="${i}" data-k="title" placeholder="المسمى / الصفة (من دليل المناصب)" value="${esc(s.title)}">
     <input class="nmi" data-s="${i}" data-k="name" placeholder="الاسم" value="${esc(s.name)}">
     <input class="emi" data-s="${i}" data-k="email" dir="ltr" placeholder="name@sr.edu.sa" value="${esc(s.email)}">
+    <div class="slots poshint" data-hint="${i}" hidden></div>
     <div class="slots"><span class="hint">موضع التوقيع:</span>${slotOpts(s).map(k => `<label><input type="checkbox" data-s="${i}" data-slot="${k}" ${s.slots.includes(k) ? 'checked' : ''}>${slotAr(k)}</label>`).join('')}</div></div>`).join('');
   box.querySelectorAll('[data-k]').forEach(el => el.oninput = el.onchange = () => {
     const s = RT.steps[el.dataset.s]; s[el.dataset.k] = el.value;
-    if (el.dataset.k === 'title') { const p = posLookup(el.value); if (p.email && !s.email) { s.email = p.email; s.name = s.name || p.name; renderSteps(); } }
+    if (el.dataset.k === 'title') fillFromPosition(el.dataset.s);
     if (el.dataset.k === 'kind') { s.slots = []; renderSteps(); } previewRoute();
   });
   box.querySelectorAll('[data-slot]').forEach(el => el.onchange = () => { const s = RT.steps[el.dataset.s]; s.slots = el.checked ? [...new Set(s.slots.concat(el.dataset.slot))] : s.slots.filter(x => x !== el.dataset.slot); previewRoute(); });
   previewRoute();
+}
+/** v1.7: choosing a position always replaces the signer's name and e-mail from «دليل المناصب» (in place, focus kept). */
+function fillFromPosition(i) {
+  const s = RT.steps[i], p = posLookup(s.title), row = $(`#rtSteps [data-s="${i}"][data-k="title"]`).closest('.steprow');
+  const hint = row.querySelector('[data-hint]'), nm = row.querySelector('[data-k="name"]'), em = row.querySelector('[data-k="email"]');
+  if (!p.title) { hint.hidden = true; return; }
+  s.name = p.name || ''; s.email = p.email || ''; nm.value = s.name; em.value = s.email;
+  [nm, em].forEach(x => { x.classList.remove('flash'); void x.offsetWidth; x.classList.add('flash'); });
+  hint.hidden = !!p.email;
+  hint.innerHTML = p.email ? '' : `<span class="req">لا يوجد بريد مسجّل لمنصب «${esc(p.title)}» في دليل المناصب${P.admin ? ' — <a href="#settings">أضفه من الإعدادات</a>' : ' — اطلب من مدير النظام إضافته'}، أو اكتبه هنا.</span>`;
 }
 function mvStep(i, dlt) { const j = i + dlt; if (j < 0 || j >= RT.steps.length) return; [RT.steps[i], RT.steps[j]] = [RT.steps[j], RT.steps[i]]; renderSteps(); }
 function previewRoute() { const p = $('#paper'); if (p) { p.innerHTML = formPage(CUR.d, { screen: true, preview: RT }); fitPaper(); } }

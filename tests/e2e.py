@@ -119,6 +119,16 @@ with sync_playwright() as p:
     pr.goto(f'{BASE}/?as={PROC}#route/{po}'); pr.wait_for_selector('#rtSteps .steprow')
     n = pr.locator('#rtSteps .steprow').count()
     ok(n == 3, f'DoA suggestion produced {n} ordered signers with e-mails from the position directory')
+    # v1.7 — changing a filled signer's position replaces name + e-mail; a new (second) row fills too
+    t0 = pr.locator('#rtSteps [data-s="0"][data-k="title"]')
+    t0.fill('مدير إدارة المشتريات')
+    ok(pr.input_value('#rtSteps [data-s="0"][data-k="email"]') == S2 and pr.input_value('#rtSteps [data-s="0"][data-k="name"]') == 'أ. سارة الزهراني', 'changing the position of a filled signer replaces name and e-mail')
+    t0.fill('مدير إدارة المستودعات')
+    ok(pr.input_value('#rtSteps [data-s="0"][data-k="email"]') == S1, 'changing it back restores the original signer')
+    pr.click('text=إضافة موقّع'); i = pr.locator('#rtSteps .steprow').count() - 1
+    pr.locator(f'#rtSteps [data-s="{i}"][data-k="title"]').fill('مدير الشركة')
+    ok(pr.input_value(f'#rtSteps [data-s="{i}"][data-k="email"]') == 'company.mgr@sr.edu.sa', 'a newly added signer is filled from the position directory')
+    pr.locator(f'#rtSteps .steprow >> nth={i} >> .btn.danger').click()
     pr.fill('#rtNote', 'يُعتمد الشراء المباشر وفق عرض السعر الأقل والمطابق فنيًا.')
     pr.screenshot(path=f'{OUT}/02-route.png', full_page=True)
     pr.click('text=اعتماد المسار وبدء دورة التوقيعات')
