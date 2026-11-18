@@ -89,7 +89,7 @@ with sync_playwright() as p:
     br = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--no-sandbox'])
     print('A · full approval cycle in the UI')
     rq = page_as(br, REQ, 'new'); rq._as = REQ
-    rq.fill('[data-m=dept]', 'الإدارة التنفيذية للاتصالات وتقنية المعلومات')
+    rq.select_option('[data-m=dept]', 'الإدارة التنفيذية للاتصالات وتقنية المعلومات')
     rq.fill('[data-m=budget]', 'BUD-ICT-2026-07')
     rq.fill('[data-m=subject]', 'توريد أجهزة شبكات ومستلزمات تشغيل لمركز البيانات')
     rq.fill('[data-m=supplier]', 'شركة التقنية المتقدمة')

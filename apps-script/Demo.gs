@@ -8,7 +8,6 @@ function seedDemoData() {
   setup_();
   const me = currentEmail_();
   settingsSave_(me, { settings: {
-    DEPTS: ['الإدارة التنفيذية للاتصالات وتقنية المعلومات', 'إدارة المرافق', 'عمادة شؤون الطلاب', 'الإدارة المالية'],
     BUDGETS: ['BUD-ICT-2026-07 · تشغيل البنية التحتية', 'BUD-FAC-2026-02 · صيانة المرافق', 'BUD-STU-2026-04 · الأنشطة الطلابية']
   } });
   const demo = [
@@ -18,7 +17,7 @@ function seedDemoData() {
       consumables: [{ desc: 'ترخيص سنوي — نظام النسخ الاحتياطي', unit: 'ترخيص', qty: 1, price: 72000 }], assets: [], submit: true },
     { dept: 'إدارة المرافق', subject: 'شراء خوادم وأجهزة تخزين (أصول أكثر من 100 ألف)', supplier: 'شركة الأنظمة المتكاملة',
       consumables: [], assets: [{ desc: 'خادم تخزين 200TB', unit: 'جهاز', qty: 2, price: 68000 }, { desc: 'مبدّل ألياف SAN', unit: 'جهاز', qty: 2, price: 21000 }], submit: false },
-    { dept: 'عمادة شؤون الطلاب', subject: 'أثاث وتجهيزات قاعات الأنشطة (مستهلكات + أصول)', supplier: 'مؤسسة الأثاث الحديث',
+    { dept: 'إدارة الحياة الجامعية', subject: 'أثاث وتجهيزات قاعات الأنشطة (مستهلكات + أصول)', supplier: 'مؤسسة الأثاث الحديث',
       consumables: [{ desc: 'مستلزمات قرطاسية للأنشطة', unit: 'طقم', qty: 40, price: 150 }], assets: [{ desc: 'شاشات عرض تفاعلية 86 بوصة', unit: 'جهاز', qty: 3, price: 24000 }], submit: false }
   ];
   const out = [];

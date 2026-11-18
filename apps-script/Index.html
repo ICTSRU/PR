@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="1.4">
+<meta name="version" content="1.5">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -263,7 +263,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.4</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.5</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
@@ -356,7 +356,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <script>
 /* =========================================================
-   POFlow v1.4 — Purchase Order Approval & Digital Signature Platform
+   POFlow v1.5 — Purchase Order Approval & Digital Signature Platform
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -497,6 +497,27 @@ function dashBody() {
   icons();
 }
 
+/* ---------- v1.5: «الجهة الطالبة» = قائمة «الكلية / الجهة» في منصة نبض الشبكة (SRU NetPulse) ----------
+   Canonical SRU departments (sru-departments.json, verbatim) — fetched live; embedded copy used if the fetch fails */
+const DEPARTMENTS_URL = ['https:', '', 'dt.sr.edu.sa', 'digital-enablement', 'packages', 'sru-departments.json'].join('/');
+let DEPARTMENTS = [
+ {label:"مكتب رئيس الجامعة",items:["مكتب رئيس الجامعة","وحدة التوعية الفكرية","مركز القيم والسلوك المهني","مكتب إدارة الاستراتيجية","إدارة التميز المؤسسي","إدارة الاتصال المؤسسي","إدارة المسؤولية المجتمعية","إدارة المراجعة الداخلية","مكتب الحوكمة وإدارة المخاطر والالتزام","إدارة الشؤون القانونية"]},
+ {label:"الإدارة التنفيذية لتطوير الأعمال",items:["الإدارة التنفيذية لتطوير الأعمال","إدارة التدريب والاستشارات","مركز التدريب","مركز الاستشارات","إدارة الشراكات","إدارة تطوير المنتجات والخدمات","مركز الابتكار وريادة الأعمال"]},
+ {label:"عمداء الكليات",items:["عمداء الكليات","كلية الطب","كلية التمريض","كلية العلوم التطبيقية","كلية الأعمال"]},
+ {label:"نائب الرئيس للشؤون الأكاديمية",items:["نائب الرئيس للشؤون الأكاديمية","النائب المساعد لتجربة الطالب","مكتب القبول","مكتب المنح والحلول المالية","مكتب التسجيل والإرشاد الأكاديمي","إدارة الحياة الجامعية","مكتب رعاية الخريجين","النائب المساعد للتميز الأكاديمي","مركز التعليم والتعلم","قسم المهارات والمعارف الأساسية","مركز التقييم والقياس","إدارة التجهيزات التعليمية","مكتب الاعتماد الأكاديمي","النائب المساعد للدراسات العليا والبحث العلمي","مكتب الدراسات العليا","مكتب البحث العلمي"]},
+ {label:"المجلس العلمي",items:["المجلس العلمي"]},
+ {label:"المشرفة على القسم النسائي",items:["المشرفة على القسم النسائي","شطر الطالبات"]},
+ {label:"الإدارة التنفيذية للاتصالات وتقنية المعلومات",items:["الإدارة التنفيذية للاتصالات وتقنية المعلومات","إدارة الأمن السيبراني","إدارة التحول الرقمي","إدارة تقنية المعلومات","مكتب إدارة البيانات"]},
+ {label:"الإدارة التنفيذية للخدمات المشتركة",items:["الإدارة التنفيذية للخدمات المشتركة","إدارة الشؤون المالية","إدارة رأس المال البشري","إدارة المرافق","الإدارة الهندسية","إدارة المشتريات","إدارة المستودعات"]}
+];
+async function loadDepartments() {
+  try { const r = await fetch(DEPARTMENTS_URL, { cache: 'no-store' }); if (r.ok) { const j = await r.json(); if (Array.isArray(j.groups) && j.groups.length) DEPARTMENTS = j.groups; } } catch (e) { /* embedded copy */ }
+}
+function deptOptions(cur) {
+  const all = DEPARTMENTS.flatMap(g => g.items), keep = cur && !all.includes(cur);
+  return `<option value="">— اختر الجهة —</option>` + (keep ? `<option selected>${esc(cur)}</option>` : '') +
+    DEPARTMENTS.map(g => `<optgroup label="${esc(g.label)}">${g.items.map(i => `<option ${i === cur ? 'selected' : ''}>${esc(i)}</option>`).join('')}</optgroup>`).join('');
+}
 /* =====================================================================
    2 · Create / edit a purchase order (requesting department)
    ===================================================================== */
@@ -516,7 +537,7 @@ function renderEditor() {
   <div class="card"><h3 class="s" style="margin-top:0">بيانات الطلب</h3>
     <div class="grid g4">
       <label class="f">التاريخ Date<input type="date" data-m="date" value="${esc(m.date)}"></label>
-      <label class="f">الجهة الطالبة * Requesting Dept.<input list="dlDepts" data-m="dept" value="${esc(m.dept)}"></label>
+      <label class="f">الجهة الطالبة * Requesting Dept. <span class="hint">(الكلية / الجهة)</span><select data-m="dept">${deptOptions(m.dept)}</select></label>
       <label class="f">بند الميزانية Budget Element<input list="dlBud" data-m="budget" value="${esc(m.budget)}"></label>
       <label class="f">العملة<select data-m="currency">${['SAR', 'USD', 'EUR'].map(c => `<option ${c === m.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
       <label class="f" style="grid-column:span 2">موضوع الطلب *<input data-m="subject" value="${esc(m.subject)}" placeholder="مثال: توريد أجهزة شبكات لمبنى الإدارة"></label>
@@ -527,7 +548,6 @@ function renderEditor() {
       <label class="f">مدير إدارة الجهة الطالبة — بريد الموقّع الأول * <span class="hint">(يعد · Responsible)</span><input id="mgrEmail" dir="ltr" placeholder="name@sr.edu.sa" value="${esc(mgr.email || '')}"></label>
       <label class="f">اسم مدير الإدارة<input id="mgrName" value="${esc(mgr.name || '')}"></label>
     </div>
-    <datalist id="dlDepts">${(SET.DEPTS || []).map(x => `<option>${esc(x)}</option>`).join('')}</datalist>
     <datalist id="dlBud">${(SET.BUDGETS || []).map(x => `<option>${esc(x)}</option>`).join('')}</datalist>
   </div>
   ${itemsCard('consumables', 'المستهلكات أو الخدمات', 'Consumables / Services', 'cons-h')}
@@ -545,7 +565,7 @@ function renderEditor() {
     <button class="btn primary" onclick="saveDraft(true)"><i data-lucide="send" class="icon"></i>حفظ وإرسال لتوقيع مدير الإدارة</button>
     ${m.id ? `<button class="btn" onclick="go('po/${esc(m.id)}')"><i data-lucide="eye" class="icon"></i>معاينة المستند</button>` : ''}
     <span class="hint">بعد توقيع مدير إدارة الجهة الطالبة يُحال الطلب تلقائيًا إلى إدارة المشتريات.</span></div>` : ''}`;
-  $$('[data-m]').forEach(el => el.oninput = () => { ED.meta[el.dataset.m] = el.value; });
+  $$('[data-m]').forEach(el => el.oninput = el.onchange = () => { ED.meta[el.dataset.m] = el.value; });
   bindItems(); icons();
 }
 function itemsCard(key, ar, en, cls) {
@@ -1078,7 +1098,7 @@ ROUTES.settings = async function () {
     ${fld('REMIND_HOURS', 'تذكير الموقّع بعد (ساعة)', '', 'number')}${fld('ESCALATE_DAYS', 'التصعيد بعد (يوم) على الخطوة نفسها', '', 'number')}${fld('TARGET_DAYS', 'المدة المستهدفة الافتراضية للاعتماد (يوم)', '', 'number')}</div>
     <div class="toolbar" style="margin-top:8px"><button class="btn" onclick="remindNow()"><i data-lucide="bell-ring" class="icon"></i>تشغيل التذكيرات الآن</button><span class="hint">تعمل تلقائيًا كل ساعة (مشغّل remindPending).</span></div></div>
   <div class="card"><h3 class="s" style="margin-top:0">قالب المستند</h3><div class="grid g3">${fld('COMPANY_AR', 'اسم الجهة (عربي)')}${fld('COMPANY_EN', 'اسم الجهة (إنجليزي)')}${fld('CURRENCY', 'العملة الافتراضية')}${fld('RETENTION_YEARS', 'مدة الاحتفاظ بالمستندات (سنة)', '', 'number')}${fld('DIGITAL_PROVIDER', 'مزود التوقيع الرقمي المعتمد', '(للربط مستقبلًا)')}</div>
-    <div class="grid g2" style="margin-top:8px"><label class="f">الجهات الطالبة (سطر لكل جهة)<textarea id="sDepts">${esc(js('DEPTS').join('\n'))}</textarea></label><label class="f">بنود الميزانية (سطر لكل بند)<textarea id="sBud">${esc(js('BUDGETS').join('\n'))}</textarea></label></div></div>
+    <div class="grid g2" style="margin-top:8px"><div class="f"><b style="color:var(--purple-dark);font-size:.85rem">الجهات الطالبة</b><span class="hint">من القائمة الرسمية <span class="en">sru-departments.json</span> — نفس قائمة «الكلية / الجهة» في منصة نبض الشبكة (${DEPARTMENTS.length} مجموعة · ${DEPARTMENTS.reduce((n, g) => n + g.items.length, 0)} جهة). تُحدَّث تلقائيًا من المصدر.</span></div><label class="f">بنود الميزانية (سطر لكل بند)<textarea id="sBud">${esc(js('BUDGETS').join('\n'))}</textarea></label></div></div>
   <div class="card"><h3 class="s" style="margin-top:0">دليل المناصب المستخدم في اقتراح المسار</h3><table class="reg"><thead><tr><th>المسمى (كما في مصفوفة الصلاحيات)</th><th>الاسم</th><th>البريد</th></tr></thead><tbody id="sPos">
     ${pos.map((p, i) => `<tr><td><input data-p="${i}" data-k="title" value="${esc(p.title)}"></td><td><input data-p="${i}" data-k="name" value="${esc(p.name)}"></td><td><input data-p="${i}" data-k="email" dir="ltr" value="${esc(p.email)}"></td></tr>`).join('')}
     <tr><td><input data-p="${pos.length}" data-k="title" placeholder="مسمى جديد"></td><td><input data-p="${pos.length}" data-k="name"></td><td><input data-p="${pos.length}" data-k="email" dir="ltr"></td></tr></tbody></table></div>
@@ -1090,10 +1110,10 @@ ROUTES.settings = async function () {
 async function saveSettings() {
   try {
     const st = {}; $$('[data-set]').forEach(el => st[el.dataset.set] = el.value);
-    st.DEPTS = $('#sDepts').value.split('\n').map(x => x.trim()).filter(Boolean); st.BUDGETS = $('#sBud').value.split('\n').map(x => x.trim()).filter(Boolean);
+    st.BUDGETS = $('#sBud').value.split('\n').map(x => x.trim()).filter(Boolean);
     const pos = []; $$('[data-p]').forEach(el => { const i = el.dataset.p; pos[i] = pos[i] || {}; pos[i][el.dataset.k] = el.value.trim(); }); st.POSITIONS = pos.filter(p => p && p.title);
     try { st.DOA = JSON.parse($('#sDoa').value); } catch (e) { return toast('صيغة مصفوفة الصلاحيات (JSON) غير صحيحة'); }
-    await call({ action: 'settingsSave', settings: st }); Object.assign(SET, { DOA: st.DOA, POSITIONS: st.POSITIONS, DEPTS: st.DEPTS, BUDGETS: st.BUDGETS, CURRENCY: st.CURRENCY, COMPANY_AR: st.COMPANY_AR, COMPANY_EN: st.COMPANY_EN, TARGET_DAYS: st.TARGET_DAYS });
+    await call({ action: 'settingsSave', settings: st }); Object.assign(SET, { DOA: st.DOA, POSITIONS: st.POSITIONS, BUDGETS: st.BUDGETS, CURRENCY: st.CURRENCY, COMPANY_AR: st.COMPANY_AR, COMPANY_EN: st.COMPANY_EN, TARGET_DAYS: st.TARGET_DAYS });
     toast('✔ حُفظت الإعدادات');
   } catch (e) { toast(e.message); }
 }
@@ -1407,7 +1427,7 @@ async function previewPdf() { toast('جارٍ إنشاء معاينة PDF…'); 
   if (p.po && !location.hash) history.replaceState(null, '', '#po/' + p.po);
   else if (p.verify && !location.hash) history.replaceState(null, '', '#verify/' + p.verify);
   else if (p.page && ROUTES[p.page] && !location.hash) history.replaceState(null, '', '#' + p.page);
-  route(); loadNotif(); setInterval(loadNotif, 120000);
+  loadDepartments().finally(route); loadNotif(); setInterval(loadNotif, 120000);
   if (P.sign) loadMySigs(true);
   document.addEventListener('click', e => { const n = $('#notif'); if (!n.hidden && !e.target.closest('#notif') && !e.target.closest('#btnBell')) n.hidden = true; });
 })();
