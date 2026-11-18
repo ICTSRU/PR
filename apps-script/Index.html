@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="version" content="1.4">
+<title>منصة أوامر الشراء | POFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
+<style>
+/* ===== SRU identity (SRU_IDENTITY.md) + Brand Kit v1.1 inlined (Apps Script standard) ===== */
+:root{--purple:#501e8c;--purple-dark:#3a1464;--purple-light:#f0ebf8;--blue:#0a6eaa;--blue-light:#e6f3fa;--bg:#f7f5fb;--ink:#241436;--muted:#6b5a80;
+  --border:rgba(80,30,140,.12);--radius:4px;--ok:#1d7a46;--ok-bg:#e8f5ee;--warn:#9a5b00;--warn-bg:#fff4e0;--bad:#b42318;--bad-bg:#fdecea;--info-bg:#eef4fb}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Cairo",Tahoma,Arial,sans-serif;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+.en{direction:ltr;unicode-bidi:isolate}
+.mono{font-family:Consolas,monospace;direction:ltr;unicode-bidi:isolate}
+a{color:var(--blue)}
+.icon{width:16px;height:16px;vertical-align:-3px;flex:none}
+.sru-brandbar{background:#fff;border-bottom:1px solid var(--border)}
+.sru-brandbar .in{max-width:1360px;margin:0 auto;padding:8px 16px;display:flex;justify-content:space-between;align-items:center}
+.sru-brandbar img{height:40px;width:auto;display:block}
+.sru-tech-bg,.sru-tech-bg-dark{position:relative;overflow:hidden;isolation:isolate}
+.sru-tech-bg{background:#501e8c linear-gradient(110deg,#501e8c 0%,#4a1f8a 50%,#2b3f9e 100%)}
+.sru-tech-bg-dark{background:#3a1464 linear-gradient(110deg,#3a1464 0%,#2e2a80 100%)}
+.sru-tech-bg::before,.sru-tech-bg-dark::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22520%22%20height%3D%22200%22%20viewBox%3D%220%200%20520%20200%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%238fd3ff%22%20stroke-opacity%3D%22.35%22%20stroke-width%3D%221.2%22%3E%3Cpath%20d%3D%22M30%20150L95%2090L170%20120L230%2050L310%2085L380%2030L460%2070L510%2020%22/%3E%3Cpath%20d%3D%22M95%2090L120%2025L230%2050%22/%3E%3Cpath%20d%3D%22M170%20120L250%20170L310%2085L360%20160L460%2070%22/%3E%3Cpath%20d%3D%22M380%2030L420%20140L360%20160%22/%3E%3Cpath%20d%3D%22M30%20150L60%2060L120%2025%22/%3E%3C/g%3E%3Cg%20fill%3D%22%23ffffff%22%20fill-opacity%3D%22.45%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%22150%22%20r%3D%223%22/%3E%3Ccircle%20cx%3D%2295%22%20cy%3D%2290%22%20r%3D%223.5%22/%3E%3Ccircle%20cx%3D%22170%22%20cy%3D%22120%22%20r%3D%223%22/%3E%3Ccircle%20cx%3D%22230%22%20cy%3D%2250%22%20r%3D%224%22/%3E%3Ccircle%20cx%3D%22310%22%20cy%3D%2285%22%20r%3D%223%22/%3E%3Ccircle%20cx%3D%22380%22%20cy%3D%2230%22%20r%3D%223.5%22/%3E%3Ccircle%20cx%3D%22460%22%20cy%3D%2270%22%20r%3D%224%22/%3E%3Ccircle%20cx%3D%22510%22%20cy%3D%2220%22%20r%3D%222.5%22/%3E%3C/g%3E%3C/svg%3E');background-size:520px 200px;animation:sruNetDrift 40s linear infinite}
+@keyframes sruNetDrift{from{background-position:0 0}to{background-position:-520px 0}}
+@media (prefers-reduced-motion:reduce){.sru-tech-bg::before,.sru-tech-bg-dark::before{animation:none}}
+
+header.hero{color:#fff}
+header.hero .in{max-width:1360px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header.hero .mark{width:50px;height:50px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center;flex:none}
+header.hero .mark svg{width:30px;height:30px}
+header.hero h1{margin:0;font-size:1.3rem;line-height:1.3}
+header.hero .sub{font-size:.82rem;color:#d9cdee}
+header.hero .grow{flex:1;min-width:200px}
+.who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip-u{background:rgba(255,255,255,.14);border-radius:20px;padding:2px 12px;font-size:.82rem}
+.hbtn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--purple);border:1px solid #fff;border-radius:var(--radius);padding:5px 12px;font:600 .85rem "Cairo",Tahoma,sans-serif;cursor:pointer;text-decoration:none;position:relative}
+.hbtn:hover{background:var(--purple-light)}
+@keyframes howtoGlow{0%,100%{box-shadow:0 0 0 0 rgba(143,211,255,0),0 0 6px 1px rgba(255,255,255,.35)}50%{box-shadow:0 0 0 4px rgba(143,211,255,.35),0 0 18px 6px rgba(143,211,255,.75)}}
+.glow{animation:howtoGlow 2.2s ease-in-out infinite;border-color:#8fd3ff!important}
+.glow:hover{animation:none}
+@media (prefers-reduced-motion:reduce){.glow{animation:none;box-shadow:0 0 0 2px #8fd3ff}}
+.badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font-size:.7rem;padding:0 5px;font-family:Arial,sans-serif}
+.hbtn .badge{position:absolute;top:-7px;left:-7px}
+
+nav.tabs{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+nav.tabs .in{max-width:1360px;margin:0 auto;padding:0 10px;display:flex;gap:2px;overflow-x:auto}
+nav.tabs a{display:flex;align-items:center;gap:6px;padding:10px 12px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.9rem;border-bottom:3px solid transparent;white-space:nowrap}
+nav.tabs a:hover{color:var(--purple)}
+nav.tabs a.on{color:var(--purple);border-bottom-color:var(--purple)}
+main{flex:1;width:100%;max-width:1360px;margin:0 auto;padding:16px}
+h2.t{margin:0 0 12px;color:var(--purple-dark);font-size:1.2rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h3.s{margin:14px 0 8px;color:var(--purple-dark);font-size:1rem}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.card.err{border-color:var(--bad);color:var(--bad)}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--purple);border:1px solid var(--purple);border-radius:var(--radius);padding:6px 12px;font:600 .88rem "Cairo",Tahoma,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--purple-light)}
+.btn.primary{background:var(--purple);color:#fff}.btn.primary:hover{background:var(--purple-dark)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.danger{color:var(--bad);border-color:var(--bad)}.btn.danger:hover{background:var(--bad-bg)}
+.btn.sm{padding:3px 8px;font-size:.8rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:.85rem;font-weight:600;color:var(--purple-dark)}
+input,select,textarea{font:inherit;font-weight:400;color:var(--ink);border:1px solid rgba(80,30,140,.25);border-radius:var(--radius);padding:6px 8px;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(10,110,170,.35);border-color:var(--blue)}
+textarea{min-height:70px;resize:vertical}
+.hint{color:var(--muted);font-size:.82rem;font-weight:400}
+.req{color:var(--bad);font-size:.85rem}
+table.reg{width:100%;border-collapse:collapse;font-size:.86rem}
+table.reg th{background:var(--purple-light);color:var(--purple-dark);text-align:right;padding:7px;border-bottom:1px solid var(--border);white-space:nowrap}
+table.reg td{padding:7px;border-bottom:1px solid var(--border);vertical-align:top}
+table.reg tr.click{cursor:pointer}table.reg tr.click:hover td{background:#faf8fd}
+.num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;white-space:nowrap}
+.st{display:inline-flex;align-items:center;gap:4px;border-radius:12px;padding:1px 9px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.st-draft{background:#eee;color:#555}.st-req_sign,.st-signing{background:var(--warn-bg);color:var(--warn)}.st-proc_review{background:var(--info-bg);color:var(--blue)}
+.st-returned{background:#fff0f6;color:#a3195b}.st-rejected{background:var(--bad-bg);color:var(--bad)}.st-approved{background:var(--ok-bg);color:var(--ok)}.st-cancelled{background:#eee;color:#777;text-decoration:line-through}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.tile{background:#fff;border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:var(--radius);padding:10px 12px;cursor:pointer}
+.tile .k{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.tile .v{font-size:1.6rem;font-weight:800;color:var(--purple-dark);font-family:Arial,sans-serif;line-height:1.3}
+.tile.warn{border-top-color:var(--warn)}.tile.bad{border-top-color:var(--bad)}.tile.ok{border-top-color:var(--ok)}.tile.info{border-top-color:var(--blue)}
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar{display:grid;grid-template-columns:minmax(110px,32%) 1fr;gap:8px;align-items:center;font-size:.83rem}
+.bar .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .tr{position:relative;height:20px}
+.bar .fl{position:absolute;inset-block:2px;right:0;background:var(--purple);border-radius:2px 4px 4px 2px;min-width:2px}
+.bar .vl{position:absolute;top:0;font-size:.78rem;color:var(--ink);font-family:Arial,sans-serif;white-space:nowrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.filters label.f{min-width:140px}
+.empty{padding:22px;text-align:center;color:var(--muted)}
+.loading{padding:40px;text-align:center;color:var(--muted)}
+.banner{border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start}
+.banner.bad{background:var(--bad-bg);color:var(--bad);border:1px solid rgba(180,35,24,.25)}
+.banner.ok{background:var(--ok-bg);color:var(--ok);border:1px solid rgba(29,122,70,.25)}
+.banner.warn{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(154,91,0,.25)}
+.banner.info{background:var(--info-bg);color:var(--blue);border:1px solid rgba(10,110,170,.2)}
+
+/* layout of one PO */
+.po-wrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;align-items:start}
+@media (max-width:1100px){.po-wrap{grid-template-columns:1fr}}
+.side .card{padding:12px}
+.paperbox{background:#e9e5f0;border:1px solid var(--border);border-radius:var(--radius);padding:12px;overflow:auto}
+.paperfit{margin:0 auto;box-shadow:0 4px 18px rgba(36,20,54,.15);background:#fff}
+/* sequence */
+.seq{display:flex;flex-direction:column;gap:0}
+.seq .it{display:grid;grid-template-columns:28px 1fr;gap:8px;position:relative;padding-bottom:10px}
+.seq .it:not(:last-child)::after{content:"";position:absolute;right:13px;top:26px;bottom:0;width:2px;background:#ddd6e8}
+.seq .dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;font-weight:800;background:#eee;color:#666;z-index:1;font-family:Arial,sans-serif}
+.seq .signed .dot{background:var(--ok);color:#fff}.seq .current .dot{background:var(--warn);color:#fff;box-shadow:0 0 0 4px rgba(154,91,0,.18)}
+.seq .rejected .dot{background:var(--bad);color:#fff}.seq .inform .dot{background:var(--blue-light);color:var(--blue)}
+.seq .nm{font-weight:700;font-size:.88rem}.seq .tt{font-size:.78rem;color:var(--muted)}
+.tl{list-style:none;margin:0;padding:0;font-size:.82rem}
+.tl li{border-right:2px solid var(--purple-light);padding:2px 10px 8px;position:relative}
+.tl li::before{content:"";position:absolute;right:-6px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--purple)}
+.tl .at{color:var(--muted);font-size:.75rem}
+/* items editor */
+table.items{width:100%;border-collapse:collapse;font-size:.85rem}
+table.items th{padding:5px;text-align:right;color:#fff}
+table.items td{padding:3px;border-bottom:1px solid var(--border)}
+table.items input{padding:4px 6px}
+.cons-h th{background:#4f6fae}.asset-h th{background:#4e8a3a}
+.tot{font-weight:800;color:var(--purple-dark)}
+.doa{font-size:.82rem;background:var(--purple-light);border-radius:var(--radius);padding:6px 10px;margin-top:6px}
+.steprow{display:grid;grid-template-columns:30px 1fr 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:#fff}
+.steprow .ti{grid-column:2 / 5}.steprow .nmi{grid-column:2}.steprow .emi{grid-column:3 / 5}
+.steprow.locked{background:#f6f4f9;opacity:.85}
+.steprow .n{width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;display:grid;place-items:center;font-weight:800;font-family:Arial,sans-serif;font-size:.8rem}
+.slots{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.78rem;grid-column:2 / -1}
+.slots label{display:flex;align-items:center;gap:3px;font-weight:400}
+.slots input{width:auto}
+.notif{position:absolute;left:0;top:44px;width:360px;max-height:420px;overflow:auto;background:#fff;color:var(--ink);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:50;font-size:.84rem}
+.notif .n{padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer}.notif .n.u{background:#faf6ff;font-weight:700}
+.notif .n .at{font-size:.72rem;color:var(--muted);font-weight:400}
+
+/* dialogs */
+dialog{border:0;border-radius:6px;padding:0;width:min(640px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.3);color:var(--ink)}
+dialog::backdrop{background:rgba(36,20,54,.45)}
+.dlg-h{background:var(--purple);color:#fff;padding:10px 14px;display:flex;gap:8px;align-items:center}
+.dlg-h .grow{flex:1;font-weight:700}
+.dlg-h .btn{background:#fff}
+.dlg-b{padding:14px;display:flex;flex-direction:column;gap:10px;max-height:78vh;overflow:auto}
+.ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:640px){.ms-grid{grid-template-columns:1fr}}
+#pad{width:100%;height:160px;border:1px dashed var(--purple);border-radius:var(--radius);touch-action:none;background:#fff}
+#msPrev{max-height:110px;display:none;margin-top:6px;border:1px solid var(--border)}
+#pvImg{max-width:100%;max-height:220px;display:block;margin:0 auto;user-select:none;-webkit-user-drag:none}
+.chip{display:inline-block;border-radius:10px;padding:0 8px;background:var(--ok-bg);color:var(--ok);font-size:.76rem}.chip.lk{background:var(--bad-bg);color:var(--bad)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--purple-dark);color:#fff;padding:10px 18px;border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:999;opacity:0;pointer-events:none;transition:opacity .2s;max-width:92vw}
+.toast.on{opacity:1}
+.drop{border:2px dashed rgba(80,30,140,.35);border-radius:var(--radius);padding:22px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.hov{background:var(--purple-light)}
+
+footer.sru-footer{color:#e6dcf5;font-size:.82rem;margin-top:20px}
+footer.sru-footer .in{max-width:1360px;margin:0 auto;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.sru-support{border:1px solid rgba(255,255,255,.35);border-radius:var(--radius);padding:6px 12px;height:44px;display:flex;align-items:center;gap:6px;direction:ltr}
+.sru-support a{color:#fff}.sru-support .star{font-weight:800;color:#8fd3ff;font-size:1.1rem}
+.sru-itoc{display:flex;align-items:center;height:44px;background:#fff;border-radius:var(--radius);padding:4px 10px}
+.sru-itoc img{height:32px;display:block}
+footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);padding:0 8px;border-radius:3px}
+
+/* ===== The official Purchase Requisition form (screen + PDF) ===== */
+.fpage{width:794px;height:1123px;box-sizing:border-box;padding:26px 30px 40px 40px;background:#fff;color:#111;position:relative;overflow:hidden;direction:rtl;font-family:'PdfCairo',"Cairo",Tahoma,Arial,sans-serif;font-size:11px;line-height:1.35}
+.fpage.screen{height:auto;min-height:1123px}
+.fpage *{box-sizing:border-box}
+.fpage .mono{font-family:Consolas,monospace}
+.f-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;direction:ltr}
+.f-head .ttl{font-family:Arial,sans-serif;font-weight:700;font-size:17px;color:#111}
+.f-head .co{display:flex;align-items:center;gap:8px;direction:rtl}
+.f-head .co .mk{height:44px}.f-head .co .na{height:17px;display:block}
+.f-head .co .en{font-family:Arial,sans-serif;font-size:8.5px;font-weight:700;direction:ltr;margin-top:2px;color:#222}
+.f-info{display:grid;grid-template-columns:200px 1fr;gap:14px;direction:ltr;margin-bottom:12px}
+.f-serial{display:grid;grid-template-columns:28px 1fr;border:1px solid #333;background:#f1efcf}
+.f-serial .vt{writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px;text-align:center;border-left:0;border-right:1px solid #333;padding:4px 2px;direction:rtl}
+.f-serial table,.f-meta{width:100%;border-collapse:collapse}
+.f-serial td{border-bottom:1px solid #333;text-align:center;padding:3px;height:22px;font-family:Arial,sans-serif}
+.f-serial tr:last-child td{border-bottom:0}
+.f-meta td{border:1px solid #333;padding:3px 6px;height:24px}
+.f-meta .le{font-family:Arial,sans-serif;width:110px}.f-meta .la{text-align:right;width:90px;direction:rtl}.f-meta .va{direction:rtl;text-align:right;font-weight:700}
+.f-tbl{width:100%;border-collapse:collapse;margin-bottom:8px}
+.f-tbl td,.f-tbl th{border:1px solid #333;padding:2px 5px;height:21px}
+.f-tbl th{font-weight:700;font-size:10px;text-align:center;line-height:1.25}
+.f-tbl .cap td{text-align:center;font-weight:700}
+.f-cons .cap td,.f-cons th{background:#b4c7e7}.f-asset .cap td,.f-asset th{background:#a9d18e}
+.f-tbl .c-n{width:24px;text-align:center}.f-tbl .c-u{width:60px;text-align:center}.f-tbl .c-q{width:52px;text-align:center}.f-tbl .c-p,.f-tbl .c-t{width:86px;text-align:left;direction:ltr;font-family:Arial,sans-serif}
+.f-tbl .totrow td{font-weight:700;background:#f4f4f4}
+.f-raci{width:100%;border-collapse:collapse;margin-bottom:10px;table-layout:fixed}
+.f-raci td,.f-raci th{border:1px solid #333;padding:2px 4px;vertical-align:middle;text-align:center}
+.f-raci th{font-size:10px;height:20px}
+.f-raci .rh{width:118px;font-weight:700}
+.f-raci .rn td{height:24px}
+.f-raci .rs td{height:60px}
+.f-cons .f-raci th{background:#b4c7e7}.f-asset .f-raci th{background:#a9d18e}
+.ent{display:inline-flex;flex-direction:column;align-items:center;margin:1px 3px;max-width:100%;vertical-align:middle}
+.ent .nm{font-weight:700;font-size:9.5px}.ent .tt{font-size:8px;color:#555}
+.sg{display:inline-flex;flex-direction:column;align-items:center;margin:1px 3px;vertical-align:middle;min-width:60px}
+.sg img{max-height:34px;max-width:110px;display:block}
+.sg.many img{max-height:24px;max-width:80px}
+.sg .blurred img{filter:none}
+.sg .stp{border:1.2px solid #1d7a46;color:#1d7a46;border-radius:4px;padding:0 4px;font-size:7.5px;line-height:1.3;text-align:center;background:#f3faf6}
+.sg .stp b{font-size:8px}
+.sg .rej{border:1.2px solid #b42318;color:#b42318;border-radius:4px;padding:1px 5px;font-size:8.5px;font-weight:700;background:#fdecea}
+.sg .aw{color:#9a5b00;font-size:8.5px;font-weight:700}
+.sg .pd{color:#999;font-size:8px}
+.f-proc{border:1.4px solid #333;border-radius:10px;min-height:64px;padding:4px 12px;margin-top:4px}
+.f-proc .h{font-weight:700;text-decoration:underline;font-size:11.5px}
+.f-proc .b{white-space:pre-line;font-size:10.5px}
+.f-rail{position:absolute;right:8px;top:170px;bottom:120px;width:20px;writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;font-weight:700;display:flex;justify-content:space-around;align-items:center}
+.f-rail span::before{content:"▪";margin:4px 0;display:inline-block}
+.f-foot{position:absolute;left:40px;right:30px;bottom:14px;display:flex;justify-content:space-between;font-size:8.5px;color:#6b5a80;border-top:1px solid #e3dcef;padding-top:4px;direction:rtl}
+.f-wmk{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:84px;font-weight:700;color:rgba(180,35,24,.10);transform:rotate(-30deg);pointer-events:none}
+.f-h2{text-align:center;font-weight:700;font-size:12px;margin:8px 0 4px}
+.f-sub{font-weight:700;font-size:11px;margin:6px 0 3px}
+.f-doa td,.f-doa th{font-size:9.5px;text-align:center;vertical-align:middle}
+.f-doa th{background:#dde3ef}
+.f-doa .code-c{background:#9dc3e6;width:34px}.f-doa .code-a{background:#a9d18e;width:34px}
+.f-cert td,.f-cert th{font-size:9.5px;vertical-align:top;text-align:right}
+.f-cert th{background:#ece6f5}
+.vbox{display:flex;gap:14px;align-items:center;border:1.5px solid #1d7a46;border-radius:8px;padding:8px 10px;margin:8px 0;background:#f6fbf8}
+.vbox .vtx{display:flex;flex-direction:column;gap:2px;font-size:10px}
+.vbox .vid{font-family:Consolas,monospace;font-size:17px;font-weight:700;color:#1d7a46;letter-spacing:1px}
+.fdoc-host{position:absolute;left:-10000px;top:0;width:794px}
+.blurred{filter:blur(0)}
+@media print{
+  body *{visibility:hidden}
+  .printarea,.printarea *{visibility:visible}
+  .printarea{position:absolute;inset:0 auto auto 0;zoom:1!important}
+  .no-print{display:none!important}
+  @page{size:A4;margin:0}
+}
+</style>
+</head>
+<body>
+<div class="sru-brandbar no-print"><div class="in">
+  <img id="lgSru" alt="جامعة سليمان الراجحي | Sulaiman Alrajhi University">
+  <img id="lgIctd" alt="الإدارة التنفيذية للاتصالات وتقنية المعلومات">
+</div></div>
+
+<header class="hero sru-tech-bg no-print"><div class="in">
+  <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h5"/><path d="M8 17c1.5-1.5 2.5 1 4 0s2-2 4-.5"/></svg></div>
+  <div class="grow"><h1>منصة أوامر الشراء والتوقيعات الإلكترونية</h1>
+    <div class="sub en">POFlow — Purchase Order Approval &amp; Digital Signature Platform</div></div>
+  <div class="who">
+    <a class="hbtn glow" id="btnHowto" target="_blank" rel="noopener" title="فيديو وخطوات: كيف تسجّل توقيعك وتوقّع أو ترفض أمر الشراء"><i data-lucide="circle-play" class="icon"></i>كيفية التوقيع</a>
+    <button class="hbtn" id="btnSigs" onclick="openSigs()" title="توقيعاتي المشفّرة في سجل توقيعات المنصة"><i data-lucide="signature" class="icon"></i>توقيعاتي</button>
+    <span style="position:relative"><button class="hbtn" id="btnBell" onclick="toggleNotif()" title="الإشعارات"><i data-lucide="bell" class="icon"></i><span class="badge" id="bellN" hidden>0</span></button>
+      <div class="notif" id="notif" hidden></div></span>
+    <span class="chip-u"><span class="en" id="meMail"></span> · <b id="meRole"></b></span>
+  </div>
+</div></header>
+
+<nav class="tabs no-print"><div class="in" id="nav"></div></nav>
+<main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
+
+<footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.4</span></div>
+  <div class="toolbar">
+    <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
+    <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
+  </div>
+</div></footer>
+<div class="toast" id="toast"></div>
+
+<!-- ======== signature register (policy-platform model) ======== -->
+<dialog id="dlgSigs">
+  <div class="dlg-h"><i data-lucide="signature" class="icon"></i><span class="grow">توقيعاتي المشفّرة <span class="en" style="color:#d9cdee">My encrypted signatures</span></span>
+    <button class="btn sm" onclick="loadMySigs()"><i data-lucide="refresh-cw" class="icon"></i>تحديث</button>
+    <button class="btn sm" onclick="dlgSigs.close()"><i data-lucide="x" class="icon"></i>إغلاق</button></div>
+  <div class="dlg-b">
+    <div class="hint">سجل التوقيعات <b>خاص بمنصة أوامر الشراء فقط</b> ومستقل عن أي منصة أخرى. تُشفَّر الصورة داخل متصفحك (AES-256-GCM)، ولا يصل الرقم السري ولا الصورة الواضحة إلى الخادم.</div>
+    <div class="hint"><a class="howto" target="_blank" rel="noopener">▶ كيفية التوقيع</a>: إضافة التوقيع، والتوقيع على أمر الشراء أو رفضه، وكيف يُحمى توقيعك.</div>
+    <div style="overflow-x:auto"><table class="reg"><thead><tr><th>الاسم</th><th>المسمى</th><th>الحالة</th><th>تاريخ الإضافة</th><th></th></tr></thead><tbody id="msBody"><tr><td colspan="5" class="hint">…</td></tr></tbody></table></div>
+    <div id="msDefWrap" hidden class="card" style="margin:0"><b>طريقة عرض التوقيع الافتراضية للمنصة</b> <span class="hint">(لمدير النظام — تُثبَّت في كل أمر شراء عند أول توقيع)</span>
+      <div class="toolbar" style="margin-top:6px"><select id="msDefMode" style="width:auto"><option value="stamp">ختم التوقيع فقط</option><option value="image">صورة التوقيع</option><option value="blur">صورة مموّهة (واضحة في النسخة النهائية)</option></select><button class="btn primary" onclick="saveDefaultDisplay()"><i data-lucide="check" class="icon"></i>حفظ</button></div></div>
+    <div id="msAllWrap" hidden>
+      <h4 style="margin:6px 0 0;color:var(--purple-dark)">سجل التوقيعات — جميع الموقّعين <span class="hint">(لمدير النظام)</span></h4>
+      <div style="overflow-x:auto"><table class="reg"><thead><tr><th>الاسم</th><th>المسمى</th><th>البريد</th><th>الحالة</th><th>تاريخ الإضافة</th><th></th></tr></thead><tbody id="msAll"></tbody></table></div>
+    </div>
+    <h4 style="margin:6px 0 0;color:var(--purple-dark)">إضافة توقيع جديد</h4>
+    <div class="ms-grid">
+      <label class="f">الاسم *<input type="text" id="msName" placeholder="الاسم الكامل"></label>
+      <label class="f">المسمى الوظيفي<input type="text" id="msPos" placeholder="مثال: مدير إدارة المشتريات"></label>
+      <label class="f">الجهة<input type="text" id="msOrg" value="جامعة سليمان الراجحي"></label>
+    </div>
+    <label class="f" id="msOwnerWrap" hidden>بريد صاحب التوقيع (لمدير النظام فقط — لتسجيل توقيع شخص آخر ويسلّمه الرقم السري؛ اتركه فارغًا ليكون باسمك)<input type="email" id="msOwner" dir="ltr" placeholder="name@sr.edu.sa"></label>
+    <div><label style="margin-inline-end:14px"><input type="radio" name="msSrc" value="upload" checked onchange="srcMode()" style="width:auto"> رفع صورة</label><label><input type="radio" name="msSrc" value="draw" onchange="srcMode()" style="width:auto"> رسم التوقيع</label></div>
+    <div id="msUp"><input type="file" id="msFile" accept="image/png,image/jpeg,image/webp"><div class="hint">يُفضَّل PNG بخلفية شفافة.</div><img id="msPrev" alt=""></div>
+    <div id="msDraw" hidden><canvas id="pad"></canvas><button class="btn sm" style="margin-top:6px" onclick="sizePad()"><i data-lucide="eraser" class="icon"></i>مسح</button></div>
+    <div class="ms-grid">
+      <label class="f">الرقم السري * (8 خانات على الأقل تشمل حروفًا وأرقامًا)<input type="password" id="msPin" autocomplete="new-password"></label>
+      <label class="f">تأكيد الرقم السري *<input type="password" id="msPin2" autocomplete="new-password"></label>
+    </div>
+    <div class="hint">لا يمكن استرجاع الرقم السري — عند نسيانه احذف التوقيع وأضفه من جديد. يُقفل التوقيع 15 دقيقة بعد 5 محاولات خاطئة.</div>
+    <div class="toolbar"><button class="btn primary" id="msAdd" onclick="addSig()"><i data-lucide="lock" class="icon"></i>تشفير وحفظ التوقيع</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgSign">
+  <div class="dlg-h"><i data-lucide="pen-line" class="icon"></i><span class="grow">توقيع أمر الشراء إلكترونيًا</span>
+    <button class="btn sm" onclick="dlgSign.close()"><i data-lucide="x" class="icon"></i>إغلاق</button></div>
+  <div class="dlg-b">
+    <div id="sgInfo"></div>
+    <label class="f">التوقيع<select id="sgSel"></select></label>
+    <label class="f">الرقم السري للتوقيع<input type="password" id="sgPin" autocomplete="off" onkeydown="if(event.key==='Enter')signGo()"></label>
+    <label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="sgAgree" style="margin-top:5px;width:auto"> <span id="sgAgreeTx">أقرّ بأنني اطّلعت على أمر الشراء بإصداره الحالي ومرفقاته، وأوافق على توقيعه إلكترونيًا في الموضع المحدد لي. أي تعديل لاحق يتطلب إصدارًا جديدًا وتوقيعًا جديدًا.</span></label>
+    <div class="hint">أول مرة؟ شاهد <a class="howto" target="_blank" rel="noopener">كيفية التوقيع</a>.</div>
+    <div class="toolbar"><button class="btn primary" id="sgGo" onclick="signGo()"><i data-lucide="check" class="icon"></i>توقيع</button><span id="sgMsg" class="req"></span></div>
+  </div>
+</dialog>
+
+<dialog id="dlgReject">
+  <div class="dlg-h" style="background:var(--bad)"><i data-lucide="octagon-x" class="icon"></i><span class="grow">رفض التوقيع على أمر الشراء</span>
+    <button class="btn sm" onclick="dlgReject.close()"><i data-lucide="x" class="icon"></i>إغلاق</button></div>
+  <div class="dlg-b">
+    <div id="rjInfo"></div>
+    <div class="banner warn">عند الرفض تتوقف دورة التوقيعات فورًا، ولا يُرسل الطلب لمن يليك، ويُبلَّغ كلٌّ من إدارة المشتريات والجهة الطالبة بالسبب.</div>
+    <label class="f">سبب الرفض * (إلزامي)<textarea id="rjReason" placeholder="اكتب سبب الرفض بوضوح…"></textarea></label>
+    <div class="toolbar"><button class="btn danger" id="rjGo" onclick="rejectGo()"><i data-lucide="octagon-x" class="icon"></i>تأكيد الرفض</button><span id="rjMsg" class="req"></span></div>
+  </div>
+</dialog>
+
+<dialog id="dlgNote">
+  <div class="dlg-h"><i data-lucide="message-square-text" class="icon"></i><span class="grow" id="ntTitle"></span>
+    <button class="btn sm" onclick="dlgNote.close()"><i data-lucide="x" class="icon"></i>إغلاق</button></div>
+  <div class="dlg-b"><div class="hint" id="ntSub"></div><textarea id="ntText"></textarea>
+    <div class="toolbar"><button class="btn primary" id="ntOk"><i data-lucide="check" class="icon"></i>تأكيد</button><span class="req" id="ntErr"></span></div></div>
+</dialog>
+
+<dialog id="dlgPin">
+  <div class="dlg-h"><i data-lucide="key-round" class="icon"></i><span class="grow" id="pinTitle">الرقم السري</span></div>
+  <div class="dlg-b">
+    <div class="hint" id="pinSub"></div>
+    <input type="password" id="pinIn" autocomplete="off">
+    <input type="password" id="pinIn2" autocomplete="off" placeholder="الرقم السري الجديد" hidden>
+    <input type="password" id="pinIn3" autocomplete="off" placeholder="تأكيد الرقم السري الجديد" hidden>
+    <div class="req" id="pinErr"></div>
+    <div class="toolbar"><button class="btn primary" id="pinOk"><i data-lucide="check" class="icon"></i>تأكيد</button><button class="btn" id="pinCancel">إلغاء</button></div>
+  </div>
+</dialog>
+
+<dialog id="dlgPrev">
+  <div class="dlg-h"><i data-lucide="eye" class="icon"></i><span class="grow" id="pvTitle">معاينة التوقيع</span></div>
+  <div class="dlg-b"><div class="hint">تُغلق المعاينة تلقائيًا خلال 15 ثانية.</div><img id="pvImg" alt="" draggable="false">
+    <div class="toolbar"><button class="btn" onclick="closePrev()">إغلاق</button></div></div>
+</dialog>
+
+<script>
+/* =========================================================
+   POFlow v1.4 — Purchase Order Approval & Digital Signature Platform
+   Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
+   which re-checks the @sr.edu.sa account and the role on the server.
+   E-signatures follow the ICTD Policy Platform model (v3.4).
+   ========================================================= */
+const BOOT = window.BOOT || {};
+const P = BOOT.perms || {}, ME = String(BOOT.user || '').toLowerCase(), SA = BOOT.statusAr || {}, SET = BOOT.settings || {};
+let PRINC = BOOT.principals || [ME];
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icons = () => { try { window.lucide && lucide.createIcons(); } catch (e) {} };
+const fmtN = n => (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtDT = d => { const x = new Date(d); return !d || isNaN(x) ? '' : x.toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle: 'medium', timeStyle: 'short' }); };
+const fmtD = d => { const x = new Date(d); return !d || isNaN(x) ? '' : x.toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { dateStyle: 'medium' }); };
+const today = () => new Date().toLocaleDateString('en-CA');
+const addDays = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
+const stChip = s => `<span class="st st-${esc(s)}">${esc(SA[s] || s)}</span>`;
+const HOWTO = (BOOT.baseUrl || '') + '?page=howto';
+let toastT;
+function toast(m, ms) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), ms || 4200); }
+
+/* ---------- server ---------- */
+function api(req) {
+  return new Promise((ok, no) => google.script.run.withSuccessHandler(ok).withFailureHandler(e => no(new Error((e && e.message) || String(e)))).poApi(req));
+}
+async function call(req) {
+  const r = await api(req);
+  if (!r || r.ok === false) { const e = new Error((r && (r.msg || r.error)) || 'تعذّر تنفيذ العملية'); e.r = r; throw e; }
+  return r;
+}
+
+/* ---------- shell ---------- */
+const NAV = [
+  ['dash', 'layout-dashboard', 'لوحة التحكم', () => true],
+  ['new', 'file-plus-2', 'أمر شراء جديد', () => P.create],
+  ['mine', 'folder-open', 'طلباتي', () => P.create],
+  ['inbox', 'inbox', 'وارد المشتريات', () => P.procurement],
+  ['sign', 'pen-line', 'صندوق التوقيعات', () => P.sign],
+  ['archive', 'archive', 'الأرشيف والبحث', () => true],
+  ['reports', 'chart-column', 'التقارير', () => P.viewAll],
+  ['verify', 'shield-check', 'التحقق', () => true],
+  ['audit', 'scroll-text', 'سجل التدقيق', () => P.audit],
+  ['users', 'users', 'المستخدمون والصلاحيات', () => P.admin],
+  ['settings', 'settings', 'الإعدادات', () => P.admin]
+];
+function renderNav(k) {
+  const cnt = { inbox: LIST.filter(x => x.status === 'proc_review').length, sign: LIST.filter(x => x.mine).length, users: BOOT.pendingRequests || 0 };
+  $('#nav').innerHTML = NAV.filter(n => n[3]()).map(n => `<a href="#${n[0]}" class="${n[0] === k ? 'on' : ''}"><i data-lucide="${n[1]}" class="icon"></i>${n[2]}${cnt[n[0]] ? ` <span class="badge">${cnt[n[0]]}</span>` : ''}</a>`).join('');
+  icons();
+}
+let LIST = [], LIST_AT = 0;
+async function loadList(force) {
+  if (!force && Date.now() - LIST_AT < 15000 && LIST.length) return LIST;
+  const r = await call({ action: 'list' }); LIST = r.items || []; LIST_AT = Date.now(); return LIST;
+}
+const ROUTES = {};
+async function route() {
+  const h = location.hash.slice(1) || defaultRoute(), [k, ...rest] = h.split('/'), arg = decodeURIComponent(rest.join('/') || '');
+  const fn = ROUTES[k] || ROUTES.dash;
+  $('#view').innerHTML = '<div class="loading">جارٍ التحميل…</div>';
+  try { await loadList(); renderNav(k); await fn(arg); }
+  catch (e) { $('#view').innerHTML = `<div class="card err"><b>تعذّر فتح الصفحة:</b> ${esc(e.message)}</div>`; }
+  icons(); window.scrollTo(0, 0);
+}
+function defaultRoute() { return 'dash'; }
+window.addEventListener('hashchange', route);
+const go = h => { if (location.hash === '#' + h) route(); else location.hash = h; };
+
+function poTable(items, opt) {
+  opt = opt || {};
+  if (!items.length) return `<div class="empty">${opt.empty || 'لا توجد طلبات.'}</div>`;
+  return `<div style="overflow-x:auto"><table class="reg"><thead><tr><th>رقم الطلب</th><th>الرقم التسلسلي</th><th>الموضوع</th><th>الجهة الطالبة</th><th>الإجمالي</th><th>الحالة</th><th>المسؤول الحالي</th><th>${opt.dateCol || 'آخر تحديث'}</th></tr></thead><tbody>` +
+    items.map(x => `<tr class="click" onclick="go('po/${esc(x.id)}')"><td><b class="en">${esc(x.id)}</b> <span class="hint">v${esc(x.version)}</span></td><td class="en">${esc(x.serial || '—')}</td>
+      <td>${esc(x.subject)}</td><td>${esc(x.dept)}</td><td class="num">${fmtN(x.total)} <span class="hint">${esc(x.currency)}</span></td><td>${stChip(x.status)}${overdue(x) ? ' <span class="st st-rejected" title="تجاوز المدة المستهدفة">⏰ متأخر</span>' : ''}</td>
+      <td>${x.current ? esc(x.current.name || x.current.email) + `<div class="hint">${esc(x.current.title || '')}</div>` : '—'}</td><td class="hint">${esc(fmtDT(opt.dateKey ? x[opt.dateKey] : x.updatedAt))}</td></tr>`).join('') + '</tbody></table></div>';
+}
+function overdue(x) {
+  if (!['req_sign', 'signing'].includes(x.status) || !x.current) return false;
+  if (x.targetDate && x.targetDate < today()) return true;
+  const since = Date.parse(x.current.since || ''); return since && (Date.now() - since) > (Number(SET.TARGET_DAYS) || 5) * 864e5;
+}
+function bars(rows, fmt) {
+  if (!rows.length) return '<div class="empty">لا توجد بيانات</div>';
+  const mx = Math.max(...rows.map(r => r.v), 1);
+  return '<div class="bars">' + rows.map(r => `<div class="bar" title="${esc(r.l)}: ${esc((fmt || String)(r.v))}"><span class="lb">${esc(r.l)}</span><span class="tr"><span class="fl" style="width:${Math.max(1, r.v / mx * 82)}%"></span><span class="vl" style="right:calc(${Math.max(1, r.v / mx * 82)}% + 6px)">${esc((fmt || String)(r.v))}</span></span></div>`).join('') + '</div>';
+}
+const groupBy = (arr, f) => arr.reduce((m, x) => { const k = f(x); (m[k] = m[k] || []).push(x); return m; }, {});
+
+/* =====================================================================
+   1 · Dashboard
+   ===================================================================== */
+const DF = { from: '', to: '', dept: '', status: '', owner: '' };
+ROUTES.dash = async function () {
+  const depts = [...new Set(LIST.map(x => x.dept).filter(Boolean))].sort();
+  const owners = [...new Set(LIST.filter(x => x.current).map(x => x.current.email))].sort();
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="layout-dashboard" class="icon"></i>لوحة التحكم <span class="hint">— ${P.viewAll ? 'جميع أوامر الشراء' : 'الطلبات المتاحة لك'}</span>
+     <span style="flex:1"></span><button class="btn sm" onclick="loadList(true).then(route)"><i data-lucide="refresh-cw" class="icon"></i>تحديث</button></h2>
+   <div class="filters card">
+     <label class="f">من تاريخ<input type="date" id="fFrom" value="${DF.from}"></label>
+     <label class="f">إلى تاريخ<input type="date" id="fTo" value="${DF.to}"></label>
+     <label class="f">الجهة الطالبة<select id="fDept"><option value="">الكل</option>${depts.map(d => `<option ${d === DF.dept ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select></label>
+     <label class="f">الحالة<select id="fSt"><option value="">الكل</option>${Object.keys(SA).map(s => `<option value="${s}" ${s === DF.status ? 'selected' : ''}>${esc(SA[s])}</option>`).join('')}</select></label>
+     <label class="f">المسؤول الحالي<select id="fOw"><option value="">الكل</option>${owners.map(o => `<option ${o === DF.owner ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>
+     <button class="btn" onclick="Object.keys(DF).forEach(k=>DF[k]='');route()"><i data-lucide="x" class="icon"></i>مسح</button>
+   </div><div id="dashBody"></div>`;
+  ['#fFrom', '#fTo', '#fDept', '#fSt', '#fOw'].forEach((s, i) => $(s).onchange = e => { DF[['from', 'to', 'dept', 'status', 'owner'][i]] = e.target.value; dashBody(); });
+  dashBody();
+};
+function dashFiltered() {
+  return LIST.filter(x => (!DF.from || (x.createdAt || '').slice(0, 10) >= DF.from) && (!DF.to || (x.createdAt || '').slice(0, 10) <= DF.to) &&
+    (!DF.dept || x.dept === DF.dept) && (!DF.status || x.status === DF.status) && (!DF.owner || (x.current && x.current.email === DF.owner)));
+}
+function dashBody() {
+  const L = dashFiltered(), c = s => L.filter(x => s.includes(x.status)).length;
+  const appr = L.filter(x => x.status === 'approved' && x.approvedAt);
+  const cyc = appr.map(x => (Date.parse(x.approvedAt) - Date.parse(x.submittedAt || x.createdAt)) / 864e5).filter(v => v >= 0);
+  const avg = cyc.length ? (cyc.reduce((a, b) => a + b, 0) / cyc.length) : 0;
+  const late = L.filter(overdue).length;
+  const tile = (k, ic, lb, v, cls, flt) => `<div class="tile ${cls || ''}" onclick="${flt ? `DF.status='${flt}';route()` : ''}"><div class="k"><i data-lucide="${ic}" class="icon"></i>${lb}</div><div class="v">${v}</div></div>`;
+  const pend = Object.entries(groupBy(L.filter(x => x.current), x => (x.current.name || x.current.email))).map(([l, a]) => ({ l, v: a.length })).sort((a, b) => b.v - a.v).slice(0, 10);
+  const byDept = Object.entries(groupBy(L, x => x.dept || '—')).map(([l, a]) => ({ l, v: a.reduce((s, x) => s + x.total, 0) })).sort((a, b) => b.v - a.v).slice(0, 8);
+  const byStatus = Object.keys(SA).map(s => ({ l: SA[s], v: c([s]) })).filter(r => r.v);
+  $('#dashBody').innerHTML = `<div class="tiles">
+    ${tile('t', 'files', 'إجمالي أوامر الشراء', L.length)}
+    ${tile('n', 'file-plus-2', 'جديدة (مسودة / توقيع الجهة)', c(['draft', 'req_sign', 'returned']), 'info')}
+    ${tile('p', 'inbox', 'قيد مراجعة المشتريات', c(['proc_review']), 'info', 'proc_review')}
+    ${tile('s', 'pen-line', 'بانتظار التوقيع', c(['signing']), 'warn', 'signing')}
+    ${tile('a', 'badge-check', 'مكتملة ومعتمدة', c(['approved']), 'ok', 'approved')}
+    ${tile('r', 'octagon-x', 'مرفوضة', c(['rejected']), 'bad', 'rejected')}
+    ${tile('l', 'alarm-clock', 'متأخرة عن المدة المستهدفة', late, 'bad')}
+    ${tile('c', 'timer', 'متوسط مدة الاعتماد (يوم)', avg ? avg.toFixed(1) : '—')}
+  </div>
+  <div class="grid g3">
+    <div class="card"><h3 class="s" style="margin-top:0">الطلبات حسب الحالة</h3>${bars(byStatus)}</div>
+    <div class="card"><h3 class="s" style="margin-top:0">الطلبات المنتظرة لدى كل موقّع</h3>${bars(pend)}</div>
+    <div class="card"><h3 class="s" style="margin-top:0">القيمة التقديرية حسب الجهة الطالبة <span class="hint">(${esc(SET.CURRENCY || 'SAR')})</span></h3>${bars(byDept, v => fmtN(v))}</div>
+  </div>
+  <div class="card"><h3 class="s" style="margin-top:0">أحدث الطلبات</h3>${poTable(L.slice().sort((a, b) => String(b.updatedAt).localeCompare(a.updatedAt)).slice(0, 12))}</div>`;
+  icons();
+}
+
+/* =====================================================================
+   2 · Create / edit a purchase order (requesting department)
+   ===================================================================== */
+let ED = null, ED_BASE;
+function blankPO() {
+  return { meta: { id: '', version: '1.0', status: 'draft', date: today(), dept: '', budget: '', subject: '', supplier: '', supplierContact: '', currency: SET.CURRENCY || 'SAR', notes: '', terms: '', requester: BOOT.name || '', requesterEmail: ME },
+           consumables: [{ desc: '', unit: '', qty: 1, price: 0 }], assets: [], attachments: [], steps: [] };
+}
+ROUTES.new = async function () { ED = blankPO(); ED_BASE = undefined; renderEditor(); };
+ROUTES.edit = async function (id) { const r = await call({ action: 'get', id }); ED = r.data; ED_BASE = r.updatedAt; if (!ED.consumables.length && !ED.assets.length) ED.consumables.push({ desc: '', unit: '', qty: 1, price: 0 }); renderEditor(); };
+function renderEditor() {
+  const d = ED, m = d.meta, mgr = (d.steps || []).find(s => s.phase === 'requester') || {};
+  const editable = !m.id || ['draft', 'returned'].includes(m.status);
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="file-plus-2" class="icon"></i>${m.id ? 'تعديل أمر الشراء <span class="en">' + esc(m.id) + '</span> <span class="hint">v' + esc(m.version) + '</span>' : 'إنشاء أمر شراء جديد'} ${m.id ? stChip(m.status) : ''}</h2>
+  ${m.status === 'returned' && m.returnNote ? `<div class="banner warn"><i data-lucide="undo-2" class="icon"></i><div><b>أعادته إدارة المشتريات لاستكمال البيانات:</b><br>${esc(m.returnNote)}</div></div>` : ''}
+  ${!editable ? `<div class="banner info">هذا الطلب في حالة «${esc(SA[m.status])}» ولا يمكن تعديله. <a href="#po/${esc(m.id)}">فتح الطلب</a></div>` : ''}
+  <div class="card"><h3 class="s" style="margin-top:0">بيانات الطلب</h3>
+    <div class="grid g4">
+      <label class="f">التاريخ Date<input type="date" data-m="date" value="${esc(m.date)}"></label>
+      <label class="f">الجهة الطالبة * Requesting Dept.<input list="dlDepts" data-m="dept" value="${esc(m.dept)}"></label>
+      <label class="f">بند الميزانية Budget Element<input list="dlBud" data-m="budget" value="${esc(m.budget)}"></label>
+      <label class="f">العملة<select data-m="currency">${['SAR', 'USD', 'EUR'].map(c => `<option ${c === m.currency ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+      <label class="f" style="grid-column:span 2">موضوع الطلب *<input data-m="subject" value="${esc(m.subject)}" placeholder="مثال: توريد أجهزة شبكات لمبنى الإدارة"></label>
+      <label class="f">المورد المقترح<input data-m="supplier" value="${esc(m.supplier)}"></label>
+      <label class="f">بيانات التواصل مع المورد<input data-m="supplierContact" value="${esc(m.supplierContact)}"></label>
+      <label class="f">مقدم الطلب<input data-m="requester" value="${esc(m.requester)}"></label>
+      <label class="f">بريد مقدم الطلب<input data-m="requesterEmail" dir="ltr" value="${esc(m.requesterEmail)}"></label>
+      <label class="f">مدير إدارة الجهة الطالبة — بريد الموقّع الأول * <span class="hint">(يعد · Responsible)</span><input id="mgrEmail" dir="ltr" placeholder="name@sr.edu.sa" value="${esc(mgr.email || '')}"></label>
+      <label class="f">اسم مدير الإدارة<input id="mgrName" value="${esc(mgr.name || '')}"></label>
+    </div>
+    <datalist id="dlDepts">${(SET.DEPTS || []).map(x => `<option>${esc(x)}</option>`).join('')}</datalist>
+    <datalist id="dlBud">${(SET.BUDGETS || []).map(x => `<option>${esc(x)}</option>`).join('')}</datalist>
+  </div>
+  ${itemsCard('consumables', 'المستهلكات أو الخدمات', 'Consumables / Services', 'cons-h')}
+  ${itemsCard('assets', 'الأصول', 'Assets', 'asset-h')}
+  <div class="banner info"><i data-lucide="info" class="icon"></i><div>يلزم التفريق ما بين الأصول والمستهلكات وتوزيعها طبقًا للجدول. يُقترح مسار الاعتماد تلقائيًا حسب <b>مصفوفة الصلاحيات</b> وإجمالي كل جدول، وتعتمده إدارة المشتريات.</div></div>
+  <div class="card"><h3 class="s" style="margin-top:0">الملاحظات والشروط</h3><div class="grid g2">
+    <label class="f">ملاحظات<textarea data-m="notes">${esc(m.notes)}</textarea></label>
+    <label class="f">الشروط ذات العلاقة<textarea data-m="terms">${esc(m.terms)}</textarea></label></div></div>
+  <div class="card"><h3 class="s" style="margin-top:0">المستندات الداعمة <span class="hint">(عروض الأسعار، الموافقات، نموذج PDF جاهز… حتى 10MB للملف)</span></h3>
+    ${m.id ? attList(d, editable) + (editable ? `<div class="toolbar" style="margin-top:8px"><select id="attKind" style="width:auto"><option value="quotation">عرض سعر</option><option value="approval">موافقة</option><option value="form">نموذج أمر الشراء PDF جاهز</option><option value="supporting">مستند داعم</option></select><input type="file" id="attFile" multiple style="width:auto"><button class="btn" onclick="uploadFiles()"><i data-lucide="upload" class="icon"></i>رفع</button></div>` : '')
+      : '<div class="hint">احفظ الطلب كمسودة أولًا ثم ارفع المرفقات.</div>'}
+  </div>
+  ${editable ? `<div class="card toolbar" style="position:sticky;bottom:0;z-index:5">
+    <button class="btn" onclick="saveDraft(false)"><i data-lucide="save" class="icon"></i>حفظ مسودة</button>
+    <button class="btn primary" onclick="saveDraft(true)"><i data-lucide="send" class="icon"></i>حفظ وإرسال لتوقيع مدير الإدارة</button>
+    ${m.id ? `<button class="btn" onclick="go('po/${esc(m.id)}')"><i data-lucide="eye" class="icon"></i>معاينة المستند</button>` : ''}
+    <span class="hint">بعد توقيع مدير إدارة الجهة الطالبة يُحال الطلب تلقائيًا إلى إدارة المشتريات.</span></div>` : ''}`;
+  $$('[data-m]').forEach(el => el.oninput = () => { ED.meta[el.dataset.m] = el.value; });
+  bindItems(); icons();
+}
+function itemsCard(key, ar, en, cls) {
+  return `<div class="card"><h3 class="s" style="margin-top:0">${ar} <span class="en hint">${en}</span></h3>
+   <div style="overflow-x:auto"><table class="items"><thead class="${cls}"><tr><th style="width:34px">م</th><th>البيان Item Description</th><th style="width:110px">الوحدة Unit</th><th style="width:90px">الكمية QTY</th><th style="width:130px">السعر التقديري</th><th style="width:140px">الإجمالي التقديري</th><th style="width:40px"></th></tr></thead>
+   <tbody id="tb-${key}"></tbody><tfoot><tr><td colspan="5" class="tot">الإجمالي التقديري</td><td class="num tot" id="tot-${key}"></td><td></td></tr></tfoot></table></div>
+   <div class="toolbar" style="margin-top:6px"><button class="btn sm" onclick="addItem('${key}')"><i data-lucide="plus" class="icon"></i>إضافة صنف</button></div>
+   <div class="doa" id="doa-${key}"></div></div>`;
+}
+function bindItems() {
+  ['consumables', 'assets'].forEach(k => {
+    const tb = $('#tb-' + k); if (!tb) return;
+    tb.innerHTML = ED[k].map((r, i) => `<tr><td style="text-align:center">${i + 1}</td><td><input data-i="${i}" data-k="desc" value="${esc(r.desc)}"></td><td><input data-i="${i}" data-k="unit" value="${esc(r.unit)}"></td>
+      <td><input type="number" min="0" step="any" data-i="${i}" data-k="qty" value="${r.qty}"></td><td><input type="number" min="0" step="any" data-i="${i}" data-k="price" value="${r.price}"></td>
+      <td class="num" id="lt-${k}-${i}">${fmtN(r.qty * r.price)}</td><td><button class="btn sm danger" onclick="ED.${k}.splice(${i},1);bindItems()" title="حذف"><i data-lucide="trash-2" class="icon"></i></button></td></tr>`).join('')
+      || `<tr><td colspan="7" class="hint" style="text-align:center">لا توجد أصناف</td></tr>`;
+    tb.querySelectorAll('input').forEach(el => el.oninput = () => { const r = ED[k][el.dataset.i]; r[el.dataset.k] = el.type === 'number' ? Number(el.value) : el.value; $(`#lt-${k}-${el.dataset.i}`).textContent = fmtN(r.qty * r.price); itemTotals(); });
+  });
+  itemTotals(); icons();
+}
+function addItem(k) { ED[k].push({ desc: '', unit: '', qty: 1, price: 0 }); bindItems(); }
+const sum = rows => rows.reduce((s, r) => s + (Number(r.qty) || 0) * (Number(r.price) || 0), 0);
+function itemTotals() {
+  [['consumables', 'cons'], ['assets', 'asset']].forEach(([k, c]) => {
+    const t = sum(ED[k]); if (!$('#tot-' + k)) return; $('#tot-' + k).textContent = fmtN(t) + ' ' + (ED.meta.currency || '');
+    const b = ED[k].length && t ? doaBand(c, t) : null;
+    $('#doa-' + k).innerHTML = b ? `<b>مصفوفة الصلاحيات:</b> ${esc(b.label)} — يعد: المدير المعني${b.C.length ? ' · يقترح/يوصي: ' + esc(b.C.join('، ')) : ''} · يعتمد: <b>${esc(b.A)}</b>${b.I.length ? ' · يعلم: ' + esc(b.I.join('، ')) : ''}` : '<span class="hint">أدخل الأصناف لعرض مسار الاعتماد المقترح.</span>';
+  });
+}
+function doaBand(cat, total) {
+  const rules = ((SET.DOA || {})[cat] || []);
+  let lo = 0;
+  for (const r of rules) { if (r.max == null || total <= r.max) return Object.assign({ label: bandLabel(cat, lo, r.max) }, r); lo = r.max; }
+  return null;
+}
+function bandLabel(cat, lo, hi) {
+  const w = cat === 'cons' ? 'مستهلكات أو خدمات' : 'أصول', f = n => Number(n).toLocaleString('en-US');
+  if (!lo) return `طلب شراء ${w} بأقل من ${f(hi)} ريال`;
+  if (hi == null) return `طلب شراء ${w} بما يتخطى ${f(lo)} ريال`;
+  return `طلب شراء ${w} بما يتخطى ${f(lo)} وحتى ${f(hi)} ريال`;
+}
+function edPayload() {
+  return { data: { meta: ED.meta, consumables: ED.consumables, assets: ED.assets }, managerEmail: ($('#mgrEmail') || {}).value || '', managerName: ($('#mgrName') || {}).value || '', baseUpdatedAt: ED_BASE };
+}
+async function saveDraft(andSubmit) {
+  try {
+    const r = await call(Object.assign({ action: 'save' }, edPayload()));
+    ED = r.data; ED_BASE = r.updatedAt; LIST_AT = 0;
+    if (andSubmit) {
+      const s = await call({ action: 'submit', id: ED.meta.id, baseUpdatedAt: ED_BASE });
+      toast('✔ أُرسل الطلب ' + ED.meta.id + ' لتوقيع مدير إدارة الجهة الطالبة'); go('po/' + s.data.meta.id); return;
+    }
+    toast('✔ حُفظت المسودة ' + ED.meta.id);
+    if (location.hash !== '#edit/' + ED.meta.id) history.replaceState(null, '', '#edit/' + ED.meta.id);
+    renderEditor();
+  } catch (e) { toast(e.message, 7000); }
+}
+const readB64 = f => new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = () => no(new Error('تعذّرت قراءة الملف')); r.readAsDataURL(f); });
+async function uploadFiles(procurement) {
+  const inp = $('#attFile'), files = [...(inp.files || [])]; if (!files.length) return toast('اختر ملفًا');
+  const d = procurement ? CUR.d : ED;
+  try {
+    if (!procurement && ED_BASE === undefined) await saveDraft(false);
+    for (const f of files) {
+      if (f.size > 10 * 1024 * 1024) { toast('الملف ' + f.name + ' أكبر من 10MB'); continue; }
+      toast('جارٍ رفع ' + f.name + '…');
+      const r = await call({ action: 'upload', id: d.meta.id, name: f.name, mime: f.type, b64: await readB64(f), kind: ($('#attKind') || {}).value || 'procurement', procurement: !!procurement });
+      if (procurement) { CUR.d = r.data; CUR.updatedAt = r.updatedAt; } else { ED = r.data; ED_BASE = r.updatedAt; }
+    }
+    toast('✔ تم رفع المرفقات'); procurement ? ROUTES.route(d.meta.id) : renderEditor();
+  } catch (e) { toast(e.message, 7000); }
+}
+const KIND_AR = { quotation: 'عرض سعر', approval: 'موافقة', form: 'نموذج PDF جاهز', supporting: 'مستند داعم', procurement: 'مستند المشتريات' };
+function attList(d, canDel) {
+  const a = d.attachments || [];
+  if (!a.length) return '<div class="hint">لا توجد مرفقات.</div>';
+  return `<table class="reg"><thead><tr><th>الملف</th><th>النوع</th><th>الحجم</th><th>بصمة SHA-256</th><th></th></tr></thead><tbody>` + a.map(x => `<tr>
+    <td><a href="javascript:void 0" onclick="openAtt('${esc(d.meta.id)}','${esc(x.id)}')">${esc(x.name)}</a><div class="hint">${esc(x.by)} · ${esc(fmtDT(x.at))}</div></td><td>${esc(KIND_AR[x.kind] || x.kind)}</td>
+    <td class="num">${(x.size / 1024).toFixed(0)} KB</td><td class="mono hint">${esc(String(x.sha).slice(0, 16))}…</td>
+    <td>${canDel ? `<button class="btn sm danger" onclick="removeAtt('${esc(d.meta.id)}','${esc(x.id)}')"><i data-lucide="trash-2" class="icon"></i></button>` : ''}</td></tr>`).join('') + '</tbody></table>';
+}
+async function openAtt(id, attId) {
+  try { toast('جارٍ فتح المرفق…'); const r = await call({ action: 'attachment', id, attId }); saveB64(r.b64, r.name, r.mime, true); } catch (e) { toast(e.message); }
+}
+async function removeAtt(id, attId) {
+  if (!confirm('حذف المرفق؟')) return;
+  try { const r = await call({ action: 'removeAtt', id, attId }); ED = r.data; ED_BASE = r.updatedAt; renderEditor(); } catch (e) { toast(e.message); }
+}
+
+/* =====================================================================
+   3 · My requests · procurement inbox · signature inbox
+   ===================================================================== */
+ROUTES.mine = async function () {
+  const mine = LIST.filter(x => x.createdBy === ME || x.requesterEmail === ME).sort((a, b) => String(b.updatedAt).localeCompare(a.updatedAt));
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="folder-open" class="icon"></i>طلباتي وأوامر الشراء الخاصة بي <span style="flex:1"></span><a class="btn primary" href="#new"><i data-lucide="file-plus-2" class="icon"></i>أمر شراء جديد</a></h2>
+   <div class="card">${poTable(mine, { empty: 'لم تُنشئ أي طلب بعد.' })}</div>`;
+};
+ROUTES.inbox = async function () {
+  const rev = LIST.filter(x => x.status === 'proc_review'), run = LIST.filter(x => x.status === 'signing'), back = LIST.filter(x => ['returned', 'rejected'].includes(x.status));
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="inbox" class="icon"></i>الطلبات الواردة إلى إدارة المشتريات</h2>
+   <div class="card"><h3 class="s" style="margin-top:0">بانتظار المراجعة وتحديد مسار التوقيعات (${rev.length})</h3>${poTable(rev, { dateCol: 'تاريخ الإحالة', dateKey: 'submittedAt', empty: 'لا توجد طلبات جديدة.' })}</div>
+   <div class="card"><h3 class="s" style="margin-top:0">قيد دورة التوقيعات (${run.length})</h3>${poTable(run, { empty: 'لا توجد طلبات قيد التوقيع.' })}</div>
+   <div class="card"><h3 class="s" style="margin-top:0">معادة أو مرفوضة (${back.length})</h3>${poTable(back, { empty: '—' })}</div>`;
+};
+ROUTES.sign = async function () {
+  const mine = LIST.filter(x => x.mine), done = LIST.filter(x => !x.mine && x.steps.some(s => PRINC.includes(s.email) && s.state !== 'pending'));
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="pen-line" class="icon"></i>صندوق التوقيعات والموافقات <span class="hint">${PRINC.length > 1 ? '— تشمل تفويضات: ' + esc(PRINC.slice(1).join('، ')) : ''}</span></h2>
+   ${!SIG.mine.length && P.sign ? `<div class="banner warn"><i data-lucide="triangle-alert" class="icon"></i><div>لم تسجّل توقيعك المشفّر بعد. <a href="javascript:void 0" onclick="openSigs()">سجّله من «توقيعاتي»</a> قبل أول توقيع، وشاهد <a class="howto" target="_blank" rel="noopener" href="${esc(HOWTO)}">كيفية التوقيع</a>.</div></div>` : ''}
+   <div class="card"><h3 class="s" style="margin-top:0">مطلوب منك الآن (${mine.length})</h3>${mine.length ? mine.map(x => `<div class="banner warn" style="justify-content:space-between;align-items:center">
+     <div><b class="en">${esc(x.id)}</b> · ${esc(x.subject)} — ${esc(x.dept)} · <span class="num">${fmtN(x.total)} ${esc(x.currency)}</span><div class="hint">خطوتك: ${esc(x.current.title)}${x.current.email !== ME ? ' — بالنيابة عن ' + esc(x.current.email) : ''} · منذ ${esc(fmtDT(x.current.since))}${x.targetDate ? ' · الموعد المستهدف ' + esc(x.targetDate) : ''}</div></div>
+     <a class="btn primary" href="#po/${esc(x.id)}"><i data-lucide="pen-line" class="icon"></i>فتح للتوقيع</a></div>`).join('') : '<div class="empty">لا توجد طلبات بانتظار توقيعك.</div>'}</div>
+   <div class="card"><h3 class="s" style="margin-top:0">طلبات شاركتَ فيها</h3>${poTable(done, { empty: '—' })}</div>`;
+};
+
+/* =====================================================================
+   4 · One purchase order — document, sequence, actions, timeline
+   ===================================================================== */
+let CUR = null;
+async function loadPO(id, ver) { const r = await call({ action: 'get', id, version: ver || undefined }); CUR = { d: r.data, updatedAt: r.updatedAt, final: r.final, totals: r.totals, latest: r.latest }; PRINC = r.principals || PRINC; return CUR; }
+ROUTES.po = async function (arg) {
+  const [id, ver] = arg.split('@'); await loadPO(id, ver);
+  if (P.sign && !SIG.loaded) loadMySigs(true);
+  renderPO();
+};
+function stepMine(s) { return s && PRINC.includes(String(s.email).toLowerCase()); }
+function isReq(d) { return d.meta.createdBy === ME || d.meta.requesterEmail === ME; }
+function renderPO() {
+  const d = CUR.d, m = d.meta, cur = d.steps.find(s => s.state === 'current'), rej = d.steps.find(s => s.state === 'rejected');
+  const mySigned = d.steps.filter(s => s.sig && s.sig.by === ME);
+  const acts = [];
+  if (!CUR.latest) acts.push(`<div class="banner info">تعرض نسخة أرشيفية (الإصدار ${esc(m.version)}). <a href="#po/${esc(m.id)}">فتح الإصدار الحالي</a></div>`);
+  else {
+    if (cur && stepMine(cur) && P.sign) acts.push(`<button class="btn ok" onclick="signStep('${cur.key}')"><i data-lucide="pen-line" class="icon"></i>توقيع${cur.email !== ME ? ' بالنيابة' : ''}</button><button class="btn danger" onclick="openReject('${cur.key}')"><i data-lucide="octagon-x" class="icon"></i>رفض</button>`);
+    if (['draft', 'returned'].includes(m.status) && isReq(d)) acts.push(`<a class="btn primary" href="#edit/${esc(m.id)}"><i data-lucide="pencil" class="icon"></i>تعديل</a><button class="btn primary" onclick="submitPO()"><i data-lucide="send" class="icon"></i>إرسال للتوقيع</button>`);
+    if (m.status === 'proc_review' && P.procurement) acts.push(`<a class="btn primary" href="#route/${esc(m.id)}"><i data-lucide="route" class="icon"></i>مراجعة وتحديد مسار التوقيعات</a><button class="btn" onclick="returnPO()"><i data-lucide="undo-2" class="icon"></i>إعادة للاستكمال</button>`);
+    if (m.status === 'signing' && P.procurement) acts.push(`<a class="btn" href="#route/${esc(m.id)}"><i data-lucide="list-ordered" class="icon"></i>تعديل المسار</a>`);
+    if (m.status === 'rejected' && (isReq(d) || P.procurement)) acts.push(`<button class="btn primary" onclick="revisePO()"><i data-lucide="git-branch-plus" class="icon"></i>إنشاء نسخة جديدة للتعديل</button>`);
+    if (m.status === 'approved' && !CUR.final && (mySigned.length || P.procurement)) acts.push(`<button class="btn primary" onclick="finalizeFlow(false)" id="btnFinal"><i data-lucide="file-check-2" class="icon"></i>إصدار النسخة النهائية PDF</button>`);
+    const wd = mySigned.find(s => canWithdraw(d, s)); if (wd && !CUR.final) acts.push(`<button class="btn" onclick="unsignStep('${wd.key}')"><i data-lucide="undo-2" class="icon"></i>إزالة توقيعي</button>`);
+    if (mySigned.some(s => !s.sig.hasImg) && effMode(d) !== 'stamp' && !CUR.final) { const s = mySigned.find(x => !x.sig.hasImg); acts.push(`<button class="btn" onclick="showSigImg('${s.key}')"><i data-lucide="image" class="icon"></i>إظهار صورة توقيعي</button>`); }
+    const canCancel = (isReq(d) && ['draft', 'returned', 'req_sign'].includes(m.status)) || (P.procurement && !['approved', 'cancelled'].includes(m.status));
+    if (canCancel) acts.push(`<button class="btn danger" onclick="cancelPO()"><i data-lucide="ban" class="icon"></i>إلغاء الطلب</button>`);
+  }
+  if (CUR.final) acts.push(`<button class="btn primary" onclick="downloadFinal()"><i data-lucide="file-down" class="icon"></i>تنزيل PDF المعتمد</button><a class="btn" href="#verify/${esc(CUR.final.verifyId)}"><i data-lucide="shield-check" class="icon"></i>التحقق</a>`);
+  acts.push(`<button class="btn" onclick="previewPdf()"><i data-lucide="file-search" class="icon"></i>معاينة PDF</button><button class="btn" onclick="window.print()"><i data-lucide="printer" class="icon"></i>طباعة</button>`);
+  const modeSel = P.procurement && !CUR.final && CUR.latest && d.steps.some(s => s.sig) ? `<label class="f" style="margin-top:8px">عرض التوقيع في المستند<select onchange="setPoDisplay(this.value)">${['stamp', 'image', 'blur'].map(k => `<option value="${k}" ${k === effMode(d) ? 'selected' : ''}>${MODE_TXT[k]}</option>`).join('')}</select></label>` : '';
+  $('#view').innerHTML = `<h2 class="t no-print"><i data-lucide="file-text" class="icon"></i>أمر الشراء <span class="en">${esc(m.id)}</span> <span class="hint">v${esc(m.version)}</span> ${stChip(m.status)} ${m.serial ? `<span class="hint en">${esc(m.serial)}</span>` : ''}
+     <span style="flex:1"></span><button class="btn sm" onclick="ROUTES.po('${esc(m.id)}${CUR.latest ? '' : '@' + esc(m.version)}')"><i data-lucide="refresh-cw" class="icon"></i>تحديث</button></h2>
+   ${rej ? `<div class="banner bad no-print"><i data-lucide="octagon-x" class="icon"></i><div><b>رُفض الطلب</b> من ${esc(rej.name || rej.email)} (${esc(rej.title)}) — ${esc(fmtDT(rej.rejectedAt))}<br>السبب: ${esc(rej.reason)}</div></div>` : ''}
+   ${m.status === 'returned' && m.returnNote ? `<div class="banner warn no-print"><b>معاد للاستكمال:</b>&nbsp;${esc(m.returnNote)}</div>` : ''}
+   ${CUR.final ? `<div class="banner ok no-print"><i data-lucide="badge-check" class="icon"></i><div><b>نسخة نهائية معتمدة</b> — صدرت ${esc(fmtDT(CUR.final.at))} · رمز التحقق <b class="mono">${esc(CUR.final.verifyId)}</b></div></div>` : ''}
+   ${m.status === 'approved' && !CUR.final ? `<div class="banner warn no-print">اكتملت التوقيعات — لم تصدر النسخة النهائية PDF بعد.</div>` : ''}
+   ${cur && stepMine(cur) ? `<div class="banner warn no-print"><i data-lucide="pen-line" class="icon"></i><div><b>دورك الآن:</b> ${esc(cur.title)} — راجع المستند ومرفقاته ثم وقّع في الموضع المحدد أو ارفض مع ذكر السبب.</div></div>` : ''}
+   <div class="po-wrap">
+     <div><div class="paperbox"><div class="paperfit printarea" id="paper">${formPage(d, { screen: true })}</div></div></div>
+     <div class="side no-print">
+       <div class="card"><div class="toolbar">${acts.join('')}</div>${modeSel}</div>
+       <div class="card"><h3 class="s" style="margin-top:0">تسلسل التوقيعات <span class="hint">(${d.steps.filter(s => s.sig).length} من ${d.steps.filter(s => s.kind !== 'inform').length})</span></h3>${seqHtml(d)}</div>
+       <div class="card"><h3 class="s" style="margin-top:0">بيانات المعاملة</h3>${infoHtml(d)}</div>
+       <div class="card"><h3 class="s" style="margin-top:0">المرفقات</h3>${attList(d, false)}</div>
+       <div class="card"><h3 class="s" style="margin-top:0">الخط الزمني</h3>${timelineHtml(d)}</div>
+       <div class="card"><h3 class="s" style="margin-top:0;display:flex;justify-content:space-between">النسخ والإصدارات <button class="btn sm" onclick="loadVersions()">عرض</button></h3><div id="verBox" class="hint">—</div></div>
+     </div></div>`;
+  fitPaper(); icons();
+}
+function fitPaper() { const p = $('#paper'); if (!p) return; const w = p.parentElement.clientWidth - 4; p.style.width = '794px'; p.style.zoom = Math.min(1, w / 794); }
+window.addEventListener('resize', () => fitPaper());
+function canWithdraw(d, s) {
+  if (!s.sig || s.sig.by !== ME) return false;
+  const i = d.steps.indexOf(s), later = d.steps.slice(i + 1).filter(x => x.kind !== 'inform');
+  if (later.some(x => x.state === 'signed' || x.state === 'rejected')) return false;
+  if (s.phase === 'requester') return d.meta.status === 'proc_review';
+  return ['signing', 'approved'].includes(d.meta.status);
+}
+const STATE_AR = { pending: 'بانتظار دوره', current: 'الإجراء الحالي', signed: 'تم التوقيع', rejected: 'مرفوض' };
+function seqHtml(d) {
+  return '<div class="seq">' + d.steps.map((s, i) => {
+    const cls = s.kind === 'inform' ? 'inform' : s.state;
+    return `<div class="it ${cls}"><span class="dot">${s.kind === 'inform' ? 'i' : s.state === 'signed' ? '✔' : s.state === 'rejected' ? '✖' : i + 1}</span><div>
+      <div class="nm">${esc(s.name || s.email)} ${s.kind === 'inform' ? '<span class="hint">(يعلم)</span>' : ''}</div>
+      <div class="tt">${esc(s.title || '')} · <span class="en">${esc(s.email)}</span></div>
+      <div class="tt">${s.kind === 'inform' ? 'يُبلَّغ عند الاعتماد النهائي' : s.sig ? `✔ ${esc(s.sig.signerName)} — ${esc(fmtDT(s.sig.at))}${s.sig.onBehalfOf ? ' · بالنيابة عن ' + esc(s.sig.onBehalfOf) : ''}` : s.state === 'rejected' ? `✖ ${esc(fmtDT(s.rejectedAt))} — ${esc(s.reason)}` : s.state === 'current' ? `⏳ منذ ${esc(fmtDT(s.since))}` : STATE_AR[s.state]}</div>
+      <div class="tt">${(s.slots || []).map(slotAr).join('، ')}</div></div></div>`;
+  }).join('') + '</div>';
+}
+function slotAr(k) { const [c, r] = k.split('.'); return ({ R: 'يعد', C: 'يقترح/يوصي', A: 'يعتمد', I: 'يعلم' })[r] + ' — ' + (c === 'cons' ? 'المستهلكات' : 'الأصول'); }
+function infoHtml(d) {
+  const m = d.meta, t = CUR.totals || { cons: sum(d.consumables), asset: sum(d.assets), all: sum(d.consumables) + sum(d.assets) };
+  const rows = [['مقدم الطلب', `${esc(m.requester || '')} <span class="en hint">${esc(m.requesterEmail)}</span>`], ['المورد', esc(m.supplier)], ['إجمالي المستهلكات', `<span class="num">${fmtN(t.cons)}</span>`],
+    ['إجمالي الأصول', `<span class="num">${fmtN(t.asset)}</span>`], ['الإجمالي', `<b class="num">${fmtN(t.all)} ${esc(m.currency)}</b>`], ['الموعد المستهدف', esc(m.targetDate || '—')],
+    ['أُنشئ', esc(fmtDT(m.createdAt))], ['أُحيل للمشتريات', esc(fmtDT(m.submittedAt))], ['الاعتماد النهائي', esc(fmtDT(m.approvedAt))]];
+  return '<table class="reg"><tbody>' + rows.map(r => `<tr><td class="hint" style="width:38%">${r[0]}</td><td>${r[1]}</td></tr>`).join('') + '</tbody></table>' +
+    (m.contentHash || m.fullHash ? `<div class="hint" style="margin-top:6px">بصمة المحتوى: <span class="mono">${esc(String(m.fullHash || m.contentHash).slice(0, 24))}…</span></div>` : '');
+}
+const ACT_AR = { create: 'إنشاء الطلب', edit: 'تعديل', submit: 'إرسال للتوقيع', sign: 'توقيع', 'to-procurement': 'إحالة للمشتريات', 'return': 'إعادة للاستكمال', route: 'تحديد مسار التوقيعات', start: 'بدء دورة التوقيعات',
+  'route-edit': 'تعديل المسار', reject: 'رفض', unsign: 'إزالة توقيع', revise: 'نسخة جديدة', approved: 'اكتمال التوقيعات', finalized: 'الاعتماد النهائي والأرشفة', cancel: 'إلغاء', attach: 'إرفاق مستند', detach: 'حذف مرفق' };
+function timelineHtml(d) {
+  const h = (d.history || []).slice().reverse();
+  return h.length ? '<ul class="tl">' + h.map(x => `<li><b>${esc(ACT_AR[x.action] || x.action)}</b> <span class="hint">v${esc(x.version)}</span>${x.note ? '<div>' + esc(x.note) + '</div>' : ''}<div class="at">${esc(fmtDT(x.at))} · <span class="en">${esc(x.by)}</span></div></li>`).join('') + '</ul>' : '<div class="hint">—</div>';
+}
+async function loadVersions() {
+  try { const r = await call({ action: 'versions', id: CUR.d.meta.id });
+    $('#verBox').innerHTML = r.items.length ? '<table class="reg"><tbody>' + r.items.map(v => `<tr class="click" onclick="go('po/${esc(CUR.d.meta.id)}@${esc(v.version)}')"><td>v${esc(v.version)}</td><td>${stChip(v.status)}</td><td class="hint">${esc(fmtDT(v.savedAt))}</td></tr>`).join('') + '</tbody></table>' : 'لا توجد نسخ محفوظة بعد.';
+  } catch (e) { toast(e.message); }
+}
+function applyServer(r) { CUR.d = r.data; CUR.updatedAt = r.updatedAt; LIST_AT = 0; renderPO(); loadList(true).then(() => renderNav('po')); }
+async function submitPO() { try { const r = await call({ action: 'submit', id: CUR.d.meta.id, baseUpdatedAt: CUR.updatedAt }); applyServer(r); toast('✔ أُرسل لتوقيع مدير الإدارة'); } catch (e) { toast(e.message, 7000); } }
+function askNote(title, sub, okLabel) {
+  return new Promise(res => { $('#ntTitle').textContent = title; $('#ntSub').textContent = sub || ''; $('#ntText').value = ''; $('#ntErr').textContent = ''; $('#ntOk').lastChild.textContent = okLabel || 'تأكيد';
+    $('#ntOk').onclick = () => { const v = $('#ntText').value.trim(); if (!v) { $('#ntErr').textContent = 'هذا الحقل مطلوب'; return; } dlgNote.close(); res(v); };
+    dlgNote.onclose = () => res(null); dlgNote.showModal(); });
+}
+async function returnPO() { const n = await askNote('إعادة الطلب للجهة الطالبة لاستكمال البيانات', 'اكتب المطلوب استكماله. سيُنشأ إصدار جديد ويُلغى توقيع الجهة الطالبة ليُعاد بعد التعديل.', 'إعادة'); if (!n) return;
+  try { applyServer(await call({ action: 'return', id: CUR.d.meta.id, note: n })); toast('أُعيد الطلب للجهة الطالبة'); } catch (e) { toast(e.message); } }
+async function cancelPO() { const n = await askNote('إلغاء أمر الشراء', 'سبب الإلغاء (يُسجّل في سجل التدقيق ويُبلَّغ مقدم الطلب).', 'إلغاء الطلب'); if (!n) return;
+  try { applyServer(await call({ action: 'cancel', id: CUR.d.meta.id, reason: n })); toast('أُلغي الطلب'); } catch (e) { toast(e.message); } }
+async function revisePO() { if (!confirm('إنشاء إصدار جديد من هذا الطلب للتعديل؟ يبقى الإصدار المرفوض محفوظًا في سجل النسخ، وتبدأ الدورة من جديد بعد الإرسال.')) return;
+  try { const r = await call({ action: 'revise', id: CUR.d.meta.id }); LIST_AT = 0; toast('أُنشئ الإصدار ' + r.data.meta.version); go('edit/' + r.data.meta.id); } catch (e) { toast(e.message); } }
+
+/* =====================================================================
+   5 · Procurement — review, serial number, ordered signers, positions in the document
+   ===================================================================== */
+let RT = null;
+ROUTES.route = async function (id) {
+  if (!P.procurement) throw new Error('هذه الشاشة لإدارة المشتريات');
+  await loadPO(id); const d = CUR.d, m = d.meta;
+  if (!['proc_review', 'signing'].includes(m.status)) { renderPO(); toast('الطلب ليس في مرحلة تحديد المسار'); return; }
+  const running = m.status === 'signing';
+  const chain = d.steps.filter(s => s.phase === 'chain');
+  RT = { running, locked: running ? chain.filter(s => s.state !== 'pending') : [], steps: (running ? chain.filter(s => s.state === 'pending') : chain).map(s => ({ kind: s.kind, title: s.title, name: s.name, email: s.email, slots: s.slots.slice() })) };
+  if (!running && !RT.steps.length) RT.steps = suggestSteps(d);
+  const num = (m.id.split('-').pop() || '').replace(/^0+/, '');
+  const dd = today().split('-');
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="route" class="icon"></i>${running ? 'تعديل مسار التوقيعات' : 'مراجعة الطلب وتحديد مسار التوقيعات'} — <span class="en">${esc(m.id)}</span> ${stChip(m.status)}</h2>
+  <div class="po-wrap"><div><div class="paperbox"><div class="paperfit" id="paper">${formPage(d, { screen: true, preview: RT })}</div></div></div>
+   <div class="side">
+    ${running ? '' : `<div class="card"><h3 class="s" style="margin-top:0">بيانات إدارة المشتريات</h3>
+      <label class="f">الرقم التسلسلي * Serial Number <span class="hint">(تملأ بواسطة المشتريات)</span><input id="rtSerial" dir="ltr" value="${esc(m.serial || `SRN/${dd[2]}/${dd[1]}/${dd[0]}-${num}`)}"></label>
+      <label class="f" style="margin-top:6px">الموعد المستهدف لاستكمال الاعتمادات<input type="date" id="rtTarget" value="${esc(m.targetDate || addDays(Number(SET.TARGET_DAYS) || 5))}"></label>
+      <label class="f" style="margin-top:6px">توجيه إدارة المشتريات<textarea id="rtNote" placeholder="يظهر في خانة «توجيه إدارة المشتريات» في المستند">${esc(m.procNote || '')}</textarea></label>
+      <div class="toolbar" style="margin-top:8px"><input type="file" id="attFile" multiple style="width:auto"><button class="btn sm" onclick="uploadFiles(true)"><i data-lucide="upload" class="icon"></i>إرفاق مستند للمشتريات</button></div>
+      <div class="toolbar" style="margin-top:8px"><button class="btn" onclick="returnPO()"><i data-lucide="undo-2" class="icon"></i>إعادة للجهة الطالبة لاستكمال البيانات</button></div></div>`}
+    <div class="card"><h3 class="s" style="margin-top:0;display:flex;justify-content:space-between;align-items:center">قائمة الموقّعين بالترتيب
+      ${running ? '' : '<button class="btn sm" onclick="RT.steps=suggestSteps(CUR.d);renderSteps()" title="اقتراح المسار من مصفوفة الصلاحيات حسب إجمالي كل جدول"><i data-lucide="wand-sparkles" class="icon"></i>اقتراح حسب مصفوفة الصلاحيات</button>'}</h3>
+      <div class="hint" style="margin-bottom:6px">يرسل النظام طلب التوقيع تلقائيًا للأول، ثم للتالي بعد كل توقيع دون تدخل يدوي. حدّد لكل موقّع موضع توقيعه في المستند (الجدول والعمود).</div>
+      <div id="rtSteps"></div>
+      <div class="toolbar"><button class="btn sm" onclick="RT.steps.push({kind:'sign',title:'',name:'',email:'',slots:[]});renderSteps()"><i data-lucide="plus" class="icon"></i>إضافة موقّع</button>
+        <button class="btn sm" onclick="RT.steps.push({kind:'inform',title:'',name:'',email:'',slots:[CUR.d.consumables.length?'cons.I':'asset.I']});renderSteps()"><i data-lucide="bell-plus" class="icon"></i>إضافة «يعلم»</button></div>
+      <datalist id="dlPos">${(SET.POSITIONS || []).map(p => `<option value="${esc(p.title)}">`).join('')}</datalist>
+    </div>
+    <div class="card toolbar">${running ? `<label class="f" style="width:100%">سبب تعديل المسار *<input id="rtReason"></label><button class="btn primary" onclick="saveRoute('edit')"><i data-lucide="save" class="icon"></i>حفظ تعديل المسار</button>`
+      : `<button class="btn" onclick="saveRoute(false)"><i data-lucide="save" class="icon"></i>حفظ المسار</button><button class="btn ok" onclick="saveRoute(true)"><i data-lucide="play" class="icon"></i>اعتماد المسار وبدء دورة التوقيعات</button>`}
+      <a class="btn" href="#po/${esc(m.id)}">رجوع</a></div>
+   </div></div>`;
+  renderSteps(); fitPaper(); icons();
+  ['#rtSerial', '#rtNote'].forEach(q => { const el = $(q); if (el) el.oninput = previewRoute; });
+};
+function posLookup(title) { return (SET.POSITIONS || []).find(p => p.title === title) || {}; }
+function suggestSteps(d) {
+  const req = d.steps.find(s => s.phase === 'requester') || {}, rank = t => ({ 'الجهة الطالبة': 0, 'مدير إدارة المستودعات': 1, 'مدير إدارة المرافق': 1, 'مدير إدارة المشتريات': 2, 'الإدارة المالية': 3, 'الرئيس التنفيذي للخدمات المشتركة': 5, 'مدير الشركة': 6 })[t] ?? 4;
+  const C = [], A = [], I = [];
+  [['cons', d.consumables], ['asset', d.assets]].forEach(([cat, rows]) => {
+    if (!rows.length) return; const b = doaBand(cat, sum(rows)); if (!b) return;
+    b.C.forEach(t => C.push({ t, slot: cat + '.C' })); A.push({ t: b.A, slot: cat + '.A' }); b.I.forEach(t => I.push({ t, slot: cat + '.I' }));
+  });
+  const mk = (x, kind) => { const p = x.t === 'الجهة الطالبة' ? { email: req.email, name: req.name } : posLookup(x.t); return { kind, title: x.t === 'الجهة الطالبة' ? 'ممثل الجهة الطالبة — ' + (d.meta.dept || '') : x.t, name: p.name || '', email: p.email || '', slots: [x.slot], _t: x.t }; };
+  const out = [];
+  const push = s => { const ex = out.find(o => o.kind === s.kind && o._t === s._t && o.email === s.email); if (ex) { if (!ex.slots.includes(s.slots[0])) ex.slots.push(s.slots[0]); } else out.push(s); };
+  C.sort((a, b) => rank(a.t) - rank(b.t)).forEach(x => push(mk(x, 'sign')));
+  A.sort((a, b) => rank(a.t) - rank(b.t)).forEach(x => push(mk(x, 'sign')));
+  I.forEach(x => push(mk(x, 'inform')));
+  return out;
+}
+function renderSteps() {
+  const box = $('#rtSteps'); if (!box) return;
+  const slotOpts = s => (s.kind === 'inform' ? ['cons.I', 'asset.I'] : ['cons.C', 'cons.A', 'asset.C', 'asset.A']).filter(k => k.startsWith('cons') ? CUR.d.consumables.length : CUR.d.assets.length);
+  const lockedHtml = RT.locked.map((s, i) => `<div class="steprow locked"><span class="n">${i + 1}</span><b style="grid-column:span 4">${esc(s.name || s.email)} <span class="hint">${esc(s.title)}</span></b><span>${s.state === 'signed' ? '✔' : '⏳'}</span></div>`).join('');
+  box.innerHTML = lockedHtml + RT.steps.map((s, i) => `<div class="steprow"><span class="n">${RT.locked.length + i + 1}</span>
+    <select data-s="${i}" data-k="kind"><option value="sign" ${s.kind === 'sign' ? 'selected' : ''}>موقّع</option><option value="inform" ${s.kind === 'inform' ? 'selected' : ''}>يعلم (إشعار)</option></select>
+    <span></span><span style="white-space:nowrap"><button class="btn sm" onclick="mvStep(${i},-1)" title="أعلى">▲</button><button class="btn sm" onclick="mvStep(${i},1)" title="أسفل">▼</button><button class="btn sm danger" onclick="RT.steps.splice(${i},1);renderSteps()" title="حذف">✕</button></span>
+    <input class="ti" list="dlPos" data-s="${i}" data-k="title" placeholder="المسمى / الصفة (من دليل المناصب)" value="${esc(s.title)}">
+    <input class="nmi" data-s="${i}" data-k="name" placeholder="الاسم" value="${esc(s.name)}">
+    <input class="emi" data-s="${i}" data-k="email" dir="ltr" placeholder="name@sr.edu.sa" value="${esc(s.email)}">
+    <div class="slots"><span class="hint">موضع التوقيع:</span>${slotOpts(s).map(k => `<label><input type="checkbox" data-s="${i}" data-slot="${k}" ${s.slots.includes(k) ? 'checked' : ''}>${slotAr(k)}</label>`).join('')}</div></div>`).join('');
+  box.querySelectorAll('[data-k]').forEach(el => el.oninput = el.onchange = () => {
+    const s = RT.steps[el.dataset.s]; s[el.dataset.k] = el.value;
+    if (el.dataset.k === 'title') { const p = posLookup(el.value); if (p.email && !s.email) { s.email = p.email; s.name = s.name || p.name; renderSteps(); } }
+    if (el.dataset.k === 'kind') { s.slots = []; renderSteps(); } previewRoute();
+  });
+  box.querySelectorAll('[data-slot]').forEach(el => el.onchange = () => { const s = RT.steps[el.dataset.s]; s.slots = el.checked ? [...new Set(s.slots.concat(el.dataset.slot))] : s.slots.filter(x => x !== el.dataset.slot); previewRoute(); });
+  previewRoute();
+}
+function mvStep(i, dlt) { const j = i + dlt; if (j < 0 || j >= RT.steps.length) return; [RT.steps[i], RT.steps[j]] = [RT.steps[j], RT.steps[i]]; renderSteps(); }
+function previewRoute() { const p = $('#paper'); if (p) { p.innerHTML = formPage(CUR.d, { screen: true, preview: RT }); fitPaper(); } }
+async function saveRoute(start) {
+  const steps = RT.steps.map(s => ({ kind: s.kind, title: s.title, name: s.name, email: s.email.trim(), slots: s.slots }));
+  try {
+    let r;
+    if (start === 'edit') { const reason = $('#rtReason').value.trim(); if (!reason) return toast('اكتب سبب تعديل المسار'); r = await call({ action: 'editSteps', id: CUR.d.meta.id, steps, reason }); }
+    else {
+      if (start && !confirm('اعتماد المسار وبدء دورة التوقيعات؟ سيُرسل طلب التوقيع للموقّع الأول فورًا.')) return;
+      r = await call({ action: 'route', id: CUR.d.meta.id, serial: $('#rtSerial').value, targetDate: $('#rtTarget').value, procNote: $('#rtNote').value, steps, start: !!start, baseUpdatedAt: CUR.updatedAt });
+    }
+    LIST_AT = 0; toast(start === true ? '✔ بدأت دورة التوقيعات — أُرسل الطلب إلى ' + (r.data.steps.find(s => s.state === 'current') || {}).email : '✔ حُفظ المسار');
+    go('po/' + CUR.d.meta.id);
+  } catch (e) { toast(e.message, 7000); }
+}
+
+/* =====================================================================
+   6 · The official form, rendered from the record (screen, print and final PDF)
+   ===================================================================== */
+const MODE_TXT = { stamp: 'ختم التوقيع فقط', image: 'صورة التوقيع', blur: 'صورة مموّهة (واضحة في النسخة النهائية)' };
+function effMode(d) { return MODE_TXT[d.meta.sigDisplay] ? d.meta.sigDisplay : (SET.sigDefault || 'image'); }
+let PDF_CLEAR = null;
+const ROWS_ON_FORM = 6;
+function lg(k) { try { return (window.COMPANY_LOGO || {})[k] || ''; } catch (e) { return ''; } }
+function formPage(d, o) {
+  o = o || {};
+  const m = d.meta, steps = o.preview ? previewSteps(d, o.preview) : d.steps;
+  return `<div class="fpage ${o.screen ? 'screen' : ''}">
+   <div class="f-head"><div class="ttl">Purchase&nbsp; Requisition</div>
+     <div class="co"><div style="text-align:right">${lg('nameAr') ? `<img class="na" src="${lg('nameAr')}" alt="${esc(SET.COMPANY_AR || '')}">` : `<b>${esc(SET.COMPANY_AR || '')}</b>`}<div class="en">${esc(SET.COMPANY_EN || '')}</div></div>${lg('mark') ? `<img class="mk" src="${lg('mark')}" alt="">` : ''}</div></div>
+   <div class="f-info">
+     <div class="f-serial"><div class="vt">تملى بواسطة المشتريات</div><table><tr><td><b>Serial Number</b></td></tr><tr><td>${esc((o.preview && $('#rtSerial') ? $('#rtSerial').value : m.serial) || 'SRN/DD/MM/YEAR')}</td></tr><tr><td class="mono" style="font-size:8px">${esc(m.id)} · v${esc(m.version)}</td></tr></table></div>
+     <table class="f-meta"><tr><td class="le">Date:</td><td class="va">${esc(m.date)}</td><td class="la">التاريخ :</td></tr>
+       <tr><td class="le">Requesting Dept.</td><td class="va">${esc(m.dept)}</td><td class="la">الجهة الطالبة :</td></tr>
+       <tr><td class="le">Budget Element:</td><td class="va">${esc(m.budget)}</td><td class="la">بند الميزانية :</td></tr></table>
+   </div>
+   ${secHtml(d, steps, 'cons', 'consumables', 'Consumables / Services', 'المستهلكات أو الخدمات', o)}
+   ${secHtml(d, steps, 'asset', 'assets', 'Assets', 'الأصول', o)}
+   <div class="f-proc"><div class="h">توجيه إدارة المشتريات :</div><div class="b">${esc((o.preview ? ($('#rtNote') || {}).value : null) ?? m.procNote ?? '')}</div>
+     ${steps.some(s => s.kind === 'inform') ? `<div class="b" style="margin-top:3px"><b>يعلم Informed:</b> ${steps.filter(s => s.kind === 'inform').map(s => esc((s.name ? s.name + ' — ' : '') + s.title)).join('، ')}</div>` : ''}</div>
+   <div class="f-rail"><span>يعد : مدير إدارة الجهة الطالبة.</span><span>يلزم التفريق ما بين الأصول والمستهلكات وتوزيعها طبقًا للجدول.</span><span>انظر كامل الصلاحيات بالخلف.</span></div>
+   <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(m.id)} v${esc(m.version)}</span> · ${esc(SA[m.status] || '')}</span><span class="mono">${m.fullHash ? 'SHA-256 ' + esc(String(m.fullHash).slice(0, 16)) : ''}</span><span>${o.pageNo || ''}</span></div>
+   ${o.wmk ? '<div class="f-wmk">نسخة معاينة</div>' : ''}</div>`;
+}
+const APP_SHORT = () => BOOT.short || 'POFlow';
+function previewSteps(d, rt) {
+  let n = 1; return d.steps.filter(s => s.phase === 'requester').concat(rt.locked || [], rt.steps.map((s, i) => Object.assign({ key: 'p' + i, phase: 'chain', state: 'pending' }, s)))
+    .map(s => Object.assign({}, s, { _n: s.kind === 'inform' ? 0 : n++ }));
+}
+function secHtml(d, steps, cat, key, en, ar, o) {
+  const rows = d[key] || [], t = sum(rows), lim = o.pdf ? ROWS_ON_FORM : Math.max(ROWS_ON_FORM, rows.length);
+  const shown = rows.slice(0, lim), pad = Math.max(0, (o.pdf ? ROWS_ON_FORM : Math.max(rows.length ? rows.length : 0, ROWS_ON_FORM)) - shown.length);
+  const more = rows.length - shown.length;
+  const body = shown.map((r, i) => `<tr><td class="c-n">${i + 1}</td><td>${esc(r.desc)}</td><td class="c-u">${esc(r.unit)}</td><td class="c-q">${esc(r.qty || '')}</td><td class="c-p">${r.price ? fmtN(r.price) : ''}</td><td class="c-t">${r.qty * r.price ? fmtN(r.qty * r.price) : ''}</td></tr>`).join('') +
+    Array.from({ length: pad }, () => '<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('') +
+    (more > 0 ? `<tr><td colspan="6" style="text-align:center;font-weight:700">+ ${more} أصناف أخرى — انظر ملحق الأصناف</td></tr>` : '');
+  const slotCells = r => { const st = steps.filter(s => (s.slots || []).includes(cat + '.' + r)); return st; };
+  const R = slotCells('R'), C = slotCells('C'), A = slotCells('A');
+  const names = list => list.length ? list.map(s => `<span class="ent"><span class="nm">${esc(s.name || s.email)}</span>${s.title && s.name ? `<span class="tt">${esc(s.title)}</span>` : ''}</span>`).join('') : '';
+  const sigs = list => list.map(s => sigBox(d, s, o, list.length > 1)).join('');
+  const has = rows.length > 0;
+  return `<div class="f-${cat}"><table class="f-tbl"><tr class="cap"><td colspan="6">${en} / ${ar}</td></tr>
+     <tr><th class="c-n">م</th><th>البيان<br>Item Description</th><th class="c-u">الوحدة<br>Unit</th><th class="c-q">الكمية<br>QTY.</th><th class="c-p">السعر التقديري<br>Estimated price</th><th class="c-t">الإجمالي التقديري<br>Estimated Total</th></tr>
+     ${body}<tr class="totrow"><td colspan="5" style="text-align:right">الإجمالي التقديري ${has ? '(' + esc(d.meta.currency) + ')' : ''}</td><td class="c-t">${has ? fmtN(t) : ''}</td></tr></table>
+   <table class="f-raci"><tr><th class="rh">${ar}</th><th>يعد &nbsp;<span class="en">Responsible</span></th><th>يقترح /يوصي &nbsp;<span class="en">Consulted</span></th><th>يعتمد &nbsp;<span class="en">Accountable</span></th></tr>
+     <tr class="rn"><td class="rh">الاسم</td><td>${has ? names(R) : ''}</td><td>${has ? names(C) : ''}</td><td>${has ? names(A) : ''}</td></tr>
+     <tr class="rs"><td class="rh">التوقيع</td><td>${has ? sigs(R) : ''}</td><td>${has ? sigs(C) : ''}</td><td>${has ? sigs(A) : ''}</td></tr></table></div>`;
+}
+function sigBox(d, s, o, many) {
+  const mode = effMode(d), g = s.sig;
+  if (g) {
+    const clear = PDF_CLEAR && PDF_CLEAR[s.key];
+    const pic = mode === 'stamp' ? '' : clear ? `<img src="${esc(clear)}" alt="">` : mode === 'image' && g.img ? `<img src="${esc(g.img)}" alt="" draggable="false">` : mode === 'blur' && g.imgBlur ? `<img src="${esc(g.imgBlur)}" alt="" draggable="false" title="صورة مموّهة — تظهر واضحة في النسخة النهائية">` : '';
+    return `<span class="sg ${many ? 'many' : ''}">${pic}<span class="stp"><b>✔ موقّع إلكترونيًا</b><br>${esc(g.signerName)}${g.onBehalfOf ? '<br>بالنيابة عن ' + esc(g.onBehalfOf) : ''}<br><span class="en">${esc(fmtDT(g.at))}</span></span></span>`;
+  }
+  if (s.state === 'rejected') return `<span class="sg"><span class="rej">✖ مرفوض<br><span class="en" style="font-weight:400">${esc(fmtD(s.rejectedAt))}</span></span></span>`;
+  if (s.state === 'current') return `<span class="sg"><span class="aw">⏳ بانتظار التوقيع</span>${!o.pdf && !o.preview && stepMine(s) && P.sign && CUR && CUR.latest ? `<button class="btn sm ok no-print" style="margin-top:2px" onclick="signStep('${s.key}')">توقيع</button>` : ''}</span>`;
+  if (o.preview) return `<span class="sg"><span class="pd">التوقيع رقم ${s._n}</span></span>`;
+  return ['signing', 'req_sign', 'proc_review'].includes(d.meta.status) ? `<span class="sg"><span class="pd">بانتظار دوره</span></span>` : '';
+}
+
+/* =====================================================================
+   7 · Archive & advanced search · reports
+   ===================================================================== */
+const AF = { q: '', dept: '', status: '', from: '', to: '', min: '', max: '' };
+ROUTES.archive = async function () {
+  const depts = [...new Set(LIST.map(x => x.dept).filter(Boolean))].sort();
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="archive" class="icon"></i>الأرشيف الإلكتروني والبحث المتقدم</h2>
+  <div class="card filters">
+    <label class="f" style="flex:2;min-width:220px">بحث (رقم الطلب · الرقم التسلسلي · الموضوع · المورد)<input id="aQ" value="${esc(AF.q)}"></label>
+    <label class="f">الجهة الطالبة<select id="aDept"><option value="">الكل</option>${depts.map(d => `<option ${d === AF.dept ? 'selected' : ''}>${esc(d)}</option>`).join('')}</select></label>
+    <label class="f">الحالة<select id="aSt"><option value="">الكل</option>${Object.keys(SA).map(s => `<option value="${s}" ${s === AF.status ? 'selected' : ''}>${esc(SA[s])}</option>`).join('')}</select></label>
+    <label class="f">من<input type="date" id="aFrom" value="${AF.from}"></label><label class="f">إلى<input type="date" id="aTo" value="${AF.to}"></label>
+    <label class="f">القيمة من<input type="number" id="aMin" value="${AF.min}"></label><label class="f">إلى<input type="number" id="aMax" value="${AF.max}"></label>
+    <button class="btn" onclick="exportCsv(archFiltered(),'POFlow-archive')"><i data-lucide="file-spreadsheet" class="icon"></i>تصدير CSV</button>
+  </div><div class="card" id="aBody"></div>
+  <div class="hint">تُحفظ النسخ النهائية الموقّعة وجميع المرفقات وسجل التوقيعات في مجلدات Drive خاصة، وتُطبّق سياسة الاحتفاظ (${esc(SET.RETENTION_YEARS || 10)} سنوات) والنسخ الاحتياطي على مستوى Google Workspace.</div>`;
+  [['#aQ', 'q'], ['#aDept', 'dept'], ['#aSt', 'status'], ['#aFrom', 'from'], ['#aTo', 'to'], ['#aMin', 'min'], ['#aMax', 'max']].forEach(([s, k]) => $(s).oninput = e => { AF[k] = e.target.value; archBody(); });
+  archBody();
+};
+function archFiltered() {
+  const q = AF.q.trim().toLowerCase();
+  return LIST.filter(x => (!q || [x.id, x.serial, x.subject, x.supplier, x.requester].join(' ').toLowerCase().includes(q)) && (!AF.dept || x.dept === AF.dept) && (!AF.status || x.status === AF.status) &&
+    (!AF.from || (x.createdAt || '').slice(0, 10) >= AF.from) && (!AF.to || (x.createdAt || '').slice(0, 10) <= AF.to) && (!AF.min || x.total >= Number(AF.min)) && (!AF.max || x.total <= Number(AF.max)))
+    .sort((a, b) => String(b.createdAt).localeCompare(a.createdAt));
+}
+function archBody() { const L = archFiltered(); $('#aBody').innerHTML = `<div class="hint" style="margin-bottom:6px">${L.length} نتيجة</div>` + poTable(L, { dateCol: 'تاريخ الإنشاء', dateKey: 'createdAt' }); }
+function exportCsv(rows, name) {
+  const cols = [['id', 'رقم الطلب'], ['version', 'الإصدار'], ['serial', 'الرقم التسلسلي'], ['statusAr', 'الحالة'], ['dept', 'الجهة الطالبة'], ['subject', 'الموضوع'], ['supplier', 'المورد'], ['cons', 'المستهلكات'], ['asset', 'الأصول'], ['total', 'الإجمالي'], ['currency', 'العملة'], ['createdAt', 'الإنشاء'], ['submittedAt', 'الإحالة'], ['approvedAt', 'الاعتماد'], ['cycleDays', 'مدة الاعتماد (يوم)']];
+  const val = (x, k) => k === 'statusAr' ? SA[x.status] : k === 'cycleDays' ? (x.approvedAt ? ((Date.parse(x.approvedAt) - Date.parse(x.submittedAt || x.createdAt)) / 864e5).toFixed(1) : '') : x[k];
+  const csv = '﻿' + [cols.map(c => c[1])].concat(rows.map(x => cols.map(c => val(x, c[0])))).map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' })); a.download = name + '-' + today() + '.csv'; document.body.appendChild(a); a.click(); setTimeout(() => a.remove(), 500);
+}
+ROUTES.reports = async function () {
+  const L = LIST, appr = L.filter(x => x.status === 'approved');
+  const byDept = Object.entries(groupBy(L, x => x.dept || '—')).map(([l, a]) => ({ l, n: a.length, v: a.reduce((s, x) => s + x.total, 0), ok: a.filter(x => x.status === 'approved').length, rj: a.filter(x => x.status === 'rejected').length })).sort((a, b) => b.v - a.v);
+  const byMonth = Object.entries(groupBy(L, x => (x.createdAt || '').slice(0, 7))).sort().map(([l, a]) => ({ l, v: a.length }));
+  const cyc = appr.map(x => ({ x, d: (Date.parse(x.approvedAt) - Date.parse(x.submittedAt || x.createdAt)) / 864e5 })).sort((a, b) => b.d - a.d);
+  // time spent per signer (from step timestamps)
+  const wait = {}; L.forEach(x => { let prev = Date.parse(x.routedAt || x.submittedAt || x.createdAt); x.steps.filter(s => s.phase === 'chain' && s.kind === 'sign').forEach(s => { const at = Date.parse(s.at || ''); if (at && prev) { (wait[s.name || s.email] = wait[s.name || s.email] || []).push((at - prev) / 36e5); prev = at; } }); });
+  const waitRows = Object.entries(wait).map(([l, a]) => ({ l, v: Math.round(a.reduce((s, v) => s + v, 0) / a.length * 10) / 10 })).sort((a, b) => b.v - a.v);
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="chart-column" class="icon"></i>التقارير والإحصاءات <span style="flex:1"></span><button class="btn" onclick="exportCsv(LIST,'POFlow-report')"><i data-lucide="file-spreadsheet" class="icon"></i>تصدير جميع البيانات CSV</button></h2>
+   <div class="grid g2">
+    <div class="card"><h3 class="s" style="margin-top:0">عدد الطلبات شهريًا</h3>${bars(byMonth)}</div>
+    <div class="card"><h3 class="s" style="margin-top:0">متوسط زمن التوقيع لكل موقّع <span class="hint">(ساعة)</span></h3>${bars(waitRows, v => v + ' س')}</div>
+   </div>
+   <div class="card"><h3 class="s" style="margin-top:0">ملخص حسب الجهة الطالبة</h3><table class="reg"><thead><tr><th>الجهة</th><th>عدد الطلبات</th><th>معتمدة</th><th>مرفوضة</th><th>القيمة التقديرية</th></tr></thead><tbody>
+     ${byDept.map(r => `<tr><td>${esc(r.l)}</td><td class="num">${r.n}</td><td class="num">${r.ok}</td><td class="num">${r.rj}</td><td class="num">${fmtN(r.v)}</td></tr>`).join('') || '<tr><td colspan="5" class="empty">—</td></tr>'}</tbody></table></div>
+   <div class="card"><h3 class="s" style="margin-top:0">مدد دورات الاعتماد المكتملة</h3><table class="reg"><thead><tr><th>الطلب</th><th>الجهة</th><th>الإحالة</th><th>الاعتماد</th><th>المدة (يوم)</th></tr></thead><tbody>
+     ${cyc.map(c => `<tr class="click" onclick="go('po/${esc(c.x.id)}')"><td class="en">${esc(c.x.id)}</td><td>${esc(c.x.dept)}</td><td class="hint">${esc(fmtDT(c.x.submittedAt))}</td><td class="hint">${esc(fmtDT(c.x.approvedAt))}</td><td class="num">${c.d.toFixed(1)}</td></tr>`).join('') || '<tr><td colspan="5" class="empty">لا توجد طلبات معتمدة بعد.</td></tr>'}</tbody></table></div>`;
+};
+
+/* =====================================================================
+   8 · Verification · audit trail
+   ===================================================================== */
+ROUTES.verify = async function (code) {
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="shield-check" class="icon"></i>التحقق من أمر شراء معتمد</h2>
+  <div class="grid g2"><div class="card"><h3 class="s" style="margin-top:0">برمز التحقق (أو رمز QR في شهادة التوقيع)</h3>
+     <div class="toolbar"><input id="vCode" dir="ltr" placeholder="XXXX-XXXX-XXXX" value="${esc(code || '')}" style="max-width:240px" class="mono"><button class="btn primary" onclick="verifyCode()"><i data-lucide="search" class="icon"></i>تحقق</button></div></div>
+   <div class="card"><h3 class="s" style="margin-top:0">بملف PDF</h3><div class="drop" id="vDrop">اسحب ملف PDF هنا أو اضغط للاختيار<br><span class="hint">تُحسب بصمة الملف في متصفحك ولا يُرفع الملف</span></div><input type="file" id="vFile" accept="application/pdf" hidden></div></div>
+  <div id="vRes"></div>`;
+  const dr = $('#vDrop'), fi = $('#vFile');
+  dr.onclick = () => fi.click(); fi.onchange = () => fi.files[0] && verifyFile(fi.files[0]);
+  dr.ondragover = e => { e.preventDefault(); dr.classList.add('hov'); }; dr.ondragleave = () => dr.classList.remove('hov');
+  dr.ondrop = e => { e.preventDefault(); dr.classList.remove('hov'); e.dataTransfer.files[0] && verifyFile(e.dataTransfer.files[0]); };
+  if (code) verifyCode();
+};
+async function verifyCode() { try { showVerify(await call({ action: 'verify', id: $('#vCode').value })); } catch (e) { toast(e.message); } }
+async function verifyFile(f) {
+  try { const h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', await f.arrayBuffer()))].map(b => b.toString(16).padStart(2, '0')).join(''); showVerify(await call({ action: 'verifyHash', hash: h })); } catch (e) { toast(e.message); }
+}
+function showVerify(r) {
+  if (!r.found) { $('#vRes').innerHTML = `<div class="banner bad"><i data-lucide="shield-x" class="icon"></i>${esc(r.error)}</div>`; icons(); return; }
+  $('#vRes').innerHTML = `<div class="banner ${r.valid ? 'ok' : 'bad'}"><i data-lucide="${r.valid ? 'shield-check' : 'shield-alert'}" class="icon"></i><div><b>${r.valid ? 'أمر الشراء معتمد وسليم — جميع التوقيعات تطابق المحتوى' : 'تنبيه: لا تتطابق البصمات — المحتوى أو التوقيعات تغيّرت'}</b>
+    <br><span class="en">${esc(r.id)} v${esc(r.version)}</span> · ${esc(r.serial)} · ${esc(r.subject)} · ${esc(r.dept)} · <span class="num">${fmtN(r.total)} ${esc(r.currency)}</span><br>صدرت النسخة النهائية ${esc(fmtDT(r.finalizedAt))}</div></div>
+   <div class="card"><table class="reg"><thead><tr><th>الصفة</th><th>الموقّع</th><th>البريد</th><th>التاريخ</th><th>المطابقة</th></tr></thead><tbody>
+   ${r.signers.map(s => `<tr><td>${esc(s.title)}</td><td><b>${esc(s.signer)}</b><div class="hint">${esc(s.position)}</div></td><td class="en">${esc(s.by)}${s.onBehalfOf ? '<div class="hint">بالنيابة عن ' + esc(s.onBehalfOf) + '</div>' : ''}</td><td class="hint">${esc(fmtDT(s.at))}</td><td>${s.match ? '<span class="st st-approved">✔ مطابق</span>' : '<span class="st st-rejected">✖</span>'}</td></tr>`).join('')}</tbody></table>
+   <div class="hint" style="margin-top:8px">بصمة المحتوى: <span class="mono">${esc(r.fullHash)}</span><br>بصمة الملف: <span class="mono">${esc(r.pdfHash)}</span></div></div>`;
+  icons();
+}
+ROUTES.audit = async function () {
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="scroll-text" class="icon"></i>سجل التدقيق <span class="hint">Audit Trail — للقراءة فقط، لا يمكن تعديله أو حذفه من المنصة</span></h2>
+   <div class="card filters"><label class="f" style="flex:1">بحث<input id="auQ" placeholder="بريد · رقم طلب · إجراء"></label><button class="btn primary" onclick="loadAudit()"><i data-lucide="search" class="icon"></i>بحث</button></div><div class="card" id="auBody"><div class="loading">…</div></div>`;
+  loadAudit();
+};
+async function loadAudit() {
+  try { const r = await call({ action: 'audit', q: $('#auQ').value });
+    $('#auBody').innerHTML = `<div style="overflow-x:auto"><table class="reg"><thead><tr><th>التاريخ</th><th>الوقت</th><th>المستخدم</th><th>الإجراء</th><th>الطلب</th><th>الإصدار</th><th>التفاصيل</th><th>النتيجة</th></tr></thead><tbody>${r.items.map(x => `<tr><td>${esc(x.date)}</td><td>${esc(x.time)}</td><td class="en">${esc(x.email)}</td><td>${esc(ACT_AR[x.action] || x.action)}</td><td class="en">${x.poId ? `<a href="#po/${esc(x.poId)}">${esc(x.poId)}</a>` : ''}</td><td>${esc(x.version)}</td><td>${esc(x.detail)}</td><td>${esc(x.result)}</td></tr>`).join('')}</tbody></table></div>`;
+  } catch (e) { $('#auBody').innerHTML = esc(e.message); }
+}
+
+/* =====================================================================
+   9 · Users, roles & delegation · settings (admin)
+   ===================================================================== */
+const ROLE_OPTS = { admin: 'مدير النظام · Admin', editor: 'محرر · Editor', viewer: 'مشاهد · Viewer' };
+const ROLE_HINT = { admin: 'كل الصلاحيات: المستخدمون وطلبات الدخول والتفويض والإعدادات + المشتريات', editor: 'إنشاء الطلبات والتوقيع على الخطوات المسندة (مع «المشتريات»: المراجعة وتحديد المسار)', viewer: 'اطّلاع فقط: الطلبات والأرشيف والتقارير والتحقق وسجل التدقيق' };
+ROUTES.users = async function () {
+  const [u, dl, rq] = await Promise.all([call({ action: 'users' }), call({ action: 'delegations' }), call({ action: 'accessRequests' })]);
+  const pend = rq.items.filter(x => x.status === 'pending'), done = rq.items.filter(x => x.status !== 'pending').slice(0, 15);
+  BOOT.pendingRequests = pend.length; renderNav('users');
+  const roleSel = (v, attr) => `<select ${attr || ''}>${Object.entries(ROLE_OPTS).map(([k, l]) => `<option value="${k}" ${k === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const cnt = r => u.items.filter(x => x.role === r && x.active).length;
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="users" class="icon"></i>إدارة المستخدمين والصلاحيات</h2>
+  <div class="banner info"><i data-lucide="shield" class="icon"></i><div>الدخول مقصور على المستخدمين المفعّلين في هذه القائمة فقط. من لا يملك صلاحية تظهر له شاشة <b>«طلب صلاحية الدخول»</b>، ويصل طلبه بالبريد إلى <b class="en">m.elmahdy@sr.edu.sa</b> ويظهر هنا للموافقة أو الرفض. الصلاحيات يتحقق منها الخادم في كل عملية.</div></div>
+  <div class="tiles">${Object.keys(ROLE_OPTS).map(r => `<div class="tile ${r === 'admin' ? '' : r === 'editor' ? 'info' : 'ok'}" title="${esc(ROLE_HINT[r])}"><div class="k">${esc(ROLE_OPTS[r])}</div><div class="v">${cnt(r)}</div></div>`).join('')}
+    <div class="tile warn"><div class="k">طلبات دخول بانتظار المراجعة</div><div class="v">${pend.length}</div></div></div>
+  <div class="card"><h3 class="s" style="margin-top:0">طلبات صلاحية الدخول (${pend.length})</h3>
+   ${pend.length ? `<table class="reg"><thead><tr><th>مقدم الطلب</th><th>الصلاحية المطلوبة</th><th>السبب</th><th>التاريخ</th><th>منح الصلاحية</th><th></th></tr></thead><tbody>${pend.map(x => `<tr data-r="${esc(x.rid)}">
+     <td><b>${esc(x.name)}</b><div class="en hint">${esc(x.email)}</div></td><td>${esc(ROLE_OPTS[x.role] || x.role)}</td><td>${esc(x.reason)}</td><td class="hint">${esc(x.date)} ${esc(x.time)}</td>
+     <td>${roleSel(x.role, 'data-rrole')}<label style="display:flex;gap:4px;font-size:.78rem;margin-top:4px"><input type="checkbox" data-rproc style="width:auto">فريق المشتريات</label></td>
+     <td style="white-space:nowrap"><button class="btn sm ok" onclick="decideReq('${esc(x.rid)}','approve')"><i data-lucide="check" class="icon"></i>موافقة</button> <button class="btn sm danger" onclick="decideReq('${esc(x.rid)}','reject')"><i data-lucide="x" class="icon"></i>رفض</button></td></tr>`).join('')}</tbody></table>`
+     : '<div class="empty">لا توجد طلبات جديدة.</div>'}
+   ${done.length ? `<details style="margin-top:8px"><summary class="hint">الطلبات السابقة (${done.length})</summary><table class="reg"><tbody>${done.map(x => `<tr><td>${esc(x.name)} <span class="en hint">${esc(x.email)}</span></td><td>${x.status === 'approved' ? '<span class="st st-approved">موافق عليه</span>' : '<span class="st st-rejected">مرفوض</span>'}</td><td class="hint">${esc(x.decidedBy)} · ${esc(fmtDT(x.decidedAt))}</td><td>${esc(x.note)}</td></tr>`).join('')}</tbody></table></details>` : ''}</div>
+  <div class="card"><h3 class="s" style="margin-top:0">المستخدمون المصرّح لهم (${u.items.length})</h3>
+  <div class="filters" style="margin-bottom:6px"><input id="uQ" placeholder="بحث بالبريد أو الاسم…" style="max-width:320px" oninput="filterUsers(this.value)"></div>
+  <div style="overflow-x:auto"><table class="reg" id="uTbl"><thead><tr><th>البريد</th><th>الاسم</th><th>الصلاحية</th><th>فريق المشتريات</th><th>مفعّل</th><th>ملاحظات</th><th></th></tr></thead><tbody>
+  ${u.items.map((x, i) => `<tr data-u="${i}" data-q="${esc((x.email + ' ' + x.name).toLowerCase())}"><td class="en">${esc(x.email)}${x.owner ? ' <span class="chip">المالك</span>' : ''}</td><td><input data-f="name" value="${esc(x.name)}"></td>
+    <td>${roleSel(x.role, `data-role ${x.owner ? 'disabled' : ''}`)}</td><td style="text-align:center"><input type="checkbox" data-f="proc" ${x.procurement ? 'checked' : ''} ${x.role !== 'editor' ? 'disabled' : ''} style="width:auto" title="يمنح المحرر صلاحيات إدارة المشتريات"></td>
+    <td style="text-align:center"><input type="checkbox" data-f="active" ${x.active ? 'checked' : ''} ${x.owner ? 'disabled' : ''} style="width:auto"></td><td><input data-f="notes" value="${esc(x.notes)}"></td>
+    <td><button class="btn sm primary" onclick="saveUser(${i})">حفظ</button></td></tr>`).join('')}
+  <tr><td><input id="nuEmail" dir="ltr" placeholder="name@sr.edu.sa"></td><td><input id="nuName" placeholder="الاسم"></td><td>${roleSel('viewer', 'id="nuRole"')}</td><td style="text-align:center"><input type="checkbox" id="nuProc" style="width:auto"></td><td></td><td><input id="nuNotes"></td><td><button class="btn sm primary" onclick="saveUser(-1)"><i data-lucide="user-plus" class="icon"></i>إضافة</button></td></tr></tbody></table></div>
+  <div class="hint" style="margin-top:6px">${Object.keys(ROLE_OPTS).map(r => `<b>${esc(ROLE_OPTS[r])}:</b> ${esc(ROLE_HINT[r])}`).join(' · ')}</div></div>
+  <h3 class="s">تفويض التوقيع <span class="hint">— تفويض رسمي مؤقت ومحدد المدة، يُسجّل في سجل التدقيق، ويظهر في التوقيع «بالنيابة عن»</span></h3>
+  <div class="card"><table class="reg"><thead><tr><th>المفوِّض</th><th>المفوَّض إليه</th><th>من</th><th>إلى</th><th>السبب</th><th>الحالة</th><th></th></tr></thead><tbody>
+  ${dl.items.map(x => `<tr><td class="en">${esc(x.fromEmail)}</td><td class="en">${esc(x.toEmail)}</td><td>${esc(x.start)}</td><td>${esc(x.end)}</td><td>${esc(x.reason)}</td><td>${x.active ? '<span class="chip">نشط</span>' : '<span class="chip lk">موقوف</span>'}</td><td><button class="btn sm" onclick="toggleDel('${esc(x.did)}',${!x.active})">${x.active ? 'إيقاف' : 'تفعيل'}</button></td></tr>`).join('')}
+  <tr><td><input id="ndFrom" dir="ltr" placeholder="من (الموقّع الأصلي)"></td><td><input id="ndTo" dir="ltr" placeholder="إلى (المفوَّض)"></td><td><input type="date" id="ndStart" value="${today()}"></td><td><input type="date" id="ndEnd" value="${addDays(14)}"></td><td><input id="ndReason" placeholder="إجازة / مهمة رسمية"></td><td></td><td><button class="btn sm primary" onclick="addDel()"><i data-lucide="plus" class="icon"></i>إضافة</button></td></tr></tbody></table></div>`;
+  window._U = u.items;
+  $$('#uTbl [data-role]').forEach(sel => sel.onchange = () => { const pc = sel.closest('tr').querySelector('[data-f=proc]'); pc.disabled = sel.value !== 'editor'; if (pc.disabled) pc.checked = false; });
+  icons();
+};
+function filterUsers(q) { q = q.trim().toLowerCase(); $$('#uTbl tr[data-u]').forEach(tr => tr.hidden = q && !tr.dataset.q.includes(q)); }
+async function saveUser(i) {
+  try {
+    const p = i < 0 ? { email: $('#nuEmail').value, name: $('#nuName').value, role: $('#nuRole').value, procurement: $('#nuProc').checked, notes: $('#nuNotes').value, active: true }
+      : (() => { const tr = document.querySelector(`tr[data-u="${i}"]`); return { email: _U[i].email, name: tr.querySelector('[data-f=name]').value, role: tr.querySelector('[data-role]').value, procurement: tr.querySelector('[data-f=proc]').checked, active: tr.querySelector('[data-f=active]').checked, notes: tr.querySelector('[data-f=notes]').value }; })();
+    await call(Object.assign({ action: 'userSave' }, p)); toast('✔ حُفظ المستخدم — تسري الصلاحية خلال دقيقتين'); ROUTES.users();
+  } catch (e) { toast(e.message, 6000); }
+}
+async function decideReq(rid, decision) {
+  const tr = document.querySelector(`tr[data-r="${rid}"]`), role = tr.querySelector('[data-rrole]').value, procurement = tr.querySelector('[data-rproc]').checked;
+  let note = '';
+  if (decision === 'reject') { note = await askNote('رفض طلب صلاحية الدخول', 'سبب الرفض (يُرسل إلى مقدم الطلب).', 'رفض'); if (note === null) return; }
+  else if (!confirm('منح صلاحية «' + ROLE_OPTS[role] + '»' + (procurement ? ' مع فريق المشتريات' : '') + ' وإبلاغ مقدم الطلب بالبريد؟')) return;
+  try { await call({ action: 'accessDecide', rid, decision, role, procurement, note }); toast(decision === 'approve' ? '✔ مُنحت الصلاحية وأُبلغ مقدم الطلب' : 'رُفض الطلب وأُبلغ مقدم الطلب'); ROUTES.users(); } catch (e) { toast(e.message); }
+}
+async function addDel() { try { await call({ action: 'delegationSave', fromEmail: $('#ndFrom').value, toEmail: $('#ndTo').value, start: $('#ndStart').value, end: $('#ndEnd').value, reason: $('#ndReason').value }); toast('✔ أُضيف التفويض'); ROUTES.users(); } catch (e) { toast(e.message); } }
+async function toggleDel(did, active) { try { await call({ action: 'delegationSave', did, active }); ROUTES.users(); } catch (e) { toast(e.message); } }
+
+ROUTES.settings = async function () {
+  const s = (await call({ action: 'settings' })).settings;
+  const js = k => { try { return JSON.parse(s[k]); } catch (e) { return []; } };
+  const pos = js('POSITIONS');
+  const fld = (k, l, h, t) => `<label class="f">${l}${h ? ` <span class="hint">${h}</span>` : ''}<input data-set="${k}" ${t ? `type="${t}"` : ''} value="${esc(s[k])}" ${/EMAIL|FROM/.test(k) ? 'dir="ltr"' : ''}></label>`;
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="settings" class="icon"></i>إعدادات القوالب والإشعارات ومسارات العمل</h2>
+  ${BOOT.sheetUrl ? `<div class="card toolbar"><b>قاعدة البيانات:</b> <a class="btn" href="${esc(BOOT.sheetUrl)}" target="_blank" rel="noopener"><i data-lucide="sheet" class="icon"></i>فتح «سجل أوامر الشراء - POFlow»</a>${BOOT.folderUrl ? `<a class="btn" href="${esc(BOOT.folderUrl)}" target="_blank" rel="noopener"><i data-lucide="folder" class="icon"></i>مجلد POFlow في Drive</a>` : ''}<span class="hint">خاص بالمالك — لا تشاركه؛ المنصة تقرؤه بصلاحية Execute as Me.</span></div>` : ''}
+  <div class="card"><h3 class="s" style="margin-top:0">الإشعارات والتذكيرات والتصعيد</h3><div class="grid g3">
+    ${fld('PROC_EMAILS', 'بريد إدارة المشتريات', '(مفصول بفواصل — إضافة لمن دوره «إدارة المشتريات»)')}${fld('ESCALATE_EMAIL', 'بريد التصعيد', '(عند تجاوز المدة)')}${fld('MAIL_FROM', 'المرسل', '(يُستخدم إن كان اسمًا مستعارًا لحساب المالك)')}
+    ${fld('REMIND_HOURS', 'تذكير الموقّع بعد (ساعة)', '', 'number')}${fld('ESCALATE_DAYS', 'التصعيد بعد (يوم) على الخطوة نفسها', '', 'number')}${fld('TARGET_DAYS', 'المدة المستهدفة الافتراضية للاعتماد (يوم)', '', 'number')}</div>
+    <div class="toolbar" style="margin-top:8px"><button class="btn" onclick="remindNow()"><i data-lucide="bell-ring" class="icon"></i>تشغيل التذكيرات الآن</button><span class="hint">تعمل تلقائيًا كل ساعة (مشغّل remindPending).</span></div></div>
+  <div class="card"><h3 class="s" style="margin-top:0">قالب المستند</h3><div class="grid g3">${fld('COMPANY_AR', 'اسم الجهة (عربي)')}${fld('COMPANY_EN', 'اسم الجهة (إنجليزي)')}${fld('CURRENCY', 'العملة الافتراضية')}${fld('RETENTION_YEARS', 'مدة الاحتفاظ بالمستندات (سنة)', '', 'number')}${fld('DIGITAL_PROVIDER', 'مزود التوقيع الرقمي المعتمد', '(للربط مستقبلًا)')}</div>
+    <div class="grid g2" style="margin-top:8px"><label class="f">الجهات الطالبة (سطر لكل جهة)<textarea id="sDepts">${esc(js('DEPTS').join('\n'))}</textarea></label><label class="f">بنود الميزانية (سطر لكل بند)<textarea id="sBud">${esc(js('BUDGETS').join('\n'))}</textarea></label></div></div>
+  <div class="card"><h3 class="s" style="margin-top:0">دليل المناصب المستخدم في اقتراح المسار</h3><table class="reg"><thead><tr><th>المسمى (كما في مصفوفة الصلاحيات)</th><th>الاسم</th><th>البريد</th></tr></thead><tbody id="sPos">
+    ${pos.map((p, i) => `<tr><td><input data-p="${i}" data-k="title" value="${esc(p.title)}"></td><td><input data-p="${i}" data-k="name" value="${esc(p.name)}"></td><td><input data-p="${i}" data-k="email" dir="ltr" value="${esc(p.email)}"></td></tr>`).join('')}
+    <tr><td><input data-p="${pos.length}" data-k="title" placeholder="مسمى جديد"></td><td><input data-p="${pos.length}" data-k="name"></td><td><input data-p="${pos.length}" data-k="email" dir="ltr"></td></tr></tbody></table></div>
+  <div class="card"><h3 class="s" style="margin-top:0">مصفوفة الصلاحيات (مسارات العمل) <span class="hint">— JSON: لكل فئة شرائح بحد أعلى max (null = بلا حد)، والقوائم C (يقترح/يوصي) وA (يعتمد) وI (يعلم)</span></h3>
+    <textarea id="sDoa" class="mono" style="min-height:260px;direction:ltr;text-align:left">${esc(JSON.stringify(js('DOA'), null, 2))}</textarea></div>
+  <div class="card toolbar"><button class="btn primary" onclick="saveSettings()"><i data-lucide="save" class="icon"></i>حفظ الإعدادات</button><span class="hint">تسري خلال 5 دقائق (ذاكرة مؤقتة).</span></div>`;
+  icons();
+};
+async function saveSettings() {
+  try {
+    const st = {}; $$('[data-set]').forEach(el => st[el.dataset.set] = el.value);
+    st.DEPTS = $('#sDepts').value.split('\n').map(x => x.trim()).filter(Boolean); st.BUDGETS = $('#sBud').value.split('\n').map(x => x.trim()).filter(Boolean);
+    const pos = []; $$('[data-p]').forEach(el => { const i = el.dataset.p; pos[i] = pos[i] || {}; pos[i][el.dataset.k] = el.value.trim(); }); st.POSITIONS = pos.filter(p => p && p.title);
+    try { st.DOA = JSON.parse($('#sDoa').value); } catch (e) { return toast('صيغة مصفوفة الصلاحيات (JSON) غير صحيحة'); }
+    await call({ action: 'settingsSave', settings: st }); Object.assign(SET, { DOA: st.DOA, POSITIONS: st.POSITIONS, DEPTS: st.DEPTS, BUDGETS: st.BUDGETS, CURRENCY: st.CURRENCY, COMPANY_AR: st.COMPANY_AR, COMPANY_EN: st.COMPANY_EN, TARGET_DAYS: st.TARGET_DAYS });
+    toast('✔ حُفظت الإعدادات');
+  } catch (e) { toast(e.message); }
+}
+async function remindNow() { try { const r = await call({ action: 'remindNow' }); toast('أُرسل ' + r.sent + ' تذكير/تصعيد'); } catch (e) { toast(e.message); } }
+
+/* =====================================================================
+   10 · Notifications
+   ===================================================================== */
+let NOTIF = [];
+async function loadNotif() { try { NOTIF = (await call({ action: 'notifications' })).items || []; const n = NOTIF.filter(x => !x.read).length; $('#bellN').hidden = !n; $('#bellN').textContent = n; } catch (e) {} }
+function toggleNotif() {
+  const b = $('#notif'); b.hidden = !b.hidden; if (b.hidden) return;
+  b.innerHTML = (NOTIF.length ? NOTIF.map(x => `<div class="n ${x.read ? '' : 'u'}" onclick="$('#notif').hidden=true;go('po/${esc(x.poId)}')">${esc(x.title)}<div class="at">${esc(fmtDT(x.at))}</div></div>`).join('') : '<div class="n">لا توجد إشعارات</div>') +
+    `<div class="n" style="text-align:center" onclick="markAll()"><b>تعليم الكل كمقروء</b></div>`;
+}
+async function markAll() { try { await call({ action: 'markRead', all: true }); NOTIF.forEach(x => x.read = true); $('#bellN').hidden = true; $('#notif').hidden = true; } catch (e) {} }
+
+/* =====================================================================
+   11 · E-signatures — this platform's own encrypted register (policy-platform model)
+   (AES-256-GCM in the browser; the PIN never leaves the device)
+   ===================================================================== */
+const ITER = 310000, te = new TextEncoder(), td = new TextDecoder();
+function toB64(buf) { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+function fromB64(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+const rand = n => crypto.getRandomValues(new Uint8Array(n));
+async function pinBase(pin) { return crypto.subtle.importKey('raw', te.encode(pin), 'PBKDF2', false, ['deriveKey', 'deriveBits']); }
+async function encKey(pin, salt, iter) { return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, await pinBase(pin), { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']); }
+/** Auth tag: derived from the PIN with a different salt — proves the PIN to the server but cannot decrypt. */
+async function authTag(pin, saltB64, iter) { return toB64(await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: fromB64(saltB64), iterations: iter, hash: 'SHA-256' }, await pinBase(pin), 256)); }
+async function sealSignature(dataUrl, pin) {
+  const salt = rand(16), iv = rand(12), aSalt = toB64(rand(16));
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await encKey(pin, salt, ITER), te.encode(dataUrl));
+  return { enc: { salt: toB64(salt), iv: toB64(iv), ct: toB64(ct), iter: ITER }, auth: { salt: aSalt, tag: await authTag(pin, aSalt, ITER) } };
+}
+async function openSignature(enc, pin) { const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(enc.iv) }, await encKey(pin, fromB64(enc.salt), enc.iter), fromB64(enc.ct)); return td.decode(pt); }
+const pinOk = p => p.length >= 8 && /\d/.test(p) && /[A-Za-z؀-ۿ]/.test(p);
+
+const SIG = { mine: [], all: [], admin: false, loaded: false, step: '', busy: false };
+async function loadMySigs(quiet) {
+  try { const r = await call({ action: 'sigs' }); SIG.mine = r.items || []; SIG.all = r.all || []; SIG.admin = !!r.admin; SIG.loaded = true; if (r.displayDefault) SET.sigDefault = r.displayDefault; }
+  catch (e) { if (!quiet) toast(e.message); }
+  renderMySigs();
+}
+function renderMySigs() {
+  const tb = $('#msBody'); if (!tb) return;
+  $('#msOwnerWrap').hidden = !SIG.admin; $('#msAllWrap').hidden = !SIG.admin; $('#msDefWrap').hidden = !SIG.admin; if (SET.sigDefault) $('#msDefMode').value = SET.sigDefault;
+  tb.innerHTML = !SIG.mine.length ? '<tr><td colspan="5" class="hint">لا يوجد توقيع مسجّل باسم حسابك بعد — أضفه من النموذج أدناه.</td></tr>' :
+    SIG.mine.map(s => `<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.position || '')}</td><td>${s.locked ? '<span class="chip lk">مقفل مؤقتًا</span>' : '<span class="chip">مشفّر 🔒</span>'}</td><td class="hint">${esc(fmtDT(s.createdAt))}</td>
+      <td style="white-space:nowrap"><button class="btn sm" onclick="previewSig('${s.id}')" title="معاينة"><i data-lucide="eye" class="icon"></i></button><button class="btn sm" onclick="changeSigPin('${s.id}')" title="تغيير الرقم السري"><i data-lucide="key-round" class="icon"></i></button><button class="btn sm danger" onclick="deleteSig('${s.id}')" title="حذف"><i data-lucide="trash-2" class="icon"></i></button></td></tr>`).join('');
+  if (SIG.admin) $('#msAll').innerHTML = !SIG.all.length ? '<tr><td colspan="6" class="hint">لا توجد توقيعات مسجّلة.</td></tr>' : SIG.all.map(s => `<tr><td><b>${esc(s.name)}</b></td><td>${esc(s.position || '')}</td><td class="en">${esc(s.ownerEmail)}</td><td>${s.locked ? '<span class="chip lk">مقفل</span>' : '<span class="chip">مشفّر 🔒</span>'}</td><td class="hint">${esc(fmtDT(s.createdAt))}</td><td><button class="btn sm danger" onclick="deleteSig('${s.id}',true)"><i data-lucide="trash-2" class="icon"></i></button></td></tr>`).join('');
+  icons();
+}
+function openSigs() { if (!$('#msName').value) $('#msName').value = BOOT.name || ''; dlgSigs.showModal(); loadMySigs(); setTimeout(sizePad, 60); }
+async function unlockMine(id, pin, purpose) {
+  const s = SIG.mine.find(x => x.id === id); if (!s) throw new Error('التوقيع غير موجود');
+  const r = await api({ action: 'sigUnlock', id, tag: await authTag(pin, s.authSalt, s.iter), purpose });
+  if (!r.ok) throw new Error(r.msg || r.error);
+  return openSignature(r.enc, pin);
+}
+let upURL = null, pctx = null, drawing = false, padDirty = false;
+function srcMode() { const d = document.querySelector('input[name=msSrc]:checked').value === 'draw'; $('#msUp').hidden = d; $('#msDraw').hidden = !d; if (d) sizePad(); }
+function sizePad() { const pad = $('#pad'); if (!pad) return; const r = pad.getBoundingClientRect(); if (!r.width) return; pad.width = r.width * 2; pad.height = r.height * 2; pctx = pad.getContext('2d'); pctx.scale(2, 2); pctx.lineWidth = 2.4; pctx.lineCap = 'round'; pctx.lineJoin = 'round'; pctx.strokeStyle = '#14125a'; padDirty = false; }
+function padURL() {
+  const pad = $('#pad'), d = pctx.getImageData(0, 0, pad.width, pad.height).data; let x0 = pad.width, y0 = pad.height, x1 = 0, y1 = 0;
+  for (let y = 0; y < pad.height; y++) for (let x = 0; x < pad.width; x++) if (d[(y * pad.width + x) * 4 + 3] > 0) { if (x < x0) x0 = x; if (y < y0) y0 = y; if (x > x1) x1 = x; if (y > y1) y1 = y; }
+  const m = 10; x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(pad.width, x1 + m); y1 = Math.min(pad.height, y1 + m);
+  const c = document.createElement('canvas'), sc = Math.min(1, 500 / (x1 - x0), 200 / (y1 - y0)); c.width = Math.round((x1 - x0) * sc); c.height = Math.round((y1 - y0) * sc);
+  c.getContext('2d').drawImage(pad, x0, y0, x1 - x0, y1 - y0, 0, 0, c.width, c.height); return c.toDataURL('image/png');
+}
+function wirePad() {
+  const pad = $('#pad'); if (!pad || pad._w) return; pad._w = 1;
+  const pt = e => { const r = pad.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  pad.addEventListener('pointerdown', e => { if (!pctx) sizePad(); drawing = true; pad.setPointerCapture(e.pointerId); const [x, y] = pt(e); pctx.beginPath(); pctx.moveTo(x, y); });
+  pad.addEventListener('pointermove', e => { if (!drawing) return; const [x, y] = pt(e); pctx.lineTo(x, y); pctx.stroke(); padDirty = true; });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => pad.addEventListener(ev, () => drawing = false));
+  $('#msFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if (!f) return; if (f.size > 5 * 1024 * 1024) { toast('حجم الصورة كبير (الحد 5MB)'); e.target.value = ''; return; }
+    const img = new Image(); img.onload = () => { const sc = Math.min(1, 500 / img.width, 200 / img.height), c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); upURL = c.toDataURL('image/png'); $('#msPrev').src = upURL; $('#msPrev').style.display = 'block'; URL.revokeObjectURL(img.src); }; img.src = URL.createObjectURL(f);
+  });
+}
+async function addSig() {
+  const name = $('#msName').value.trim(), pin = $('#msPin').value, pin2 = $('#msPin2').value, draw = document.querySelector('input[name=msSrc]:checked').value === 'draw';
+  if (!name) return toast('أدخل الاسم');
+  const url = draw ? (padDirty ? padURL() : null) : upURL;
+  if (!url) return toast('أضف صورة التوقيع أو ارسمه');
+  if (!pinOk(pin)) return toast('الرقم السري: 8 خانات على الأقل تشمل حروفًا وأرقامًا');
+  if (pin !== pin2) return toast('الرقمان السريان غير متطابقين');
+  $('#msAdd').disabled = true; toast('جارٍ التشفير والحفظ…');
+  try {
+    const sealed = await sealSignature(url, pin);
+    await call(Object.assign({ action: 'sigAdd', name, position: $('#msPos').value.trim(), org: $('#msOrg').value.trim(), ownerEmail: $('#msOwner').value.trim() }, sealed));
+    ['#msPos', '#msPin', '#msPin2', '#msFile', '#msOwner'].forEach(s => $(s).value = ''); upURL = null; $('#msPrev').style.display = 'none'; if (pctx) sizePad();
+    await loadMySigs(); toast('تم تشفير التوقيع وحفظه ✔');
+  } catch (e) { toast(e.message); }
+  $('#msAdd').disabled = false;
+}
+let prevTimer;
+async function previewSig(id) {
+  const s = SIG.mine.find(x => x.id === id);
+  const url = await askPin({ title: 'معاينة التوقيع', sub: s.name, verify: pin => unlockMine(id, pin, 'preview') }); if (!url) return;
+  $('#pvTitle').textContent = 'توقيع: ' + s.name; $('#pvImg').src = url; dlgPrev.showModal(); clearTimeout(prevTimer); prevTimer = setTimeout(closePrev, 15000);
+}
+function closePrev() { if (dlgPrev.open) dlgPrev.close(); $('#pvImg').removeAttribute('src'); }
+async function changeSigPin(id) {
+  const s = SIG.mine.find(x => x.id === id);
+  const ok = await askPin({ title: 'تغيير الرقم السري', sub: s.name, change: true, verify: async (pin, np, np2) => {
+    if (!pinOk(np)) throw new Error('الرقم الجديد: 8 خانات على الأقل تشمل حروفًا وأرقامًا'); if (np !== np2) throw new Error('الرقمان الجديدان غير متطابقين');
+    const url = await unlockMine(id, pin, 'pin-change');
+    const r = await api(Object.assign({ action: 'sigPin', id, tag: await authTag(pin, s.authSalt, s.iter) }, await sealSignature(url, np))); if (!r.ok) throw new Error(r.msg || r.error); return true; } });
+  if (ok) { await loadMySigs(); toast('تم تغيير الرقم السري'); }
+}
+async function deleteSig(id, any) {
+  const s = (any ? SIG.all : SIG.mine).find(x => x.id === id); if (!s) return;
+  if (!confirm('حذف توقيع "' + s.name + '" نهائيًا من سجل التوقيعات؟ لا يؤثر ذلك على أوامر الشراء الموقّعة سابقًا.')) return;
+  try { await call({ action: 'sigDelete', id }); await loadMySigs(); toast('تم حذف التوقيع'); } catch (e) { toast(e.message); }
+}
+function askPin({ title, sub, change = false, verify }) {
+  return new Promise(resolve => {
+    const i1 = $('#pinIn'), i2 = $('#pinIn2'), i3 = $('#pinIn3'), err = $('#pinErr'), ok = $('#pinOk');
+    $('#pinTitle').textContent = title; $('#pinSub').textContent = sub || ''; err.textContent = ''; i1.placeholder = change ? 'الرقم السري الحالي' : 'الرقم السري';
+    [i1, i2, i3].forEach(i => i.value = ''); i2.hidden = i3.hidden = !change; dlgPin.showModal(); setTimeout(() => i1.focus(), 50);
+    const done = v => { if (dlgPin.open) dlgPin.close(); [i1, i2, i3].forEach(i => i.value = ''); ok.onclick = $('#pinCancel').onclick = dlgPin.oncancel = null; i1.onkeydown = null; resolve(v); };
+    const go2 = async () => { if (!i1.value || ok.disabled) return; ok.disabled = true; err.textContent = 'جارٍ التحقق…'; try { done(await verify(i1.value, i2.value, i3.value)); } catch (e) { err.textContent = e.message || 'رقم سري غير صحيح'; i1.select(); } ok.disabled = false; };
+    i1.onkeydown = e => { if (e.key === 'Enter') go2(); }; ok.onclick = go2; $('#pinCancel').onclick = () => done(null); dlgPin.oncancel = e => { e.preventDefault(); done(null); };
+  });
+}
+/** Irreversible blur: shrink to a few pixels, then scale back up. */
+function makeBlur(url) {
+  return new Promise(res => { if (!url) return res(''); const im = new Image(); im.onload = () => {
+    const w = Math.min(420, im.width), h = Math.round(im.height * w / im.width), sm = document.createElement('canvas'); sm.width = Math.max(4, Math.round(w / 14)); sm.height = Math.max(2, Math.round(h / 14));
+    const sx = sm.getContext('2d'); sx.imageSmoothingEnabled = true; sx.drawImage(im, 0, 0, sm.width, sm.height);
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const x = c.getContext('2d'); x.imageSmoothingEnabled = true; x.filter = 'blur(3px)'; x.drawImage(sm, 0, 0, w, h); res(c.toDataURL('image/png')); };
+    im.onerror = () => res(''); im.src = url; });
+}
+function shrinkSig(url) {
+  return new Promise(res => { const im = new Image(); im.onload = () => {
+    const sc = Math.min(1, 420 / im.width, 160 / im.height), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+    c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); let out = c.toDataURL('image/png');
+    if (out.length > 110000) { const w = document.createElement('canvas'); w.width = c.width; w.height = c.height; const x = w.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w.width, w.height); x.drawImage(c, 0, 0); out = w.toDataURL('image/jpeg', 0.8); }
+    res(out); }; im.onerror = () => res(''); im.src = url; });
+}
+async function sigImageFor(id, pin) { return shrinkSig(await unlockMine(id, pin, 'sign')); }
+
+/* ---------- sign · reject · withdraw ---------- */
+async function signStep(key) {
+  await loadMySigs(true);
+  if (!SIG.mine.length) { openSigs(); toast('أضف توقيعك المشفّر أولًا، ثم عُد إلى أمر الشراء ووقّع', 6000); return; }
+  const d = CUR.d, s = d.steps.find(x => x.key === key); SIG.step = key;
+  $('#sgInfo').innerHTML = `<b class="en">${esc(d.meta.id)}</b> ${d.meta.serial ? '· <span class="en">' + esc(d.meta.serial) + '</span>' : ''} — ${esc(d.meta.subject)} · الإصدار ${esc(d.meta.version)}<br>موضع التوقيع: <b>${esc((s.slots || []).map(slotAr).join('، '))}</b> — ${esc(s.title)}${s.email !== ME ? `<br><b style="color:var(--warn)">توقيع بالنيابة عن ${esc(s.email)} (تفويض)</b>` : ''}`;
+  $('#sgSel').innerHTML = SIG.mine.map(x => `<option value="${x.id}" ${x.locked ? 'disabled' : ''}>${esc(x.name)}${x.position ? ' — ' + esc(x.position) : ''}${x.locked ? ' (مقفل مؤقتًا)' : ''}</option>`).join('');
+  $('#sgPin').value = ''; $('#sgAgree').checked = false; $('#sgMsg').textContent = ''; $('#sgGo').disabled = false;
+  dlgSign.showModal(); icons(); setTimeout(() => $('#sgPin').focus(), 50);
+}
+async function signGo() {
+  const id = $('#sgSel').value, pin = $('#sgPin').value, m = $('#sgMsg');
+  if (!$('#sgAgree').checked) { m.textContent = 'أكّد الإقرار أولًا'; return; }
+  if (!pin) { m.textContent = 'أدخل الرقم السري'; return; }
+  const s = SIG.mine.find(x => x.id === id); if (!s) { m.textContent = 'اختر التوقيع'; return; }
+  $('#sgGo').disabled = true; m.textContent = 'جارٍ التحقق وفك تشفير صورة التوقيع…';
+  try {
+    const img = await sigImageFor(id, pin);
+    m.textContent = 'جارٍ التوقيع…';
+    const blur = await makeBlur(img);
+    const r = await api({ action: 'sign', id: CUR.d.meta.id, step: SIG.step, signerId: id, img, blur, tag: await authTag(pin, s.authSalt, s.iter), baseUpdatedAt: CUR.updatedAt });
+    if (!r.ok) { m.textContent = r.msg || r.error || 'تعذّر التوقيع'; if (r.locked) loadMySigs(true); return; }
+    dlgSign.close(); applyServer(r);
+    toast(r.phase === 'requester' ? '✔ تم التوقيع — أُحيل الطلب إلى إدارة المشتريات' : r.allSigned ? '✔ اكتملت جميع التوقيعات — جارٍ إصدار النسخة النهائية' : '✔ تم التوقيع — أُرسل الطلب للموقّع التالي تلقائيًا', 6000);
+    if (r.allSigned) finalizeFlow(true);
+  } catch (e) { m.textContent = e.message; }
+  finally { $('#sgPin').value = ''; $('#sgGo').disabled = false; }
+}
+function openReject(key) {
+  SIG.step = key; const d = CUR.d, s = d.steps.find(x => x.key === key);
+  $('#rjInfo').innerHTML = `<b class="en">${esc(d.meta.id)}</b> — ${esc(d.meta.subject)}<br>خطوتك: ${esc(s.title)}`; $('#rjReason').value = ''; $('#rjMsg').textContent = ''; dlgReject.showModal(); icons();
+}
+async function rejectGo() {
+  const reason = $('#rjReason').value.trim(); if (reason.length < 3) { $('#rjMsg').textContent = 'سبب الرفض إلزامي'; return; }
+  $('#rjGo').disabled = true;
+  try { const r = await call({ action: 'reject', id: CUR.d.meta.id, step: SIG.step, reason }); dlgReject.close(); applyServer(r); toast('⛔ رُفض الطلب وأُبلغت إدارة المشتريات والجهة الطالبة', 6000); }
+  catch (e) { $('#rjMsg').textContent = e.message; }
+  $('#rjGo').disabled = false;
+}
+async function unsignStep(key) {
+  await loadMySigs(true); const st = CUR.d.steps.find(x => x.key === key), s = SIG.mine.find(x => x.id === st.sig.signerId);
+  if (!s) return toast('التوقيع المستخدم لم يعد موجودًا في سجلك');
+  const r = await askPin({ title: 'إزالة توقيعك', sub: st.title + ' — ' + s.name, verify: async pin => { const x = await api({ action: 'unsign', id: CUR.d.meta.id, step: key, tag: await authTag(pin, s.authSalt, s.iter) }); if (!x.ok) throw new Error(x.msg || x.error); return x; } });
+  if (r) { applyServer(r); toast('أُزيل توقيعك وعادت الخطوة إليك'); }
+}
+async function showSigImg(key) {
+  await loadMySigs(true); const st = CUR.d.steps.find(x => x.key === key), s = SIG.mine.find(x => x.id === st.sig.signerId);
+  if (!s) return toast('التوقيع المستخدم لم يعد موجودًا في سجلك');
+  const r = await askPin({ title: 'إظهار صورة توقيعك في المستند', sub: st.title + ' — ' + s.name, verify: async pin => { const img = await sigImageFor(s.id, pin), blur = await makeBlur(img);
+    const x = await api({ action: 'sigShow', id: CUR.d.meta.id, step: key, img, blur, tag: await authTag(pin, s.authSalt, s.iter) }); if (!x.ok) throw new Error(x.msg || x.error); return x; } });
+  if (r) { applyServer(r); toast('أُضيفت صورة توقيعك ✔'); }
+}
+async function setPoDisplay(mode) {
+  try { const blurs = {}; if (mode === 'blur') for (const s of CUR.d.steps) if (s.sig && s.sig.img && !s.sig.imgBlur) { const b = await makeBlur(s.sig.img); if (b) blurs[s.key] = b; }
+    applyServer(await call({ action: 'setDisplay', id: CUR.d.meta.id, mode, blurs })); toast('طريقة عرض التوقيع: ' + MODE_TXT[mode]); } catch (e) { toast(e.message); }
+}
+async function saveDefaultDisplay() { try { const r = await call({ action: 'setDefaultDisplay', mode: $('#msDefMode').value }); SET.sigDefault = r.mode; toast('الإعداد الافتراضي: ' + MODE_TXT[r.mode]); } catch (e) { toast(e.message); } }
+
+/* =====================================================================
+   12 · Final signed PDF (A4, rendered in the browser; archived, fingerprinted and e-mailed by the server)
+   Pages: 1 official form · (appendix of items) · 2 Delegation-of-Authority matrix · certificate (QR, hashes, signers, timeline)
+   ===================================================================== */
+const NS_SVG = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/'), NS_XHTML = ['http:', '', 'www.w3.org', '1999', 'xhtml'].join('/');
+const CDN = ['https:', '', 'cdnjs.cloudflare.com', 'ajax', 'libs'].join('/');
+let libsP = null;
+function loadScript(src) { return new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = src; sc.onload = res; sc.onerror = () => rej(new Error('تعذّر تحميل مكتبة PDF — تحقق من الاتصال')); document.head.appendChild(sc); }); }
+function loadPdfLibs() { return libsP || (libsP = ((window.jspdf && window.jspdf.jsPDF) ? Promise.resolve() : loadScript(CDN + '/jspdf/2.5.1/jspdf.umd.min.js')).then(() => ({ JsPDF: window.jspdf.jsPDF })).catch(e => { libsP = null; throw e; })); }
+function loadQrLib() { return window.qrcode ? Promise.resolve() : loadScript(CDN + '/qrcode-generator/1.4.4/qrcode.min.js'); }
+async function pdfFonts() {
+  if (!document.getElementById('pdfFontFaces') && window.PDF_CAIRO_CSS) { const st = document.createElement('style'); st.id = 'pdfFontFaces'; st.textContent = PDF_CAIRO_CSS; document.head.appendChild(st); }
+  try { await Promise.all([document.fonts.load('16px PdfCairo'), document.fonts.load('700 16px PdfCairo')]); } catch (e) {}
+}
+function pdfCss() { const out = []; for (const sh of document.styleSheets) { let rs = []; try { rs = [...sh.cssRules]; } catch (e) { continue; } rs.forEach(r => { if (r.type === 1 && /\.f|\.fpage|\.sg|\.ent|\.vbox|\.en|\.mono|\.stp/.test(r.selectorText || '')) out.push(r.cssText); }); } return out.join('\n'); }
+async function renderPageCanvas(page, css) {
+  const xml = new XMLSerializer().serializeToString(page);
+  const svg = '<svg xmlns="' + NS_SVG + '" width="794" height="1123"><foreignObject x="0" y="0" width="794" height="1123"><div xmlns="' + NS_XHTML + '" style="width:794px;height:1123px;margin:0;padding:0"><style>' + css + '</style>' + xml + '</div></foreignObject></svg>';
+  const img = new Image(); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); await img.decode(); await new Promise(r => setTimeout(r, 60));
+  const c = document.createElement('canvas'); c.width = 1588; c.height = 2246; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); return c;
+}
+function qrSvg(text) { const q = qrcode(0, 'M'); q.addData(text); q.make(); return q.createSvgTag(3, 0).replace(/width="\d+px" height="\d+px"/, 'width="118" height="118"'); }
+function appendixPages(d) {
+  const all = [['cons', 'consumables', 'المستهلكات أو الخدمات'], ['asset', 'assets', 'الأصول']].filter(x => d[x[1]].length > ROWS_ON_FORM);
+  if (!all.length) return [];
+  const rows = []; all.forEach(([c, k, ar]) => { rows.push({ h: ar }); d[k].forEach((r, i) => rows.push({ r, i })); });
+  const pages = []; for (let i = 0; i < rows.length; i += 38) pages.push(rows.slice(i, i + 38));
+  return pages.map((chunk, pi) => `<div class="fpage"><div class="f-h2">ملحق الأصناف — ${esc(d.meta.id)} ${pages.length > 1 ? '(' + (pi + 1) + '/' + pages.length + ')' : ''}</div>
+    <table class="f-tbl f-cons"><tr><th class="c-n">م</th><th>البيان</th><th class="c-u">الوحدة</th><th class="c-q">الكمية</th><th class="c-p">السعر التقديري</th><th class="c-t">الإجمالي التقديري</th></tr>
+    ${chunk.map(x => x.h ? `<tr class="cap"><td colspan="6">${esc(x.h)}</td></tr>` : `<tr><td class="c-n">${x.i + 1}</td><td>${esc(x.r.desc)}</td><td class="c-u">${esc(x.r.unit)}</td><td class="c-q">${esc(x.r.qty)}</td><td class="c-p">${fmtN(x.r.price)}</td><td class="c-t">${fmtN(x.r.qty * x.r.price)}</td></tr>`).join('')}</table>
+    <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(d.meta.id)} v${esc(d.meta.version)}</span></span><span></span><span class="pn"></span></div></div>`);
+}
+function doaPage(d) {
+  const D = SET.DOA || {}, rowsFor = cat => { let lo = 0; return (D[cat] || []).map((r, i) => { const l = bandLabel(cat, lo, r.max); lo = r.max; const merged = !r.C.length;
+    return `<tr>${i === 0 ? `<td rowspan="${D[cat].length}" class="code-${cat === 'cons' ? 'c' : 'a'}"></td>` : ''}<td style="text-align:right">${esc(l)}</td>${merged ? '<td colspan="2">المدير المعني</td>' : `<td>المدير المعني</td><td>${esc(r.C.length > 2 ? 'لجنة مكونة من (' + r.C.join(' - ') + ')' : r.C.join(' / '))}</td>`}<td>${esc(r.A)}</td><td>${esc(r.I.join('، ') || '—')}</td></tr>`; }).join(''); };
+  const head = '<tr><th>ترميز<br>Code</th><th>الصلاحيات<br>Authority</th><th>يعد<br>Responsible</th><th>يقترح ويوصي<br>Consulted</th><th>يعتمد<br>Accountable</th><th>يعلم<br>Informed</th></tr>';
+  return `<div class="fpage"><div class="f-head"><div class="ttl">Purchase&nbsp; Requisition</div><div class="co"><div style="text-align:right">${lg('nameAr') ? `<img class="na" src="${lg('nameAr')}" alt="">` : ''}<div class="en">${esc(SET.COMPANY_EN || '')}</div></div>${lg('mark') ? `<img class="mk" src="${lg('mark')}" alt="">` : ''}</div></div>
+   <div class="f-h2" style="margin-top:30px">مصفوفة الصلاحيات / <span class="en">Delegation of Authority Matrix</span></div>
+   <div class="f-sub">أولًا: المستهلكات أو الخدمات / <span class="en">Consumables / Services</span></div><table class="f-tbl f-doa">${head}${rowsFor('cons')}</table>
+   <div class="f-sub">ثانيًا: الأصول / <span class="en">Assets</span></div><table class="f-tbl f-doa">${head}${rowsFor('asset')}</table>
+   <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(d.meta.id)} v${esc(d.meta.version)}</span></span><span></span><span class="pn"></span></div></div>`;
+}
+function certPage(d, vt) {
+  const m = d.meta, sg = d.steps.filter(s => s.kind !== 'inform');
+  const hist = (d.history || []).filter(h => ['submit', 'sign', 'to-procurement', 'route', 'start', 'approved', 'return', 'route-edit'].includes(h.action)).slice(-14);
+  return `<div class="fpage"><div class="f-h2" style="font-size:14px">شهادة التوقيع الإلكتروني · <span class="en">Electronic Signature Certificate</span></div>
+   <table class="f-tbl f-cert"><tr><th style="width:24%">أمر الشراء</th><td>${esc(m.subject)} — <span class="mono">${esc(m.id)}</span> · الإصدار ${esc(m.version)} · الرقم التسلسلي <span class="mono">${esc(m.serial)}</span></td></tr>
+    <tr><th>الجهة الطالبة</th><td>${esc(m.dept)} · بند الميزانية: ${esc(m.budget)} · الإجمالي التقديري <b class="en">${fmtN(sum(d.consumables) + sum(d.assets))} ${esc(m.currency)}</b></td></tr>
+    <tr><th>بصمة الطلب (توقيع الجهة الطالبة)</th><td class="mono">${esc(vt ? vt.contentHash : m.contentHash || '')}</td></tr>
+    <tr><th>بصمة المستند المعتمد (سلسلة الاعتماد)</th><td class="mono">${esc(vt ? vt.fullHash : m.fullHash || '')}</td></tr>
+    <tr><th>تاريخ الاعتماد النهائي</th><td>${esc(fmtDT(m.approvedAt || new Date()))} · أصدر الملف: <span class="en">${esc(ME)}</span></td></tr></table>
+   ${vt ? `<div class="vbox"><div>${qrSvg(vt.url)}</div><div class="vtx"><b>التحقق من أمر الشراء</b><span>امسح الرمز أو افتح منصة أوامر الشراء ← «التحقق» وأدخل رمز التحقق:</span><span class="vid">${esc(vt.id)}</span><span>ويمكن رفع هذا الملف في صفحة التحقق لمطابقة بصمته مع النسخة الأرشيفية.</span></div></div>` : ''}
+   <table class="f-tbl f-cert"><tr><th>#</th><th>الصفة / موضع التوقيع</th><th>الموقّع</th><th>البريد الجامعي</th><th>التاريخ والوقت</th><th>البصمة</th></tr>
+    ${sg.map((s, i) => { const g = s.sig || {}; return `<tr><td>${i + 1}</td><td><b>${esc(s.title)}</b><br>${esc((s.slots || []).map(slotAr).join('، '))}</td><td><b>${esc(g.signerName || '')}</b>${g.position ? '<br>' + esc(g.position) : ''}${g.onBehalfOf ? '<br>بالنيابة عن <span class="en">' + esc(g.onBehalfOf) + '</span>' : ''}</td><td class="en">${esc(g.by || s.email)}</td><td>${esc(fmtDT(g.at))}</td><td class="mono">${esc(String(g.docHash || '').slice(0, 12))}</td></tr>`; }).join('')}</table>
+   <table class="f-tbl f-cert"><tr><th colspan="3">سجل الإجراءات (مختصر)</th></tr>${hist.map(h => `<tr><td style="width:22%">${esc(fmtDT(h.at))}</td><td style="width:26%">${esc(ACT_AR[h.action] || h.action)}</td><td>${esc(h.note)} <span class="en hint">${esc(h.by)}</span></td></tr>`).join('')}</table>
+   ${(d.attachments || []).length ? `<table class="f-tbl f-cert"><tr><th colspan="2">المرفقات المعتمدة مع الطلب</th></tr>${d.attachments.map(a => `<tr><td>${esc(a.name)}</td><td class="mono" style="width:52%">${esc(a.sha)}</td></tr>`).join('')}</table>` : ''}
+   <p style="font-size:9.5px">وُقّع أمر الشراء إلكترونيًا عبر منصة أوامر الشراء (POFlow) في الإدارة التنفيذية للاتصالات وتقنية المعلومات. تحقّق الخادم من هوية كل موقّع عبر حسابه الجامعي (‎@sr.edu.sa‎) ومن الرقم السري لتوقيعه المشفّر، وسُجّلت كل عملية في سجل التدقيق. تثبت البصمتان أعلاه أن محتوى الطلب لم يتغير بعد التوقيع. <b>هذا توقيع إلكتروني بسيط موثّق</b> (هوية جامعية + رقم سري + سجل تدقيق)، وصورة التوقيع وحدها ليست دليلًا كافيًا؛ وعند الحاجة إلى توقيع رقمي معتمد قانونيًا يُستخدم مزود توقيع رقمي مرخّص.</p>
+   <p class="en" style="font-size:8.5px;text-align:left">Signed electronically on POFlow (ICTD — ITOC). Each signer was authenticated with a university Google account and the PIN of an encrypted personal signature; every action is in the audit trail. This is a documented simple electronic signature, not a qualified digital signature.</p>
+   <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(m.id)} v${esc(m.version)}</span></span><span class="mono">${vt ? esc(vt.id) : ''}</span><span class="pn"></span></div></div>`;
+}
+async function generatePdfB64(preview, vt) {
+  await pdfFonts(); const { JsPDF } = await loadPdfLibs(); if (vt) await loadQrLib();
+  const d = CUR.d, host = document.createElement('div'); host.className = 'fdoc-host'; document.body.appendChild(host);
+  try {
+    host.innerHTML = formPage(d, { pdf: true, wmk: preview }) + appendixPages(d).join('') + doaPage(d) + certPage(d, vt);
+    const pages = [...host.querySelectorAll('.fpage')];
+    pages.forEach((pg, i) => { const pn = pg.querySelector('.f-foot span:last-child'); if (pn) pn.textContent = 'صفحة ' + (i + 1) + ' من ' + pages.length; if (preview && !pg.querySelector('.f-wmk')) pg.insertAdjacentHTML('beforeend', '<div class="f-wmk">نسخة معاينة</div>'); });
+    await Promise.all([...host.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const css = (window.PDF_CAIRO_CSS || '') + '\n' + pdfCss();
+    const pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    for (let i = 0; i < pages.length; i++) { const c = await renderPageCanvas(pages[i], css); if (i) pdf.addPage(); pdf.addImage(c.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297); }
+    pdf.setProperties({ title: d.meta.id + ' v' + d.meta.version + ' — ' + d.meta.subject, subject: 'Purchase Requisition', creator: 'POFlow v' + (BOOT.version || '1.0') });
+    return pdf.output('datauristring').split(',')[1];
+  } finally { host.remove(); }
+}
+async function finalizeFlow(auto) {
+  if (SIG.busy || CUR.final || CUR.d.meta.status !== 'approved') return;
+  if (!auto && !confirm('إصدار النسخة النهائية الموقّعة بصيغة PDF وأرشفتها وإرسالها إلى إدارة المشتريات والجهة الطالبة والموقّعين؟')) return;
+  SIG.busy = true; const b = $('#btnFinal'); if (b) b.disabled = true; toast('جارٍ إنشاء النسخة النهائية PDF…', 20000);
+  try {
+    const vt = await call({ action: 'vtoken', id: CUR.d.meta.id });
+    if (effMode(CUR.d) === 'blur') { const fi = await call({ action: 'finalImages', id: CUR.d.meta.id }); PDF_CLEAR = fi.images || {}; }
+    let pdf; try { pdf = await generatePdfB64(false, vt); } finally { PDF_CLEAR = null; }
+    const r = await call({ action: 'finalize', id: CUR.d.meta.id, pdf });
+    CUR.final = { at: r.at, pdfHash: r.pdfHash, verifyId: r.verifyId };
+    toast(r.already ? 'صدرت النسخة النهائية مسبقًا' : '📄 صدرت النسخة النهائية وأُرسلت إلى ' + (r.sentTo || []).length + ' مستلمين وحُفظت في الأرشيف', 7000);
+    await loadPO(CUR.d.meta.id); renderPO();
+  } catch (e) { toast('تعذّر إصدار النسخة النهائية: ' + e.message, 8000); }
+  SIG.busy = false;
+}
+function saveB64(b64, name, mime, open) {
+  const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  const url = URL.createObjectURL(new Blob([u], { type: mime || 'application/pdf' }));
+  if (open && /pdf|image/.test(mime || '')) { window.open(url, '_blank'); return; }
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+}
+async function downloadFinal() { try { const r = await call({ action: 'finalPdf', id: CUR.d.meta.id, version: CUR.d.meta.version }); saveB64(r.b64, r.name); } catch (e) { toast(e.message); } }
+async function previewPdf() { toast('جارٍ إنشاء معاينة PDF…'); try { saveB64(await generatePdfB64(true), CUR.d.meta.id + '-v' + CUR.d.meta.version + '-preview.pdf'); } catch (e) { toast(e.message); } }
+
+/* ---------- init ---------- */
+(function init() {
+  try { $('#lgSru').src = ITOC_LOGOS.sru; $('#lgIctd').src = ITOC_LOGOS.ictd; $('#lgItoc').src = ITOC_LOGOS.itoc; } catch (e) {}
+  $('#meMail').textContent = ME; $('#meRole').textContent = BOOT.roleAr || ''; $('#appVer').textContent = 'v' + (BOOT.version || '1.0');
+  $('#btnHowto').href = HOWTO; $$('.howto').forEach(a => a.href = HOWTO);
+  if (!P.sign) $('#btnSigs').hidden = true;
+  wirePad();
+  const p = BOOT.params || {};
+  if (p.po && !location.hash) history.replaceState(null, '', '#po/' + p.po);
+  else if (p.verify && !location.hash) history.replaceState(null, '', '#verify/' + p.verify);
+  else if (p.page && ROUTES[p.page] && !location.hash) history.replaceState(null, '', '#' + p.page);
+  route(); loadNotif(); setInterval(loadNotif, 120000);
+  if (P.sign) loadMySigs(true);
+  document.addEventListener('click', e => { const n = $('#notif'); if (!n.hidden && !e.target.closest('#notif') && !e.target.closest('#btnBell')) n.hidden = true; });
+})();
+</script>
+</body>
+</html>

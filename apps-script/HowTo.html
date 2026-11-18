@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>كيفية التوقيع | POFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--purple:#501e8c;--purple-dark:#3a1464;--purple-light:#f0ebf8;--blue:#0a6eaa;--bg:#f7f5fb;--ink:#241436;--muted:#6b5a80;--border:rgba(80,30,140,.12);--ok:#1d7a46;--bad:#b42318;--warn:#9a5b00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Cairo",Tahoma,Arial,sans-serif;line-height:1.7}
+.hero{background:#501e8c linear-gradient(110deg,#501e8c 0%,#4a1f8a 50%,#2b3f9e 100%);color:#fff;padding:22px 16px}
+.hero .in,.wrap{max-width:980px;margin:0 auto}
+.hero h1{margin:0;font-size:1.5rem}.hero p{margin:4px 0 0;color:#d9cdee}
+.wrap{padding:18px 16px}
+.frame{border-radius:10px;padding:3px;background:linear-gradient(90deg,#8fd3ff,#501e8c,#8fd3ff);background-size:200% 100%;animation:fl 6s linear infinite;margin-bottom:18px}
+@keyframes fl{to{background-position:200% 0}}
+@media (prefers-reduced-motion:reduce){.frame{animation:none}}
+.stage{background:#fff;border-radius:8px;padding:18px;min-height:260px;position:relative;overflow:hidden}
+.flow{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px}
+.node{border:2px solid var(--border);border-radius:8px;padding:8px 12px;min-width:120px;text-align:center;font-weight:700;font-size:.9rem;transition:all .4s;background:#fff}
+.node small{display:block;font-weight:400;color:var(--muted);font-size:.75rem}
+.node.on{border-color:var(--warn);box-shadow:0 0 0 4px rgba(154,91,0,.15);transform:translateY(-3px)}
+.node.done{border-color:var(--ok);background:#e8f5ee}
+.node.rej{border-color:var(--bad);background:#fdecea}
+.arr{color:#b9a9d3;font-size:1.3rem}
+.cap{text-align:center;margin-top:16px;font-weight:700;color:var(--purple-dark);min-height:52px}
+.ctl{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.btn{background:var(--purple);color:#fff;border:0;border-radius:4px;padding:7px 14px;font:700 .9rem "Cairo",Tahoma;cursor:pointer}
+.btn.s{background:#fff;color:var(--purple);border:1px solid var(--purple)}
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{background:#fff;border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:4px;padding:14px}
+.card h3{margin:0 0 6px;color:var(--purple-dark);font-size:1rem;display:flex;gap:8px;align-items:center}
+.card .n{width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;display:grid;place-items:center;font-family:Arial;font-size:.85rem;flex:none}
+.card ul{margin:0;padding-inline-start:18px;font-size:.9rem}
+.sec{background:var(--purple-light);border-radius:4px;padding:12px 14px;margin-top:16px;font-size:.92rem}
+.en{direction:ltr;unicode-bidi:isolate}
+a{color:var(--blue)}
+footer{background:#3a1464;color:#e6dcf5;font-size:.82rem;text-align:center;padding:12px;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="hero"><div class="in"><h1>كيفية التوقيع على أوامر الشراء</h1><p>منصة أوامر الشراء والتوقيعات الإلكترونية · <span class="en">POFlow v1.4</span> — نفس منطق التوقيع المعتمد في منصة السياسات</p></div></div>
+<div class="wrap">
+  <div class="frame"><div class="stage">
+    <div class="flow" id="flow">
+      <div class="node" data-i="0">الجهة الطالبة<small>إنشاء الطلب</small></div><span class="arr">←</span>
+      <div class="node" data-i="1">مدير الإدارة<small>يعد · Responsible</small></div><span class="arr">←</span>
+      <div class="node" data-i="2">إدارة المشتريات<small>المراجعة وتحديد المسار</small></div><span class="arr">←</span>
+      <div class="node" data-i="3">الموقّع 1<small>يقترح / يوصي</small></div><span class="arr">←</span>
+      <div class="node" data-i="4">الموقّع 2<small>يقترح / يوصي</small></div><span class="arr">←</span>
+      <div class="node" data-i="5">الموقّع 3<small>يعتمد · Accountable</small></div><span class="arr">←</span>
+      <div class="node" data-i="6">PDF نهائي<small>أرشفة وإرسال</small></div>
+    </div>
+    <div class="cap" id="cap"></div>
+    <div class="ctl"><button class="btn" id="play">▶ تشغيل</button><button class="btn s" id="rej">عرض سيناريو الرفض</button></div>
+  </div></div>
+
+  <div class="steps">
+    <div class="card"><h3><span class="n">1</span>سجّل توقيعك مرة واحدة</h3><ul>
+      <li>اضغط <b>«توقيعاتي»</b> أعلى المنصة ← «إضافة توقيع جديد».</li>
+      <li>ارفع صورة توقيعك (PNG بخلفية شفافة) أو ارسمه.</li>
+      <li>اختر <b>رقمًا سريًا</b> من 8 خانات على الأقل يجمع حروفًا وأرقامًا.</li>
+      <li>تُشفَّر الصورة داخل متصفحك قبل حفظها، ولا يصل الرقم السري إلى الخادم.</li></ul></div>
+    <div class="card"><h3><span class="n">2</span>يصلك طلب التوقيع تلقائيًا</h3><ul>
+      <li>رسالة بريد + إشعار داخل المنصة عندما يحين دورك فقط.</li>
+      <li>افتح <b>«صندوق التوقيعات»</b> أو رابط الرسالة.</li>
+      <li>لا يمكن التوقيع قبل دورك في التسلسل الذي حددته إدارة المشتريات.</li></ul></div>
+    <div class="card"><h3><span class="n">3</span>راجع المستند</h3><ul>
+      <li>يظهر أمر الشراء بنموذجه الرسمي، مع التوقيعات السابقة وحالة كل موقّع.</li>
+      <li>افتح المرفقات (عروض الأسعار، الموافقات…).</li>
+      <li>خانتك مميزة بعبارة «⏳ بانتظار التوقيع» في موضعها (يعد / يقترح ويوصي / يعتمد).</li></ul></div>
+    <div class="card"><h3><span class="n">4</span>وقّع أو ارفض</h3><ul>
+      <li><b>توقيع:</b> اختر توقيعك، اكتب الرقم السري، وأكّد الإقرار ← يُثبَّت التوقيع ويُرسل الطلب للتالي فورًا.</li>
+      <li><b>رفض:</b> اكتب سبب الرفض (إلزامي) ← تتوقف الدورة ويُبلَّغ المشتريات والجهة الطالبة.</li>
+      <li>5 محاولات خاطئة للرقم السري تقفل التوقيع 15 دقيقة.</li></ul></div>
+    <div class="card"><h3><span class="n">5</span>بعد آخر توقيع</h3><ul>
+      <li>تُنشأ نسخة <b>PDF نهائية</b>: النموذج الرسمي + مصفوفة الصلاحيات + شهادة التوقيع ورمز QR.</li>
+      <li>تُحفظ في الأرشيف وتُرسل إلى المشتريات والجهة الطالبة والموقّعين.</li>
+      <li>يمكن التحقق منها لاحقًا برمز التحقق أو برفع الملف في صفحة «التحقق».</li></ul></div>
+    <div class="card"><h3><span class="n">6</span>حالات خاصة</h3><ul>
+      <li><b>إزالة توقيعك:</b> متاحة برقمك السري ما لم يتخذ الموقّع التالي إجراءً.</li>
+      <li><b>التفويض:</b> عند غيابك يفعّل مدير النظام تفويضًا مؤقتًا، ويظهر التوقيع «بالنيابة عن».</li>
+      <li><b>نسيت الرقم السري؟</b> احذف التوقيع من «توقيعاتي» وأضفه من جديد.</li></ul></div>
+  </div>
+
+  <div class="sec"><b>كيف يُحمى توقيعك؟</b> صورة التوقيع مشفّرة دائمًا بـ <span class="en">AES-256-GCM</span> بمفتاح مشتق من رقمك السري (<span class="en">PBKDF2 · 310,000</span> تكرار) داخل متصفحك. يتحقق الخادم من رقمك السري عبر بصمة مشتقة لا تكفي لفك التشفير، ويتحقق من هويتك عبر حسابك الجامعي <span class="en">@sr.edu.sa</span>. كل توقيع يحمل بصمة <span class="en">SHA-256</span> لمحتوى أمر الشراء، فأي تعديل لاحق يُكشف فورًا. هذا <b>توقيع إلكتروني بسيط موثّق</b>؛ وعند الحاجة إلى توقيع رقمي معتمد قانونيًا يُستخدم مزود مرخّص.</div>
+</div>
+<footer>مركز العمليات التقنية ITOC — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · <span class="en">v1.4</span></footer>
+<script>
+const caps=['تنشئ الجهة الطالبة أمر الشراء وترفق المستندات الداعمة','يوقّع مدير إدارة الجهة الطالبة (يعد) فيُحال الطلب تلقائيًا إلى المشتريات','تراجع المشتريات الطلب، وتحدد الرقم التسلسلي والموقّعين وترتيبهم ومواضع توقيعهم','يصل الطلب للموقّع الأول فقط — يوقّع برقمه السري','بعد كل توقيع ينتقل الطلب للتالي دون تدخل يدوي','صاحب الاعتماد (يعتمد) يوقّع أخيرًا','تُنشأ نسخة PDF نهائية بكل التوقيعات وتُؤرشف وتُرسل للمشتريات'];
+const nodes=[...document.querySelectorAll('.node')],cap=document.getElementById('cap');let t=null;
+function reset(){clearInterval(t);nodes.forEach(n=>n.className='node');cap.textContent='';}
+function run(rej){reset();let i=0;t=setInterval(()=>{nodes.forEach((n,k)=>n.className='node'+(k<i?' done':k===i?' on':''));
+  if(rej&&i===4){nodes[4].className='node rej';nodes[5].className='node';cap.innerHTML='⛔ رفض الموقّع الثاني مع ذكر السبب — توقفت الدورة، وأُبلغت المشتريات والجهة الطالبة، ولم يُرسل الطلب للموقّع الثالث';clearInterval(t);return;}
+  cap.textContent=caps[i]||'';if(++i>nodes.length){clearInterval(t);nodes.forEach(n=>n.className='node done');cap.textContent='✅ مكتمل ومعتمد';}},1700);}
+document.getElementById('play').onclick=()=>run(false);document.getElementById('rej').onclick=()=>run(true);
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)run(false);
+</script>
+</body>
+</html>

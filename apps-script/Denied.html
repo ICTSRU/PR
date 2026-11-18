@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="version" content="1.4">
+<title>طلب صلاحية الدخول | POFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+:root{--purple:#501e8c;--purple-dark:#3a1464;--purple-light:#f0ebf8;--blue:#0a6eaa;--bg:#f7f5fb;--ink:#241436;--muted:#6b5a80;--border:rgba(80,30,140,.12);--ok:#1d7a46;--bad:#b42318;--warn:#9a5b00}
+*{box-sizing:border-box}[hidden]{display:none!important}
+html,body{margin:0}body{min-height:100vh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font-family:"Cairo",Tahoma,Arial,sans-serif;line-height:1.7}
+.en{direction:ltr;unicode-bidi:isolate}
+.bb{background:#fff;border-bottom:1px solid var(--border)}.bb .in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;justify-content:space-between;align-items:center}.bb img{height:40px;display:block}
+.band,.foot{position:relative;overflow:hidden;isolation:isolate;color:#fff}
+.band{background:#501e8c linear-gradient(110deg,#501e8c 0%,#4a1f8a 50%,#2b3f9e 100%)}.foot{background:#3a1464 linear-gradient(110deg,#3a1464 0%,#2e2a80 100%);font-size:.82rem;color:#e6dcf5}
+.band::before,.foot::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22520%22%20height%3D%22200%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%238fd3ff%22%20stroke-opacity%3D%22.35%22%20stroke-width%3D%221.2%22%3E%3Cpath%20d%3D%22M30%20150L95%2090L170%20120L230%2050L310%2085L380%2030L460%2070L510%2020%22/%3E%3Cpath%20d%3D%22M170%20120L250%20170L310%2085L360%20160L460%2070%22/%3E%3C/g%3E%3Cg%20fill%3D%22%23fff%22%20fill-opacity%3D%22.45%22%3E%3Ccircle%20cx%3D%2295%22%20cy%3D%2290%22%20r%3D%223.5%22/%3E%3Ccircle%20cx%3D%22230%22%20cy%3D%2250%22%20r%3D%224%22/%3E%3Ccircle%20cx%3D%22380%22%20cy%3D%2230%22%20r%3D%223.5%22/%3E%3Ccircle%20cx%3D%22460%22%20cy%3D%2270%22%20r%3D%224%22/%3E%3C/g%3E%3C/svg%3E');background-size:520px 200px;animation:d 40s linear infinite}
+@keyframes d{to{background-position:-520px 0}}@media (prefers-reduced-motion:reduce){.band::before,.foot::before{animation:none}}
+.band .in{max-width:1100px;margin:0 auto;padding:14px 16px}.band h1{margin:0;font-size:1.25rem}.band p{margin:0;color:#d9cdee;font-size:.85rem}
+main{flex:1;display:grid;place-items:center;padding:28px 16px}
+.card{width:100%;max-width:520px;background:#fff;border:1px solid var(--border);border-top:4px solid var(--purple);border-radius:4px;padding:26px 24px;box-shadow:0 10px 30px rgba(58,20,100,.08)}
+.ic{width:56px;height:56px;border-radius:50%;background:var(--purple-light);display:grid;place-items:center;margin:0 auto 8px}
+.ic svg{width:28px;height:28px;color:var(--purple)}
+h2{margin:0 0 4px;text-align:center;color:var(--purple-dark);font-size:1.25rem}
+.sub{text-align:center;color:var(--muted);margin:0 0 14px}
+.who{display:block;width:max-content;margin:0 auto 14px;background:var(--purple-light);color:var(--purple-dark);border-radius:4px;padding:2px 12px;font-family:Arial,sans-serif;font-size:.9rem;direction:ltr}
+label{display:flex;flex-direction:column;gap:3px;font-size:.88rem;font-weight:600;color:var(--purple-dark);margin-bottom:10px}
+input,select,textarea{font:inherit;font-weight:400;border:1px solid rgba(80,30,140,.25);border-radius:4px;padding:7px 9px;width:100%;color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.roles label{flex-direction:row;align-items:flex-start;gap:8px;border:1px solid var(--border);border-radius:4px;padding:8px;font-weight:400;cursor:pointer;margin:0}
+.roles label:has(input:checked){border-color:var(--purple);background:var(--purple-light)}
+.roles input{width:auto;margin-top:5px}.roles b{display:block;color:var(--purple-dark)}.roles small{color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--purple);color:#fff;border:0;border-radius:4px;padding:11px;font:700 1rem "Cairo",Tahoma;cursor:pointer}
+.btn:hover{background:var(--purple-dark)}.btn[disabled]{opacity:.6;cursor:wait}
+.msg{border-radius:4px;padding:10px 12px;margin-top:12px;font-size:.92rem}
+.msg.ok{background:#e8f5ee;color:var(--ok);border:1px solid rgba(29,122,70,.25)}.msg.bad{background:#fdecea;color:var(--bad);border:1px solid rgba(180,35,24,.25)}.msg.warn{background:#fff4e0;color:var(--warn);border:1px solid rgba(154,91,0,.25)}
+.en-note{margin-top:14px;padding-top:10px;border-top:1px solid var(--border);direction:ltr;font-size:.8rem;color:#8a7c9c;font-family:Arial,sans-serif}
+.foot .in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center}
+.foot .ver{font-family:Arial;background:rgba(255,255,255,.14);padding:0 8px;border-radius:3px}
+.foot a.itoc{background:#fff;border-radius:4px;padding:4px 10px;display:flex}.foot a.itoc img{height:32px}
+</style>
+</head>
+<body>
+<div class="bb"><div class="in"><img id="lgSru" alt="جامعة سليمان الراجحي"><img id="lgIctd" alt="الإدارة التنفيذية للاتصالات وتقنية المعلومات"></div></div>
+<div class="band"><div class="in"><h1>منصة أوامر الشراء والتوقيعات الإلكترونية</h1><p class="en">POFlow — Purchase Order Approval &amp; Digital Signature Platform</p></div></div>
+<main><div class="card">
+  <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+  <h2 id="ttl">لا تملك صلاحية الدخول</h2>
+  <p class="sub" id="sub"></p>
+  <span class="who" id="who"></span>
+
+  <div id="domainBox" hidden><div class="msg bad">المنصة متاحة لمنسوبي جامعة سليمان الراجحي فقط. سجّل الدخول بحساب Google الجامعي المنتهي بـ <b class="en">@sr.edu.sa</b> ثم أعد فتح الرابط.</div></div>
+
+  <form id="reqForm" hidden onsubmit="send(event)">
+    <label>الاسم الكامل *<input id="rqName" required maxlength="120" placeholder="الاسم كما في سجلات الجامعة"></label>
+    <div style="font-size:.88rem;font-weight:600;color:var(--purple-dark);margin-bottom:4px">الصلاحية المطلوبة *</div>
+    <div class="roles">
+      <label><input type="radio" name="rqRole" value="editor"><span><b>محرر · Editor</b><small>إنشاء طلبات الشراء والتوقيع على الخطوات المسندة إليّ</small></span></label>
+      <label><input type="radio" name="rqRole" value="viewer" checked><span><b>مشاهد · Viewer</b><small>الاطّلاع على الطلبات والأرشيف والتقارير دون تعديل</small></span></label>
+    </div>
+    <label>سبب طلب الصلاحية *<textarea id="rqReason" required maxlength="600" placeholder="مثال: مدير إدارة وأحتاج إلى التوقيع على أوامر الشراء الخاصة بإدارتي"></textarea></label>
+    <button class="btn" id="rqGo" type="submit"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></svg>إرسال طلب صلاحية الدخول</button>
+  </form>
+  <div id="res"></div>
+  <div class="en-note" id="enNote"></div>
+</div></main>
+<div class="foot"><div class="in"><span>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver" id="ver"></span></span>
+  <a class="itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC"></a></div></div>
+<script>
+const D = window.DENY || {}, $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+try { $('#lgSru').src = ITOC_LOGOS.sru; $('#lgIctd').src = ITOC_LOGOS.ictd; $('#lgItoc').src = ITOC_LOGOS.itoc; } catch (e) {}
+$('#ver').textContent = 'v' + (D.version || '1.3');
+$('#who').textContent = D.email || '—';
+$('#enNote').innerHTML = 'POFlow is limited to authorised Sulaiman Al Rajhi University accounts. Access requests are reviewed by the platform administrator (<span>' + esc(D.admin) + '</span>).';
+function showPending() {
+  $('#reqForm').hidden = true;
+  $('#res').innerHTML = '<div class="msg warn"><b>طلبك قيد المراجعة.</b><br>أُرسل طلب صلاحية الدخول إلى مدير المنصة <b class="en">' + esc(D.admin) + '</b>، وستصلك رسالة بالبريد عند البت فيه.</div>';
+}
+if (D.reason === 'domain') { $('#sub').textContent = 'الدخول متاح لحسابات الجامعة فقط'; $('#domainBox').hidden = false; }
+else {
+  $('#sub').innerHTML = 'حسابك غير مضاف إلى قائمة المصرّح لهم بالدخول إلى المنصة.<br>أرسل طلب صلاحية إلى مدير المنصة، وسيصلك الرد بالبريد.';
+  if (D.pending) showPending(); else $('#reqForm').hidden = false;
+}
+function send(e) {
+  e.preventDefault();
+  const name = $('#rqName').value.trim(), reason = $('#rqReason').value.trim(), role = (document.querySelector('input[name=rqRole]:checked') || {}).value;
+  if (!name || reason.length < 5) { $('#res').innerHTML = '<div class="msg bad">اكتب الاسم وسبب الطلب.</div>'; return; }
+  $('#rqGo').disabled = true; $('#res').innerHTML = '<div class="msg warn">جارٍ الإرسال…</div>';
+  google.script.run.withSuccessHandler(r => {
+    $('#rqGo').disabled = false;
+    if (r && r.already) { $('#res').innerHTML = '<div class="msg ok">لديك صلاحية الدخول — <a href="' + location.href.split('#')[0] + '">افتح المنصة</a></div>'; return; }
+    if (r && r.pending) { showPending(); return; }
+    $('#reqForm').hidden = true;
+    $('#res').innerHTML = '<div class="msg ok"><b>✔ أُرسل طلبك بنجاح</b> إلى مدير المنصة <b class="en">' + esc(D.admin) + '</b>.<br>ستصلك رسالة على <span class="en">' + esc(D.email) + '</span> عند الموافقة، ثم يمكنك الدخول من الرابط نفسه.</div>';
+  }).withFailureHandler(err => { $('#rqGo').disabled = false; $('#res').innerHTML = '<div class="msg bad">' + esc(err && err.message || err) + '</div>'; }).requestAccess({ name, role, reason });
+}
+</script>
+</body>
+</html>
