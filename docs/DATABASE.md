@@ -49,7 +49,8 @@
     "createdAt": "ISO", "createdBy": "…", "submittedAt": "ISO", "routedAt": "ISO", "approvedAt": "", "rejectedAt": "",
     "prevVersion": "", "returnNote": "", "contentHash": "sha256", "fullHash": "sha256", "finalizedAt": ""
   },
-  "consumables": [{ "desc": "…", "unit": "جهاز", "qty": 6, "price": 9500 }],
+  "consumables": [{ "desc": "…", "unit": "جهاز", "qty": 6, "price": 9500, "spec": "المواصفات الفنية للبند (v1.9)" }],
+  "_meta.specs (v1.9)": { "email": "…", "name": "…", "note": "…", "due": "YYYY-MM-DD", "requestedAt": "ISO", "requestedBy": "…", "general": "…", "doneAt": "ISO", "doneBy": "…", "rounds": [] },
   "assets": [],
   "attachments": [{ "id": "driveFileId", "name": "…pdf", "mime": "application/pdf", "size": 1234, "sha": "sha256", "by": "…", "at": "ISO", "kind": "quotation" }],
   "steps": [
@@ -72,6 +73,7 @@
 | `draft` | مسودة |
 | `req_sign` | بانتظار توقيع الجهة الطالبة |
 | `proc_review` | قيد مراجعة المشتريات |
+| `tech_specs` | بانتظار المواصفات الفنية (v1.9) |
 | `returned` | معاد للاستكمال |
 | `signing` | بانتظار التوقيع |
 | `rejected` | مرفوض |

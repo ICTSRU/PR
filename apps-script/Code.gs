@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- *  POFlow v1.8 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
+ *  POFlow v1.9 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
  *  Purchase Order Approval & Digital Signature Platform
  *  Built on SRU Secure Access Kit v1.4 — access limited to @sr.edu.sa accounts
  *  E-signature logic = the ICTD Policy Platform model (v3.4), applied to a sequential PO workflow:
@@ -29,7 +29,7 @@
 const APP_NAME       = 'منصة أوامر الشراء';
 const APP_NAME_EN    = 'POFlow — Purchase Order Approval & Digital Signature Platform';
 const APP_SHORT      = 'POFlow';
-const APP_VERSION    = '1.8';
+const APP_VERSION    = '1.9';
 const ALLOWED_DOMAIN = 'sr.edu.sa';
 const FAVICON_URL    = 'https://ictsru.github.io/ITOC/assets/itoc-logo.png';
 const TZ             = 'Asia/Riyadh';
@@ -74,7 +74,7 @@ const DEFAULT_ALLOWED = [
 const ROLES   = ['admin', 'editor', 'viewer'];
 const ROLE_AR = { admin: 'مدير النظام (Admin)', editor: 'محرر (Editor)', editor_proc: 'محرر · المشتريات (Editor)', viewer: 'مشاهد (Viewer)' };
 const STATUS_AR = {
-  draft: 'مسودة', req_sign: 'بانتظار توقيع الجهة الطالبة', proc_review: 'قيد مراجعة المشتريات', returned: 'معاد للاستكمال',
+  draft: 'مسودة', req_sign: 'بانتظار توقيع الجهة الطالبة', proc_review: 'قيد مراجعة المشتريات', tech_specs: 'بانتظار المواصفات الفنية', returned: 'معاد للاستكمال',
   signing: 'بانتظار التوقيع', rejected: 'مرفوض', approved: 'مكتمل ومعتمد', cancelled: 'ملغى'
 };
 
@@ -209,6 +209,9 @@ function poApi(req) {
       case 'upload':        return upload_(email, role, req);
       case 'attachment':    return attachment_(email, role, req);
       case 'removeAtt':     return removeAtt_(email, role, req);
+      case 'toSpecs':       return toSpecs_(email, role, req);
+      case 'specsSave':     return specsSave_(email, role, req);
+      case 'specsRecall':   return specsRecall_(email, role, req);
       /* signature register (policy-platform model) */
       case 'sigs':          return { ok: true, items: mySigs_(email), admin: P.admin, all: P.admin ? allSigs_() : [], displayDefault: displayDefault_() };
       case 'sigAdd':        return sigAdd_(email, req);
@@ -252,7 +255,7 @@ function perms_(role) {
 }
 const ACTION_PERM_ = {
   save: 'create', submit: 'create', revise: 'create', upload: 'create', removeAtt: 'create',
-  'return': 'procurement', route: 'procurement', editSteps: 'procurement', setDisplay: 'procurement',
+  'return': 'procurement', toSpecs: 'procurement', specsRecall: 'procurement', route: 'procurement', editSteps: 'procurement', setDisplay: 'procurement',
   sign: 'sign', reject: 'sign', unsign: 'sign', sigAdd: 'sign', sigUnlock: 'sign', sigPin: 'sign', sigDelete: 'sign', sigShow: 'sign',
   users: 'admin', userSave: 'admin', accessRequests: 'admin', accessDecide: 'admin', delegations: 'admin', delegationSave: 'admin', settingsSave: 'admin', setDefaultDisplay: 'admin', remindNow: 'admin',
   audit: 'audit'
@@ -614,11 +617,17 @@ function totals_(d) {
 }
 function round2_(x) { return Math.round(x * 100) / 100; }
 function current_(d) { return (d.steps || []).filter(function (s) { return s.state === 'current'; })[0] || null; }
+/** v1.9: who holds the request now — the technical-specs party while status = tech_specs, otherwise the current signing step. */
+function owner_(d) {
+  const sp = d.meta && d.meta.specs;
+  if (d.meta.status === 'tech_specs' && sp) return { email: sp.email, name: sp.name || '', title: 'إعداد المواصفات الفنية', since: sp.requestedAt || '', phase: 'specs' };
+  return current_(d);
+}
 
 /** Persists the PO row (index columns + JSON) and, when asked, a snapshot in Versions. */
 function persist_(d, email, opt) {
   opt = opt || {};
-  const sh = sheet_(SH_PO), now = new Date().toISOString(), m = d.meta, cur = current_(d), t = totals_(d);
+  const sh = sheet_(SH_PO), now = new Date().toISOString(), m = d.meta, cur = owner_(d), t = totals_(d);
   m.statusAr = STATUS_AR[m.status] || m.status;
   const vals = [m.id, m.version, m.status, STATUS_AR[m.status] || '', m.serial, m.dept, m.requester, m.requesterEmail, m.subject, m.supplier,
     t.all, m.currency, cur ? cur.email : '', cur ? (cur.name || cur.title) : '', cur ? (cur.since || '') : '', m.targetDate,
@@ -644,8 +653,10 @@ function canView_(d, email, role) {
   if (norm_(d.meta.createdBy) === email || norm_(d.meta.requesterEmail) === email) return true;
   if (d.meta.status === 'draft') return false;
   const pr = principals_(email);
+  if (specsParties_(d).some(function (e) { return pr.indexOf(e) > -1; })) return true;
   return (d.steps || []).some(function (s) { return pr.indexOf(norm_(s.email)) > -1 || (s.sig && norm_(s.sig.by) === email); });
 }
+function specsParties_(d) { return ((d.meta.specs && d.meta.specs.rounds) || []).map(function (r) { return norm_(r.email); }).concat(d.meta.specs ? [norm_(d.meta.specs.email)] : []); }
 function isRequester_(d, email) { return norm_(d.meta.createdBy) === email || norm_(d.meta.requesterEmail) === email; }
 
 function list_(email, role) {
@@ -655,13 +666,14 @@ function list_(email, role) {
   rows.forEach(function (r) {
     let d; try { d = JSON.parse(r.slice(PO_HEADERS.length).join('')); } catch (e) { return; }
     if (!d || !canView_(d, email, role)) return;
-    const t = totals_(d), cur = current_(d), pr = principals_(email);
+    const t = totals_(d), cur = owner_(d), pr = principals_(email);
     out.push({
       id: d.meta.id, version: d.meta.version, status: d.meta.status, serial: d.meta.serial, dept: d.meta.dept, subject: d.meta.subject,
       supplier: d.meta.supplier, requester: d.meta.requester, requesterEmail: d.meta.requesterEmail, createdBy: d.meta.createdBy,
       total: t.all, cons: t.cons, asset: t.asset, currency: d.meta.currency, date: d.meta.date,
       createdAt: d.meta.createdAt, submittedAt: d.meta.submittedAt, routedAt: d.meta.routedAt, approvedAt: d.meta.approvedAt, rejectedAt: d.meta.rejectedAt,
       targetDate: d.meta.targetDate, updatedAt: String(r[PO_HEADERS.indexOf('updatedAt')]),
+      specsDue: d.meta.status === 'tech_specs' && d.meta.specs ? d.meta.specs.due || '' : '', hasSpecs: hasSpecs_(d),
       current: cur ? { email: cur.email, name: cur.name || '', title: cur.title || '', since: cur.since || '', phase: cur.phase } : null,
       mine: !!cur && pr.indexOf(norm_(cur.email)) > -1,
       steps: (d.steps || []).map(function (s) { return { email: s.email, name: s.name, title: s.title, state: s.state, phase: s.phase, at: s.sig ? s.sig.at : (s.rejectedAt || ''), since: s.since || '', kind: s.kind || 'sign' }; })
@@ -691,7 +703,7 @@ function versions_(email, role, id) {
 const REQ_FIELDS_ = ['date', 'dept', 'budget', 'subject', 'supplier', 'supplierContact', 'currency', 'notes', 'terms', 'requester', 'requesterEmail'];
 function cleanItems_(rows) {
   return (Array.isArray(rows) ? rows : []).slice(0, 200).map(function (r) {
-    return { desc: clean_(r.desc, 400), unit: clean_(r.unit, 40), qty: Math.max(0, Number(r.qty) || 0), price: Math.max(0, Number(r.price) || 0) };
+    return { desc: clean_(r.desc, 400), unit: clean_(r.unit, 40), qty: Math.max(0, Number(r.qty) || 0), price: Math.max(0, Number(r.price) || 0), spec: clean_(r.spec, 4000) };
   }).filter(function (r) { return r.desc || r.qty || r.price; });
 }
 function save_(email, role, p) {
@@ -860,12 +872,102 @@ function canon_(v) {
 /** What the requesting manager signs: the request itself (fields, items, attachment fingerprints). */
 function contentHash_(d) {
   const m = {}; ['id', 'version'].concat(REQ_FIELDS_).forEach(function (k) { m[k] = d.meta[k] == null ? '' : String(d.meta[k]); });
-  return sha_(canon_({ meta: m, consumables: d.consumables || [], assets: d.assets || [],
+  const req = function (rows) { return (rows || []).map(function (r) { return { desc: r.desc, unit: r.unit, qty: r.qty, price: r.price }; }); };   // technical specs are not part of the requester's signature
+  return sha_(canon_({ meta: m, consumables: req(d.consumables), assets: req(d.assets),
     attachments: (d.attachments || []).map(function (a) { return { name: a.name, sha: a.sha }; }) }));
 }
 /** What the approval chain signs: the request + procurement's serial number and direction. */
-function fullHash_(d) { return sha_(canon_({ content: contentHash_(d), serial: d.meta.serial || '', procNote: d.meta.procNote || '' })); }
+function fullHash_(d) {
+  const sp = function (rows) { return (rows || []).map(function (r) { return r.spec || ''; }); };
+  const o = { content: contentHash_(d), serial: d.meta.serial || '', procNote: d.meta.procNote || '' };
+  if (hasSpecs_(d)) o.specs = { cons: sp(d.consumables), asset: sp(d.assets), general: (d.meta.specs && d.meta.specs.general) || '',
+    attachments: (d.attachments || []).filter(function (a) { return a.kind === 'specs'; }).map(function (a) { return a.sha; }) };   // v1.9 — the approval chain signs the technical specs too
+  return sha_(canon_(o));
+}
+function hasSpecs_(d) { return (d.consumables || []).concat(d.assets || []).some(function (r) { return r.spec; }) || !!(d.meta.specs && d.meta.specs.general); }
 function stepHash_(d, s) { return s.phase === 'requester' ? contentHash_(d) : fullHash_(d); }
+
+
+/* ======================= Technical specifications (v1.9) =======================
+ *  proc_review ──toSpecs──▶ tech_specs (assigned party fills «المواصفات الفنية» per item) ──specsSave(submit)──▶ proc_review
+ *  The specs are not part of the requester's signature (contentHash) but are signed by the approval chain (fullHash).
+ * =============================================================================== */
+function toSpecs_(email, role, p) {
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const L = load_(p.id), d = L.d;
+    if (d.meta.status !== 'proc_review') throw new Error('الإحالة لإعداد المواصفات الفنية متاحة أثناء مراجعة المشتريات فقط');
+    const to = norm_(p.email); if (!isAllowed_(to)) throw new Error('أدخل البريد الجامعي لجهة إعداد المواصفات');
+    if (accessStatus_(to) !== 'ok') throw new Error('المستخدم ' + to + ' غير مضاف إلى المنصة — أضفه من «المستخدمون والصلاحيات» أو اطلب منه طلب صلاحية الدخول');
+    const prev = d.meta.specs || {}, now = new Date().toISOString();
+    const rounds = (prev.rounds || []).concat(prev.email ? [{ email: prev.email, name: prev.name, requestedAt: prev.requestedAt, doneAt: prev.doneAt || '', recalled: !!prev.recalled }] : []);
+    d.meta.specs = { email: to, name: clean_(p.name, 120), dept: clean_(p.dept, 200), note: clean_(p.note, 1500), due: /^\d{4}-\d{2}-\d{2}$/.test(String(p.due || '')) ? String(p.due) : '',
+                     requestedAt: now, requestedBy: email, general: prev.general || '', doneAt: '', doneBy: '', rounds: rounds };
+    d.meta.status = 'tech_specs';
+    hist_(d, email, 'to-specs', 'إحالة لإعداد المواصفات الفنية: ' + (d.meta.specs.name || to) + (d.meta.specs.note ? ' — ' + d.meta.specs.note : ''));
+    const at = persist_(d, email, {});
+    audit_log_(email, { action: 'to-specs', poId: d.meta.id, version: d.meta.version, detail: to });
+    notifySpecs_(d, 'request');
+    return { ok: true, data: d, updatedAt: at };
+  } finally { lock.releaseLock(); }
+}
+function notifySpecs_(d, kind) {
+  const sp = d.meta.specs, rem = kind === 'reminder', n = (d.consumables || []).length + (d.assets || []).length;
+  sp.notifiedAt = new Date().toISOString();
+  notify_([sp.email].concat(delegatesOf_(sp.email)), d, 'specs', rem ? 'تذكير: مطلوب إعداد المواصفات الفنية لأمر شراء' : 'مطلوب إعداد المواصفات الفنية لأمر شراء', {
+    intro: 'السلام عليكم،\n' + (rem ? 'نذكّركم بأن الطلب التالي ما زال بانتظار المواصفات الفنية منذ ' + fmtWhen_(sp.requestedAt) + '.' : 'أحالت إدارة المشتريات إليكم الطلب التالي لإعداد المواصفات الفنية لبنوده.') +
+           ' يُرجى إدخال المواصفات الفنية لكل بند (' + n + ' بنود) وإرفاق ما يلزم، ثم إرسالها؛ وتعود المعاملة تلقائيًا إلى إدارة المشتريات لتحديد مصفوفة الموافقات.',
+    rows: [['أحاله', ltr_(sp.requestedBy)], sp.due ? ['الموعد المطلوب', '<b style="color:#9a5b00">' + ltr_(sp.due) + '</b>'] : null].filter(Boolean),
+    box: sp.note ? { label: 'ملاحظة إدارة المشتريات', text: sp.note, tone: 'info' } : null,
+    cta: { label: 'إدخال المواصفات الفنية', url: ScriptApp.getService().getUrl() + '?page=specs&po=' + encodeURIComponent(d.meta.id) }
+  });
+}
+/** The technical party saves (draft) or submits the specs. p.cons / p.asset = arrays of spec text by item index. */
+function specsSave_(email, role, p) {
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const L = load_(p.id), d = L.d, sp = d.meta.specs;
+    if (d.meta.status !== 'tech_specs' || !sp) throw new Error('الطلب ليس في مرحلة إعداد المواصفات الفنية');
+    const mine = principals_(email).indexOf(norm_(sp.email)) > -1;
+    if (!mine && !perms_(role).procurement) throw new Error('إعداد المواصفات الفنية مسند إلى ' + sp.email);
+    if (p.baseUpdatedAt !== undefined && p.baseUpdatedAt !== L.updatedAt) return { ok: false, conflict: true, error: 'عُدّل الطلب بعد فتحه — أعد تحميله' };
+    const put = function (rows, arr) { (rows || []).forEach(function (r, i) { if (Array.isArray(arr) && arr[i] != null) r.spec = clean_(arr[i], 4000); }); };
+    put(d.consumables, p.cons); put(d.assets, p.asset);
+    if (p.general != null) sp.general = clean_(p.general, 4000);
+    sp.savedAt = new Date().toISOString(); sp.savedBy = email;
+    if (p.submit) {
+      const missing = (d.consumables || []).concat(d.assets || []).filter(function (r) { return !r.spec; }).length;
+      if (missing) throw new Error('أدخل المواصفات الفنية لجميع البنود (' + missing + ' بنود بلا مواصفات)');
+      sp.doneAt = sp.savedAt; sp.doneBy = email; d.meta.status = 'proc_review';
+      hist_(d, email, 'specs-done', 'اكتملت المواصفات الفنية — أُعيد الطلب إلى إدارة المشتريات' + (mine && norm_(sp.email) !== email ? ' (بالنيابة عن ' + sp.email + ')' : ''));
+    } else hist_(d, email, 'specs-save', 'حفظ مسودة المواصفات الفنية');
+    const at = persist_(d, email, { snapshot: !!p.submit, reason: p.submit ? 'specs-done' : '' });
+    audit_log_(email, { action: p.submit ? 'specs-done' : 'specs-save', poId: d.meta.id, version: d.meta.version });
+    if (p.submit) {
+      notify_(procEmails_().concat([sp.requestedBy]), d, 'specs-done', 'اكتملت المواصفات الفنية — الطلب بانتظار تحديد مصفوفة الموافقات', {
+        intro: 'أدخلت جهة إعداد المواصفات الفنية مواصفات جميع البنود، وعادت المعاملة إلى إدارة المشتريات لتحديد مصفوفة الموافقات وبدء دورة التوقيعات.',
+        rows: [['أعدّها', '<b>' + esc_(sp.name || email) + '</b> ' + ltr_(email)], ['تاريخ الإنجاز', ltr_(fmtWhen_(sp.doneAt))]],
+        box: sp.general ? { label: 'ملاحظات فنية عامة', text: sp.general, tone: 'ok' } : null,
+        cta: { label: 'تحديد مصفوفة الموافقات', url: ScriptApp.getService().getUrl() + '?page=route&po=' + encodeURIComponent(d.meta.id) } });
+      notify_([d.meta.requesterEmail], d, 'specs-done', 'اكتملت المواصفات الفنية لطلبكم', '', true);
+    }
+    return { ok: true, data: d, updatedAt: at };
+  } finally { lock.releaseLock(); }
+}
+function specsRecall_(email, role, p) {
+  const lock = LockService.getScriptLock(); lock.waitLock(20000);
+  try {
+    const L = load_(p.id), d = L.d, sp = d.meta.specs;
+    if (d.meta.status !== 'tech_specs' || !sp) throw new Error('الطلب ليس لدى جهة المواصفات الفنية');
+    const note = clean_(p.note, 500);
+    sp.recalled = true; sp.recalledAt = new Date().toISOString(); d.meta.status = 'proc_review';
+    hist_(d, email, 'specs-recall', 'استرجاع الطلب من جهة المواصفات الفنية' + (note ? ' — ' + note : ''));
+    const at = persist_(d, email, {});
+    audit_log_(email, { action: 'specs-recall', poId: d.meta.id, version: d.meta.version, detail: sp.email });
+    notify_([sp.email], d, 'specs-recall', 'أُلغيت إحالة إعداد المواصفات الفنية', { intro: 'استرجعت إدارة المشتريات الطلب التالي، ولم يعد مطلوبًا منكم إعداد مواصفاته الفنية.', box: note ? { label: 'الملاحظة', text: note, tone: 'grey' } : null });
+    return { ok: true, data: d, updatedAt: at };
+  } finally { lock.releaseLock(); }
+}
 
 /* ----- signing ----- */
 function actorFor_(email, s) {
@@ -989,8 +1091,9 @@ function upload_(email, role, p) {
   const lock = LockService.getScriptLock(); lock.waitLock(20000);
   try {
     const L = load_(p.id), d = L.d;
-    if (!isRequester_(d, email) && !perms_(role).procurement) throw new Error('غير مصرح');
-    const editable = ['draft', 'returned'].indexOf(d.meta.status) > -1 || (perms_(role).procurement && d.meta.status === 'proc_review' && p.procurement);
+    if (!isRequester_(d, email) && !perms_(role).procurement && !(d.meta.status === 'tech_specs' && d.meta.specs && principals_(email).indexOf(norm_(d.meta.specs.email)) > -1)) throw new Error('غير مصرح');
+    const specOwner = d.meta.status === 'tech_specs' && d.meta.specs && principals_(email).indexOf(norm_(d.meta.specs.email)) > -1;
+    const editable = ['draft', 'returned'].indexOf(d.meta.status) > -1 || (perms_(role).procurement && d.meta.status === 'proc_review' && p.procurement) || specOwner;
     if (!editable) throw new Error('المرفقات مقفلة بعد إرسال الطلب للتوقيع');
     if ((d.attachments || []).length >= MAX_ATTS) throw new Error('الحد الأقصى ' + MAX_ATTS + ' مرفقًا');
     if (!isB64_(p.b64, Math.ceil(MAX_ATT_BYTES * 4 / 3) + 8)) throw new Error('الملف غير صالح أو أكبر من 10MB');
@@ -998,7 +1101,7 @@ function upload_(email, role, p) {
     const bytes = Utilities.base64Decode(p.b64), sha = hexDigest_(bytes);
     const name = clean_(p.name, 160).replace(/[\\/:*?"<>|]/g, '_') || 'file';
     const f = DriveApp.getFolderById(attFolder_()).createFile(Utilities.newBlob(bytes, mime, d.meta.id + '__' + name));
-    const att = { id: f.getId(), name: name, mime: mime, size: bytes.length, sha: sha, by: email, at: new Date().toISOString(), kind: clean_(p.kind, 40) || 'supporting', procurement: !!p.procurement };
+    const att = { id: f.getId(), name: name, mime: mime, size: bytes.length, sha: sha, by: email, at: new Date().toISOString(), kind: specOwner ? 'specs' : (clean_(p.kind, 40) || 'supporting'), procurement: !!p.procurement };
     (d.attachments = d.attachments || []).push(att);
     hist_(d, email, 'attach', name);
     if (d.meta.status === 'proc_review') d.meta.fullHash = fullHash_(d);
@@ -1061,7 +1164,10 @@ const MAIL_TYPES_ = {
   escalation:   { tone: 'bad',   badge: 'تصعيد — تأخر التوقيع',     cta: 'متابعة الطلب' },
   access:       { tone: 'brand', badge: 'طلب صلاحية دخول',          cta: 'مراجعة الطلب' },
   'access-ok':  { tone: 'ok',    badge: 'تمت الموافقة',            cta: 'الدخول إلى المنصة' },
-  'access-no':  { tone: 'grey',  badge: 'لم تتم الموافقة',          cta: '' }
+  'access-no':  { tone: 'grey',  badge: 'لم تتم الموافقة',          cta: '' },
+  specs:        { tone: 'info',  badge: 'مطلوب إعداد المواصفات الفنية', cta: 'إدخال المواصفات الفنية' },
+  'specs-done': { tone: 'ok',    badge: 'اكتملت المواصفات الفنية',   cta: 'تحديد مصفوفة الموافقات' },
+  'specs-recall':{ tone: 'grey', badge: 'أُلغيت الإحالة',            cta: 'فتح الطلب' }
 };
 function slotAr_(k) { const p = String(k).split('.'); return ({ R: 'يعد', C: 'يقترح / يوصي', A: 'يعتمد', I: 'يعلم' })[p[1]] + ' — ' + (p[0] === 'cons' ? 'المستهلكات أو الخدمات' : 'الأصول'); }
 function ltr_(v) { return '<span dir="ltr" style="unicode-bidi:isolate;font-family:Consolas,\'Courier New\',monospace">' + esc_(v) + '</span>'; }
@@ -1217,7 +1323,18 @@ function remindPending() {
   let sent = 0;
   for (let i = 0; i < n; i++) {
     const row = i + 2, d = readJson_(sh, row, PO_HEADERS.length + 1);
-    if (!d || ['req_sign', 'signing'].indexOf(d.meta.status) === -1) continue;
+    if (!d || ['req_sign', 'signing', 'tech_specs'].indexOf(d.meta.status) === -1) continue;
+    if (d.meta.status === 'tech_specs') {   // v1.9 — technical-specs stage: reminder + escalation
+      const sp = d.meta.specs; if (!sp) continue;
+      let ch = false; const since = Date.parse(sp.requestedAt || '') || now, last = Date.parse(sp.notifiedAt || sp.requestedAt || '') || now;
+      if (now - last >= H * 36e5) { notifySpecs_(d, 'reminder'); sent++; ch = true; }
+      if (((now - since >= D * 864e5) || (sp.due && sp.due < today)) && esc && sp.escalatedOn !== today) {
+        notify_([esc].concat(procEmails_()), d, 'escalation', 'تصعيد: تأخر إعداد المواصفات الفنية', { intro: 'تجاوز أمر الشراء التالي المدة المستهدفة لدى جهة إعداد المواصفات الفنية.', rows: [['لدى', '<b>' + esc_(sp.name || sp.email) + '</b> ' + ltr_(sp.email)], ['منذ', ltr_(fmtWhen_(sp.requestedAt))], sp.due ? ['الموعد المطلوب', ltr_(sp.due)] : null].filter(Boolean) });
+        sp.escalatedOn = today; sent++; ch = true;
+      }
+      if (ch) sh.getRange(row, PO_HEADERS.length + 1, 1, JSON_COLS).setValues([chunk_(JSON.stringify(d))]);
+      continue;
+    }
     const s = current_(d); if (!s) continue;
     let changed = false;
     const since = Date.parse(s.since || '') || now, last = Date.parse(s.notifiedAt || s.since || '') || now;

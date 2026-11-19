@@ -28,6 +28,9 @@
 | `upload` | create / procurement | `id, name, mime, b64, kind, procurement?` | مرفق في Drive + `sha` |
 | `removeAtt` | صاحب الطلب (مسودة) | `id, attId` | — |
 | `attachment` | من يملك الرؤية | `id, attId` | `name, mime, b64` |
+| `toSpecs` | procurement | `id, email, name, note, due` | `proc_review` ← `tech_specs` + بريد للجهة الفنية (v1.9) |
+| `specsSave` | الجهة الفنية المحالة / procurement | `id, cons[], asset[], general, submit` | حفظ المسودة؛ `submit:true` ← يعود إلى `proc_review` ويُبلّغ المشتريات |
+| `specsRecall` | procurement | `id, note` | استرجاع الطلب من الجهة الفنية |
 | `return` | procurement | `id, note` | `returned` + إصدار جديد + مسح توقيع الجهة |
 | `route` | procurement | `id, serial, procNote, targetDate, steps[], start` | المسار؛ `start:true` ← `signing` وإشعار الأول |
 | `editSteps` | procurement | `id, steps[] (الخطوات المعلّقة فقط), reason` | تعديل ما لم يُبلغ بعد (مسجّل) |

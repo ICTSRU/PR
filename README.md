@@ -1,4 +1,4 @@
-# POFlow — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية · v1.8
+# POFlow — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية · v1.9
 
 **Purchase Order Approval & Digital Signature Platform** — الإدارة التنفيذية للاتصالات وتقنية المعلومات · مركز العمليات التقنية ITOC · جامعة سليمان الراجحي
 
@@ -68,7 +68,7 @@ ictsru.github.io/POFlow  →  Google sign-in (@sr.edu.sa)  →  Apps Script Web 
 | `tools/bump_version.py` | رفع رقم الإصدار في كل الملفات و`CHANGELOG` بأمر واحد |
 | `.github/workflows/deploy-apps-script.yml` · `AUTODEPLOY.md` | التحديث التلقائي (GitHub Actions + clasp) |
 | `docs/` | قاعدة البيانات · واجهات API · سير العمل · الاختبار · لقطات · نموذج PDF معتمد (بيانات اختبار) |
-| `tests/` | محاكي خدمات Apps Script + 58 اختبار قبول + 29 اختبار متصفح |
+| `tests/` | محاكي خدمات Apps Script + 72 اختبار قبول + 39 اختبار متصفح |
 
 ## قاعدة البيانات المرتبطة (v1.1)
 | العنصر | الرابط |
@@ -128,8 +128,8 @@ ictsru.github.io/POFlow  →  Google sign-in (@sr.edu.sa)  →  Apps Script Web 
 
 ## الاختبار
 ```
-node tests/acceptance.test.js          # 58 اختبار قبول على Code.gs الحقيقي (محاكي Apps Script)
-node tests/e2e-server.js 8787 & python3 tests/e2e.py   # 29 اختبار متصفح على Index.html الحقيقي
+node tests/acceptance.test.js          # 72 اختبار قبول على Code.gs الحقيقي (محاكي Apps Script)
+node tests/e2e-server.js 8787 & python3 tests/e2e.py   # 39 اختبار متصفح على Index.html الحقيقي
 ```
 انظر `docs/TESTING.md`.
 

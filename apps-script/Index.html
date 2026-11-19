@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="1.8">
+<meta name="version" content="1.9">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -83,6 +83,8 @@ table.reg td{padding:7px;border-bottom:1px solid var(--border);vertical-align:to
 table.reg tr.click{cursor:pointer}table.reg tr.click:hover td{background:#faf8fd}
 .num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;white-space:nowrap}
 .st{display:inline-flex;align-items:center;gap:4px;border-radius:12px;padding:1px 9px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.st-tech_specs{background:#efe6fb;color:#5b2aa0}.spc{font-size:8.5px;color:#5b2aa0;font-weight:700;margin-top:1px}.screen .spc{font-size:9px}
+.spitem{border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:10px;background:#fff}.spitem .h{display:flex;gap:8px;align-items:center;margin-bottom:6px}.spitem .n{min-width:34px;height:24px;border-radius:12px;background:var(--purple-light);color:var(--purple);display:grid;place-items:center;font-weight:800;font-size:.78rem;font-family:Arial}.spitem textarea{min-height:90px}
 .st-draft{background:#eee;color:#555}.st-req_sign,.st-signing{background:var(--warn-bg);color:var(--warn)}.st-proc_review{background:var(--info-bg);color:var(--blue)}
 .st-returned{background:#fff0f6;color:#a3195b}.st-rejected{background:var(--bad-bg);color:var(--bad)}.st-approved{background:var(--ok-bg);color:var(--ok)}.st-cancelled{background:#eee;color:#777;text-decoration:line-through}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
@@ -271,7 +273,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.8</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.9</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
@@ -376,7 +378,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <script>
 /* =========================================================
-   POFlow v1.8 — Purchase Order Approval & Digital Signature Platform
+   POFlow v1.9 — Purchase Order Approval & Digital Signature Platform
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -413,7 +415,7 @@ const NAV = [
   ['new', 'file-plus-2', 'أمر شراء جديد', () => P.create],
   ['mine', 'folder-open', 'طلباتي', () => P.create],
   ['inbox', 'inbox', 'وارد المشتريات', () => P.procurement],
-  ['sign', 'pen-line', 'صندوق التوقيعات', () => P.sign],
+  ['sign', 'pen-line', 'صندوق التوقيعات والمهام', () => P.sign],
   ['archive', 'archive', 'الأرشيف والبحث', () => true],
   ['reports', 'chart-column', 'التقارير', () => P.viewAll],
   ['verify', 'shield-check', 'التحقق', () => true],
@@ -433,7 +435,7 @@ async function loadList(force) {
 }
 const ROUTES = {};
 async function route() {
-  const h = location.hash.slice(1) || defaultRoute(), [k, ...rest] = h.split('/'), arg = decodeURIComponent(rest.join('/') || '');
+  const h = location.hash.slice(1) || defaultRoute(), [k, ...rest] = h.split('#')[0].split('/'), arg = decodeURIComponent(rest.join('/') || '');
   const fn = ROUTES[k] || ROUTES.dash;
   $('#view').innerHTML = '<div class="loading">جارٍ التحميل…</div>';
   try { await loadList(); renderNav(k); await fn(arg); }
@@ -454,7 +456,8 @@ function poTable(items, opt) {
       <td><button class="btn sm" onclick="event.stopPropagation();previewPO('${esc(x.id)}')" title="معاينة أمر الشراء PDF بالنموذج الرسمي مع كل الإضافات"><i data-lucide="file-search" class="icon"></i>معاينة</button></td></tr>`).join('') + '</tbody></table></div>';
 }
 function overdue(x) {
-  if (!['req_sign', 'signing'].includes(x.status) || !x.current) return false;
+  if (!['req_sign', 'signing', 'tech_specs'].includes(x.status) || !x.current) return false;
+  if (x.status === 'tech_specs' && x.specsDue) return x.specsDue < today();
   if (x.targetDate && x.targetDate < today()) return true;
   const since = Date.parse(x.current.since || ''); return since && (Date.now() - since) > (Number(SET.TARGET_DAYS) || 5) * 864e5;
 }
@@ -503,6 +506,7 @@ function dashBody() {
     ${tile('t', 'files', 'إجمالي أوامر الشراء', L.length)}
     ${tile('n', 'file-plus-2', 'جديدة (مسودة / توقيع الجهة)', c(['draft', 'req_sign', 'returned']), 'info')}
     ${tile('p', 'inbox', 'قيد مراجعة المشتريات', c(['proc_review']), 'info', 'proc_review')}
+    ${tile('t2', 'ruler', 'بانتظار المواصفات الفنية', c(['tech_specs']), 'info', 'tech_specs')}
     ${tile('s', 'pen-line', 'بانتظار التوقيع', c(['signing']), 'warn', 'signing')}
     ${tile('a', 'badge-check', 'مكتملة ومعتمدة', c(['approved']), 'ok', 'approved')}
     ${tile('r', 'octagon-x', 'مرفوضة', c(['rejected']), 'bad', 'rejected')}
@@ -659,7 +663,7 @@ async function uploadFiles(procurement) {
     toast('✔ تم رفع المرفقات'); procurement ? ROUTES.route(d.meta.id) : renderEditor();
   } catch (e) { toast(e.message, 7000); }
 }
-const KIND_AR = { quotation: 'عرض سعر', approval: 'موافقة', form: 'نموذج PDF جاهز', supporting: 'مستند داعم', procurement: 'مستند المشتريات' };
+const KIND_AR = { specs: 'مستند المواصفات الفنية', quotation: 'عرض سعر', approval: 'موافقة', form: 'نموذج PDF جاهز', supporting: 'مستند داعم', procurement: 'مستند المشتريات' };
 function attList(d, canDel) {
   const a = d.attachments || [];
   if (!a.length) return '<div class="hint">لا توجد مرفقات.</div>';
@@ -685,19 +689,20 @@ ROUTES.mine = async function () {
    <div class="card">${poTable(mine, { empty: 'لم تُنشئ أي طلب بعد.' })}</div>`;
 };
 ROUTES.inbox = async function () {
-  const rev = LIST.filter(x => x.status === 'proc_review'), run = LIST.filter(x => x.status === 'signing'), back = LIST.filter(x => ['returned', 'rejected'].includes(x.status));
+  const rev = LIST.filter(x => x.status === 'proc_review'), tech = LIST.filter(x => x.status === 'tech_specs'), run = LIST.filter(x => x.status === 'signing'), back = LIST.filter(x => ['returned', 'rejected'].includes(x.status));
   $('#view').innerHTML = `<h2 class="t"><i data-lucide="inbox" class="icon"></i>الطلبات الواردة إلى إدارة المشتريات</h2>
    <div class="card"><h3 class="s" style="margin-top:0">بانتظار المراجعة وتحديد مسار التوقيعات (${rev.length})</h3>${poTable(rev, { dateCol: 'تاريخ الإحالة', dateKey: 'submittedAt', empty: 'لا توجد طلبات جديدة.' })}</div>
+   <div class="card"><h3 class="s" style="margin-top:0">لدى جهات إعداد المواصفات الفنية (${tech.length})</h3>${poTable(tech, { empty: 'لا توجد طلبات محالة لإعداد المواصفات الفنية.' })}</div>
    <div class="card"><h3 class="s" style="margin-top:0">قيد دورة التوقيعات (${run.length})</h3>${poTable(run, { empty: 'لا توجد طلبات قيد التوقيع.' })}</div>
    <div class="card"><h3 class="s" style="margin-top:0">معادة أو مرفوضة (${back.length})</h3>${poTable(back, { empty: '—' })}</div>`;
 };
 ROUTES.sign = async function () {
   const mine = LIST.filter(x => x.mine), done = LIST.filter(x => !x.mine && x.steps.some(s => PRINC.includes(s.email) && s.state !== 'pending'));
-  $('#view').innerHTML = `<h2 class="t"><i data-lucide="pen-line" class="icon"></i>صندوق التوقيعات والموافقات <span class="hint">${PRINC.length > 1 ? '— تشمل تفويضات: ' + esc(PRINC.slice(1).join('، ')) : ''}</span></h2>
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="pen-line" class="icon"></i>صندوق التوقيعات والمهام <span class="hint">${PRINC.length > 1 ? '— تشمل تفويضات: ' + esc(PRINC.slice(1).join('، ')) : ''}</span></h2>
    ${!SIG.mine.length && P.sign ? `<div class="banner warn"><i data-lucide="triangle-alert" class="icon"></i><div>لم تسجّل توقيعك المشفّر بعد. <a href="javascript:void 0" onclick="openSigs()">سجّله من «توقيعاتي»</a> قبل أول توقيع، وشاهد <a class="howto" target="_blank" rel="noopener" href="${esc(HOWTO)}">كيفية التوقيع</a>.</div></div>` : ''}
    <div class="card"><h3 class="s" style="margin-top:0">مطلوب منك الآن (${mine.length})</h3>${mine.length ? mine.map(x => `<div class="banner warn" style="justify-content:space-between;align-items:center">
-     <div><b class="en">${esc(x.id)}</b> · ${esc(x.subject)} — ${esc(x.dept)} · <span class="num">${fmtN(x.total)} ${esc(x.currency)}</span><div class="hint">خطوتك: ${esc(x.current.title)}${x.current.email !== ME ? ' — بالنيابة عن ' + esc(x.current.email) : ''} · منذ ${esc(fmtDT(x.current.since))}${x.targetDate ? ' · الموعد المستهدف ' + esc(x.targetDate) : ''}</div></div>
-     <span class="toolbar"><button class="btn" onclick="previewPO('${esc(x.id)}')"><i data-lucide="file-search" class="icon"></i>معاينة PDF</button><a class="btn primary" href="#po/${esc(x.id)}"><i data-lucide="pen-line" class="icon"></i>فتح للتوقيع</a></span></div>`).join('') : '<div class="empty">لا توجد طلبات بانتظار توقيعك.</div>'}</div>
+     <div><b class="en">${esc(x.id)}</b> · ${esc(x.subject)} — ${esc(x.dept)} · <span class="num">${fmtN(x.total)} ${esc(x.currency)}</span><div class="hint">خطوتك: ${esc(x.current.title)}${x.current.email !== ME ? ' — بالنيابة عن ' + esc(x.current.email) : ''} · منذ ${esc(fmtDT(x.current.since))}${x.specsDue ? ' · الموعد المطلوب ' + esc(x.specsDue) : x.targetDate ? ' · الموعد المستهدف ' + esc(x.targetDate) : ''}</div></div>
+     <span class="toolbar"><button class="btn" onclick="previewPO('${esc(x.id)}')"><i data-lucide="file-search" class="icon"></i>معاينة PDF</button>${x.status === 'tech_specs' ? `<a class="btn primary" href="#specs/${esc(x.id)}"><i data-lucide="ruler" class="icon"></i>إدخال المواصفات الفنية</a>` : `<a class="btn primary" href="#po/${esc(x.id)}"><i data-lucide="pen-line" class="icon"></i>فتح للتوقيع</a>`}</span></div>`).join('') : '<div class="empty">لا توجد طلبات بانتظار توقيعك.</div>'}</div>
    <div class="card"><h3 class="s" style="margin-top:0">طلبات شاركتَ فيها</h3>${poTable(done, { empty: '—' })}</div>`;
 };
 
@@ -721,6 +726,10 @@ function renderPO() {
   else {
     if (cur && stepMine(cur) && P.sign) acts.push(`<button class="btn ok" onclick="signStep('${cur.key}')"><i data-lucide="pen-line" class="icon"></i>توقيع${cur.email !== ME ? ' بالنيابة' : ''}</button><button class="btn danger" onclick="openReject('${cur.key}')"><i data-lucide="octagon-x" class="icon"></i>رفض</button>`);
     if (['draft', 'returned'].includes(m.status) && isReq(d)) acts.push(`<a class="btn primary" href="#edit/${esc(m.id)}"><i data-lucide="pencil" class="icon"></i>تعديل</a><button class="btn primary" onclick="submitPO()"><i data-lucide="send" class="icon"></i>إرسال للتوقيع</button>`);
+    const sp = m.specs || null, specMine = m.status === 'tech_specs' && sp && PRINC.includes(String(sp.email).toLowerCase());
+    if (specMine || (m.status === 'tech_specs' && P.procurement)) acts.push(`<a class="btn primary" href="#specs/${esc(m.id)}"><i data-lucide="ruler" class="icon"></i>${specMine ? 'إدخال المواصفات الفنية' : 'عرض/إدخال المواصفات الفنية'}</a>`);
+    if (m.status === 'tech_specs' && P.procurement) acts.push(`<button class="btn" onclick="recallSpecs()"><i data-lucide="undo-2" class="icon"></i>استرجاع من جهة المواصفات</button>`);
+    if (m.status === 'proc_review' && P.procurement) acts.push(`<a class="btn" href="#route/${esc(m.id)}#specs"><i data-lucide="ruler" class="icon"></i>إحالة لإعداد المواصفات الفنية</a>`);
     if (m.status === 'proc_review' && P.procurement) acts.push(`<a class="btn primary" href="#route/${esc(m.id)}"><i data-lucide="route" class="icon"></i>مراجعة وتحديد مسار التوقيعات</a><button class="btn" onclick="returnPO()"><i data-lucide="undo-2" class="icon"></i>إعادة للاستكمال</button>`);
     if (m.status === 'signing' && P.procurement) acts.push(`<a class="btn" href="#route/${esc(m.id)}"><i data-lucide="list-ordered" class="icon"></i>تعديل المسار</a>`);
     if (m.status === 'rejected' && (isReq(d) || P.procurement)) acts.push(`<button class="btn primary" onclick="revisePO()"><i data-lucide="git-branch-plus" class="icon"></i>إنشاء نسخة جديدة للتعديل</button>`);
@@ -739,6 +748,7 @@ function renderPO() {
    ${m.status === 'returned' && m.returnNote ? `<div class="banner warn no-print"><b>معاد للاستكمال:</b>&nbsp;${esc(m.returnNote)}</div>` : ''}
    ${CUR.final ? `<div class="banner ok no-print"><i data-lucide="badge-check" class="icon"></i><div><b>نسخة نهائية معتمدة</b> — صدرت ${esc(fmtDT(CUR.final.at))} · رمز التحقق <b class="mono">${esc(CUR.final.verifyId)}</b></div></div>` : ''}
    ${m.status === 'approved' && !CUR.final ? `<div class="banner warn no-print">اكتملت التوقيعات — لم تصدر النسخة النهائية PDF بعد.</div>` : ''}
+   ${m.status === 'tech_specs' && m.specs ? `<div class="banner info no-print"><i data-lucide="ruler" class="icon"></i><div><b>بانتظار المواصفات الفنية</b> لدى ${esc(m.specs.name || m.specs.email)} <span class="en">${esc(m.specs.email)}</span> منذ ${esc(fmtDT(m.specs.requestedAt))}${m.specs.due ? ' · الموعد المطلوب ' + esc(m.specs.due) : ''}${m.specs.note ? '<br>ملاحظة المشتريات: ' + esc(m.specs.note) : ''}${PRINC.includes(String(m.specs.email).toLowerCase()) ? `<br><a class="btn sm primary" style="margin-top:6px" href="#specs/${esc(m.id)}">إدخال المواصفات الفنية</a>` : ''}</div></div>` : ''}
    ${cur && stepMine(cur) ? `<div class="banner warn no-print"><i data-lucide="pen-line" class="icon"></i><div><b>دورك الآن:</b> ${esc(cur.title)} — راجع المستند ومرفقاته ثم وقّع في الموضع المحدد أو ارفض مع ذكر السبب.</div></div>` : ''}
    <div class="po-wrap">
      <div><div class="paperbox"><div class="paperfit printarea" id="paper">${formPage(d, { screen: true })}</div></div></div>
@@ -746,6 +756,7 @@ function renderPO() {
        <div class="card"><div class="toolbar">${acts.join('')}</div>${modeSel}</div>
        <div class="card"><h3 class="s" style="margin-top:0">تسلسل التوقيعات <span class="hint">(${d.steps.filter(s => s.sig).length} من ${d.steps.filter(s => s.kind !== 'inform').length})</span></h3>${seqHtml(d)}</div>
        <div class="card"><h3 class="s" style="margin-top:0">بيانات المعاملة</h3>${infoHtml(d)}</div>
+       ${specsCard(d)}
        <div class="card"><h3 class="s" style="margin-top:0">المرفقات</h3>${attList(d, false)}</div>
        <div class="card"><h3 class="s" style="margin-top:0">الخط الزمني</h3>${timelineHtml(d)}</div>
        <div class="card"><h3 class="s" style="margin-top:0;display:flex;justify-content:space-between">النسخ والإصدارات <button class="btn sm" onclick="loadVersions()">عرض</button></h3><div id="verBox" class="hint">—</div></div>
@@ -781,7 +792,7 @@ function infoHtml(d) {
   return '<table class="reg"><tbody>' + rows.map(r => `<tr><td class="hint" style="width:38%">${r[0]}</td><td>${r[1]}</td></tr>`).join('') + '</tbody></table>' +
     (m.contentHash || m.fullHash ? `<div class="hint" style="margin-top:6px">بصمة المحتوى: <span class="mono">${esc(String(m.fullHash || m.contentHash).slice(0, 24))}…</span></div>` : '');
 }
-const ACT_AR = { create: 'إنشاء الطلب', edit: 'تعديل', submit: 'إرسال للتوقيع', sign: 'توقيع', 'to-procurement': 'إحالة للمشتريات', 'return': 'إعادة للاستكمال', route: 'تحديد مسار التوقيعات', start: 'بدء دورة التوقيعات',
+const ACT_AR = { 'to-specs': 'إحالة لإعداد المواصفات الفنية', 'specs-save': 'حفظ مسودة المواصفات', 'specs-done': 'اكتمال المواصفات الفنية', 'specs-recall': 'استرجاع من جهة المواصفات', create: 'إنشاء الطلب', edit: 'تعديل', submit: 'إرسال للتوقيع', sign: 'توقيع', 'to-procurement': 'إحالة للمشتريات', 'return': 'إعادة للاستكمال', route: 'تحديد مسار التوقيعات', start: 'بدء دورة التوقيعات',
   'route-edit': 'تعديل المسار', reject: 'رفض', unsign: 'إزالة توقيع', revise: 'نسخة جديدة', approved: 'اكتمال التوقيعات', finalized: 'الاعتماد النهائي والأرشفة', cancel: 'إلغاء', attach: 'إرفاق مستند', detach: 'حذف مرفق' };
 function timelineHtml(d) {
   const h = (d.history || []).slice().reverse();
@@ -828,7 +839,16 @@ ROUTES.route = async function (id) {
       <label class="f" style="margin-top:6px">الموعد المستهدف لاستكمال الاعتمادات<input type="date" id="rtTarget" value="${esc(m.targetDate || addDays(Number(SET.TARGET_DAYS) || 5))}"></label>
       <label class="f" style="margin-top:6px">توجيه إدارة المشتريات<textarea id="rtNote" placeholder="يظهر في خانة «توجيه إدارة المشتريات» في المستند">${esc(m.procNote || '')}</textarea></label>
       <div class="toolbar" style="margin-top:8px"><input type="file" id="attFile" multiple style="width:auto"><button class="btn sm" onclick="uploadFiles(true)"><i data-lucide="upload" class="icon"></i>إرفاق مستند للمشتريات</button></div>
-      <div class="toolbar" style="margin-top:8px"><button class="btn" onclick="returnPO()"><i data-lucide="undo-2" class="icon"></i>إعادة للجهة الطالبة لاستكمال البيانات</button></div></div>`}
+      <div class="toolbar" style="margin-top:8px"><button class="btn" onclick="returnPO()"><i data-lucide="undo-2" class="icon"></i>إعادة للجهة الطالبة لاستكمال البيانات</button></div></div>
+    <div class="card" id="specsCard"><h3 class="s" style="margin-top:0"><i data-lucide="ruler" class="icon"></i> إحالة لإعداد المواصفات الفنية ${hasSpecs(d) ? '<span class="st st-approved">مواصفات مُدخلة</span>' : ''}</h3>
+      <div class="hint" style="margin-bottom:6px">اختياري — تُحال المعاملة إلى جهة فنية لإدخال المواصفات الفنية لكل بند، ثم تعود تلقائيًا إلى المشتريات لتحديد مصفوفة الموافقات.</div>
+      <div class="grid g2" style="gap:6px"><label class="f">بريد الجهة / المختص *<input id="spEmail" dir="ltr" list="dlPosMail" placeholder="name@sr.edu.sa" value="${esc((m.specs && m.specs.email) || '')}"></label>
+      <label class="f">الاسم / الجهة<input id="spName" value="${esc((m.specs && m.specs.name) || '')}" placeholder="مثال: إدارة تقنية المعلومات"></label></div>
+      <label class="f" style="margin-top:6px">الموعد المطلوب<input type="date" id="spDue" value="${addDays(3)}"></label>
+      <label class="f" style="margin-top:6px">ملاحظة للجهة الفنية<textarea id="spNote" placeholder="مثال: يرجى تحديد الحد الأدنى للمواصفات وفق المعايير المعتمدة"></textarea></label>
+      <datalist id="dlPosMail">${(SET.POSITIONS || []).filter(p => p.email).map(p => `<option value="${esc(p.email)}">${esc(p.title + (p.name ? ' — ' + p.name : ''))}</option>`).join('')}</datalist>
+      <div class="toolbar" style="margin-top:8px"><button class="btn primary" onclick="sendToSpecs()"><i data-lucide="send" class="icon"></i>إحالة لإعداد المواصفات الفنية</button></div></div>
+    ${specsCard(d)}`}
     <div class="card"><h3 class="s" style="margin-top:0;display:flex;justify-content:space-between;align-items:center">قائمة الموقّعين بالترتيب
       ${running ? '' : '<button class="btn sm" onclick="RT.steps=suggestSteps(CUR.d);renderSteps()" title="اقتراح المسار من مصفوفة الصلاحيات حسب إجمالي كل جدول"><i data-lucide="wand-sparkles" class="icon"></i>اقتراح حسب مصفوفة الصلاحيات</button>'}</h3>
       <div class="hint" style="margin-bottom:6px">يرسل النظام طلب التوقيع تلقائيًا للأول، ثم للتالي بعد كل توقيع دون تدخل يدوي. حدّد لكل موقّع موضع توقيعه في المستند (الجدول والعمود).</div>
@@ -842,6 +862,7 @@ ROUTES.route = async function (id) {
       <a class="btn" href="#po/${esc(m.id)}">رجوع</a></div>
    </div></div>`;
   renderSteps(); fitPaper(); icons();
+  if (location.hash.endsWith('#specs')) setTimeout(() => { const c = $('#specsCard'); if (c) { c.scrollIntoView({ behavior: 'smooth' }); $('#spEmail').focus(); } }, 200);
   ['#rtSerial', '#rtNote'].forEach(q => { const el = $(q); if (el) el.oninput = previewRoute; });
 };
 function posLookup(title) { const t = String(title || '').trim(); return (SET.POSITIONS || []).find(p => String(p.title || '').trim() === t) || {}; }
@@ -907,6 +928,83 @@ async function saveRoute(start) {
 }
 
 /* =====================================================================
+   5b · Technical specifications (v1.9) — referral by procurement, entry by the technical party
+   ===================================================================== */
+const hasSpecs = d => (d.consumables || []).concat(d.assets || []).some(r => r.spec) || !!(d.meta.specs && d.meta.specs.general);
+function specsCard(d) {
+  const sp = d.meta.specs; if (!hasSpecs(d) && !sp) return '';
+  const rows = [['cons', 'consumables', 'م'], ['asset', 'assets', 'أ']].flatMap(([c, k, pre]) => (d[k] || []).map((r, i) => `<tr><td class="en">${pre}-${i + 1}</td><td><b>${esc(r.desc)}</b>${r.spec ? `<div style="white-space:pre-line;font-size:.82rem;margin-top:2px">${esc(r.spec)}</div>` : '<div class="hint">— لم تُدخل بعد</div>'}</td></tr>`)).join('');
+  return `<div class="card"><h3 class="s" style="margin-top:0"><i data-lucide="ruler" class="icon"></i> المواصفات الفنية</h3>
+    ${sp ? `<div class="hint" style="margin-bottom:6px">${sp.doneAt ? '✔ أعدّها' : '⏳ لدى'} ${esc(sp.name || sp.email)} <span class="en">${esc(sp.email)}</span>${sp.doneAt ? ' — ' + esc(fmtDT(sp.doneAt)) : ''}</div>` : ''}
+    <table class="reg"><tbody>${rows}</tbody></table>${sp && sp.general ? `<div class="banner info" style="margin:8px 0 0">${esc(sp.general)}</div>` : ''}</div>`;
+}
+async function sendToSpecs() {
+  const email = $('#spEmail').value.trim(); if (!email) return toast('أدخل بريد جهة إعداد المواصفات');
+  if (!confirm('إحالة الطلب إلى ' + email + ' لإعداد المواصفات الفنية؟ ستعود المعاملة إلى المشتريات بعد اكتمالها.')) return;
+  try { const r = await call({ action: 'toSpecs', id: CUR.d.meta.id, email, name: $('#spName').value, note: $('#spNote').value, due: $('#spDue').value });
+    LIST_AT = 0; toast('✔ أُحيل الطلب لإعداد المواصفات الفنية — أُرسل بريد إلى ' + email); go('po/' + r.data.meta.id); } catch (e) { toast(e.message, 7000); }
+}
+async function recallSpecs() {
+  const n = await askNote('استرجاع الطلب من جهة المواصفات الفنية', 'سبب الاسترجاع (يُبلَّغ إلى الجهة الفنية).', 'استرجاع'); if (n === null) return;
+  try { applyServer(await call({ action: 'specsRecall', id: CUR.d.meta.id, note: n })); toast('أُعيد الطلب إلى المشتريات'); } catch (e) { toast(e.message); }
+}
+ROUTES.specs = async function (id) {
+  await loadPO(id); const d = CUR.d, m = d.meta, sp = m.specs || {};
+  const mine = PRINC.includes(String(sp.email || '').toLowerCase()), can = m.status === 'tech_specs' && (mine || P.procurement);
+  const items = [['cons', 'consumables', 'م', 'المستهلكات أو الخدمات'], ['asset', 'assets', 'أ', 'الأصول']].filter(x => d[x[1]].length);
+  $('#view').innerHTML = `<h2 class="t"><i data-lucide="ruler" class="icon"></i>المواصفات الفنية — <span class="en">${esc(m.id)}</span> ${stChip(m.status)}</h2>
+   ${!can ? `<div class="banner info">${m.status === 'tech_specs' ? 'إعداد المواصفات مسند إلى ' + esc(sp.email) + '.' : 'الطلب ليس في مرحلة إعداد المواصفات الفنية — العرض للاطّلاع فقط.'} <a href="#po/${esc(m.id)}">فتح الطلب</a></div>` : ''}
+   <div class="banner info"><i data-lucide="info" class="icon"></i><div><b>${esc(m.subject)}</b> — ${esc(m.dept)} · مقدم الطلب ${esc(m.requester)}
+     ${sp.note ? `<br><b>ملاحظة إدارة المشتريات:</b> ${esc(sp.note)}` : ''}${sp.due ? `<br><b>الموعد المطلوب:</b> ${esc(sp.due)}` : ''}${mine && sp.email !== ME ? `<br><b>بالنيابة عن ${esc(sp.email)} (تفويض)</b>` : ''}</div></div>
+   <div class="po-wrap"><div>
+     ${items.map(([c, k, pre, ar]) => `<div class="card"><h3 class="s" style="margin-top:0">${ar}</h3>${d[k].map((r, i) => `<div class="spitem"><div class="h"><span class="n">${pre}-${i + 1}</span><b style="flex:1">${esc(r.desc)}</b><span class="hint">${esc(r.qty)} ${esc(r.unit)}</span></div>
+       <textarea data-sp="${c}" data-i="${i}" ${can ? '' : 'readonly'} placeholder="المواصفات الفنية للبند: الخصائص، الحد الأدنى للأداء، المعايير، الضمان، التوافق…">${esc(r.spec || '')}</textarea></div>`).join('')}</div>`).join('')}
+     <div class="card"><h3 class="s" style="margin-top:0">ملاحظات فنية عامة</h3><textarea id="spGeneral" ${can ? '' : 'readonly'} placeholder="اشتراطات عامة تنطبق على جميع البنود (اختياري)">${esc(sp.general || '')}</textarea></div>
+   </div><div class="side">
+     <div class="card"><h3 class="s" style="margin-top:0">مستندات المواصفات</h3>${attList({ meta: m, attachments: (d.attachments || []).filter(a => a.kind === 'specs') }, false)}
+       ${can ? `<div class="toolbar" style="margin-top:8px"><input type="file" id="attFile" multiple style="width:auto"><button class="btn sm" onclick="uploadSpecFiles()"><i data-lucide="upload" class="icon"></i>إرفاق</button></div>` : ''}</div>
+     ${can ? `<div class="card toolbar" style="position:sticky;top:60px"><button class="btn" onclick="saveSpecs(false)"><i data-lucide="save" class="icon"></i>حفظ مسودة</button>
+       <button class="btn ok" onclick="saveSpecs(true)"><i data-lucide="send" class="icon"></i>إرسال المواصفات إلى المشتريات</button>
+       <span class="hint">بعد الإرسال تعود المعاملة تلقائيًا إلى إدارة المشتريات لتحديد مصفوفة الموافقات.</span></div>` : ''}
+     <div class="card"><button class="btn" onclick="previewPO('${esc(m.id)}')"><i data-lucide="file-search" class="icon"></i>معاينة PDF</button> <a class="btn" href="#po/${esc(m.id)}">فتح الطلب</a></div>
+   </div></div>`;
+  icons();
+};
+function specPayload() { const o = { cons: [], asset: [] }; $$('[data-sp]').forEach(t => o[t.dataset.sp][t.dataset.i] = t.value); return o; }
+async function saveSpecs(submit) {
+  const sp = specPayload();
+  if (submit) { const empty = $$('[data-sp]').filter(t => !t.value.trim()).length; if (empty) return toast('أدخل المواصفات الفنية لجميع البنود (' + empty + ' بنود فارغة)', 6000);
+    if (!confirm('إرسال المواصفات الفنية إلى إدارة المشتريات؟ لن يمكنك تعديلها بعد الإرسال.')) return; }
+  try { const r = await call({ action: 'specsSave', id: CUR.d.meta.id, cons: sp.cons, asset: sp.asset, general: $('#spGeneral').value, submit: !!submit, baseUpdatedAt: CUR.updatedAt });
+    CUR.d = r.data; CUR.updatedAt = r.updatedAt; LIST_AT = 0;
+    if (submit) { toast('✔ أُرسلت المواصفات الفنية — عادت المعاملة إلى إدارة المشتريات', 6000); go('po/' + r.data.meta.id); } else toast('✔ حُفظت المسودة');
+  } catch (e) { toast(e.message, 7000); }
+}
+async function uploadSpecFiles() {
+  const files = [...($('#attFile').files || [])]; if (!files.length) return toast('اختر ملفًا');
+  try { await saveSpecs(false);
+    for (const f of files) { if (f.size > 10 * 1024 * 1024) { toast(f.name + ' أكبر من 10MB'); continue; }
+      const r = await call({ action: 'upload', id: CUR.d.meta.id, name: f.name, mime: f.type, b64: await readB64(f), kind: 'specs' }); CUR.d = r.data; CUR.updatedAt = r.updatedAt; }
+    toast('✔ أُرفقت المستندات'); ROUTES.specs(CUR.d.meta.id);
+  } catch (e) { toast(e.message, 7000); }
+}
+/** PDF: «ملحق المواصفات الفنية» pages (paginated by length). */
+function specsPages(d) {
+  if (!hasSpecs(d)) return [];
+  const sp = d.meta.specs || {}, rows = [];
+  [['cons', 'consumables', 'م', 'المستهلكات أو الخدمات'], ['asset', 'assets', 'أ', 'الأصول']].forEach(([c, k, pre, ar]) => { if (!d[k].length) return; rows.push({ h: ar }); d[k].forEach((r, i) => rows.push({ n: pre + '-' + (i + 1), r })); });
+  const pages = []; let cur = [], load = 0;
+  rows.forEach(x => { const t = String((x.r && x.r.spec) || ''), w = x.h ? 120 : 160 + Math.ceil(t.length / 95) * 70 + (t.match(/\n/g) || []).length * 70; if (load + w > 4200 && cur.length) { pages.push(cur); cur = []; load = 0; } cur.push(x); load += w; });
+  if (cur.length) pages.push(cur);
+  return pages.map((chunk, pi) => `<div class="fpage"><div class="f-h2" style="font-size:13px">ملحق المواصفات الفنية · <span class="en">Technical Specifications</span> — <span class="mono">${esc(d.meta.id)}</span>${pages.length > 1 ? ' (' + (pi + 1) + '/' + pages.length + ')' : ''}</div>
+    ${pi === 0 ? `<table class="f-tbl f-cert"><tr><th style="width:24%">أعدّها</th><td>${esc(sp.name || '')} <span class="en">${esc(sp.doneBy || sp.email || '')}</span>${sp.doneAt ? ' — ' + esc(fmtDT(sp.doneAt)) : ' — مسودة'}</td></tr>${sp.note ? `<tr><th>طلب المشتريات</th><td>${esc(sp.note)}</td></tr>` : ''}</table>` : ''}
+    <table class="f-tbl f-cons"><tr><th class="c-n" style="width:40px">البند</th><th style="width:28%">البيان</th><th>المواصفات الفنية</th></tr>
+    ${chunk.map(x => x.h ? `<tr class="cap"><td colspan="3">${esc(x.h)}</td></tr>` : `<tr><td class="c-n">${esc(x.n)}</td><td style="vertical-align:top"><b>${esc(x.r.desc)}</b><br>${esc(x.r.qty)} ${esc(x.r.unit)}</td><td style="white-space:pre-line;vertical-align:top">${esc(x.r.spec || '—')}</td></tr>`).join('')}</table>
+    ${pi === pages.length - 1 && sp.general ? `<div class="f-proc"><div class="h">ملاحظات فنية عامة :</div><div class="b">${esc(sp.general)}</div></div>` : ''}
+    <div class="f-foot"><span>${esc(APP_SHORT())} · <span class="mono">${esc(d.meta.id)} v${esc(d.meta.version)}</span></span><span></span><span class="pn"></span></div></div>`);
+}
+
+/* =====================================================================
    6 · The official form, rendered from the record (screen, print and final PDF)
    ===================================================================== */
 const MODE_TXT = { stamp: 'ختم التوقيع فقط', image: 'صورة التوقيع', blur: 'صورة مموّهة (واضحة في النسخة النهائية)' };
@@ -943,7 +1041,7 @@ function secHtml(d, steps, cat, key, en, ar, o) {
   const rows = d[key] || [], t = sum(rows), lim = o.pdf ? ROWS_ON_FORM : Math.max(ROWS_ON_FORM, rows.length);
   const shown = rows.slice(0, lim), pad = Math.max(0, (o.pdf ? ROWS_ON_FORM : Math.max(rows.length ? rows.length : 0, ROWS_ON_FORM)) - shown.length);
   const more = rows.length - shown.length;
-  const body = shown.map((r, i) => `<tr><td class="c-n">${i + 1}</td><td>${esc(r.desc)}</td><td class="c-u">${esc(r.unit)}</td><td class="c-q">${esc(r.qty || '')}</td><td class="c-p">${r.price ? fmtN(r.price) : ''}</td><td class="c-t">${r.qty * r.price ? fmtN(r.qty * r.price) : ''}</td></tr>`).join('') +
+  const body = shown.map((r, i) => `<tr><td class="c-n">${i + 1}</td><td>${esc(r.desc)}${r.spec ? `<div class="spc">◂ المواصفات الفنية: ملحق المواصفات — البند ${cat === 'cons' ? 'م' : 'أ'}-${i + 1}</div>` : ''}</td><td class="c-u">${esc(r.unit)}</td><td class="c-q">${esc(r.qty || '')}</td><td class="c-p">${r.price ? fmtN(r.price) : ''}</td><td class="c-t">${r.qty * r.price ? fmtN(r.qty * r.price) : ''}</td></tr>`).join('') +
     Array.from({ length: pad }, () => '<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>').join('') +
     (more > 0 ? `<tr><td colspan="6" style="text-align:center;font-weight:700">+ ${more} أصناف أخرى — انظر ملحق الأصناف</td></tr>` : '');
   const slotCells = r => { const st = steps.filter(s => (s.slots || []).includes(cat + '.' + r)); return st; };
@@ -1419,6 +1517,7 @@ function summaryPage(d) {
     <tr><th>المورد</th><td>${esc(m.supplier)} ${m.supplierContact ? '· ' + esc(m.supplierContact) : ''}</td></tr>
     <tr><th>الإجمالي التقديري</th><td><b class="en">${fmtN(sum(d.consumables) + sum(d.assets))} ${esc(m.currency)}</b> (المستهلكات ${fmtN(sum(d.consumables))} · الأصول ${fmtN(sum(d.assets))})</td></tr>
     ${m.notes ? `<tr><th>ملاحظات</th><td style="white-space:pre-line">${esc(m.notes)}</td></tr>` : ''}${m.terms ? `<tr><th>الشروط</th><td style="white-space:pre-line">${esc(m.terms)}</td></tr>` : ''}
+    ${m.specs ? `<tr><th>المواصفات الفنية</th><td>${m.specs.doneAt ? '✔ أعدّها' : '⏳ لدى'} ${esc(m.specs.name || '')} <span class="en">${esc(m.specs.email)}</span>${m.specs.doneAt ? ' — ' + esc(fmtDT(m.specs.doneAt)) : (m.specs.due ? ' — مطلوبة قبل ' + esc(m.specs.due) : '')}</td></tr>` : ''}
     ${m.returnNote && m.status === 'returned' ? `<tr><th>ملاحظة الإعادة</th><td>${esc(m.returnNote)}</td></tr>` : ''}</table>
    <table class="f-tbl f-cert"><tr><th>#</th><th>الصفة / موضع التوقيع</th><th>الموقّع</th><th>الحالة</th><th>التاريخ</th></tr>
     ${sg.map((s, i) => { const g = s.sig || {}; return `<tr><td>${i + 1}</td><td><b>${esc(s.title)}</b><br>${esc((s.slots || []).map(slotAr).join('، '))}</td><td><b>${esc(g.signerName || s.name || '')}</b><br><span class="en">${esc(g.by || s.email)}</span>${g.onBehalfOf ? '<br>بالنيابة عن <span class="en">' + esc(g.onBehalfOf) + '</span>' : ''}</td><td>${esc(ST[s.state] || s.state)}${s.reason ? '<br>السبب: ' + esc(s.reason) : ''}</td><td>${esc(fmtDT(g.at || s.rejectedAt || s.since))}</td></tr>`; }).join('') || '<tr><td colspan="5">لم يُحدَّد مسار التوقيعات بعد</td></tr>'}
@@ -1434,7 +1533,7 @@ async function renderPdf(d, opt) {
   await pdfFonts(); const { JsPDF } = await loadPdfLibs(); if (opt.vt) await loadQrLib();
   const host = document.createElement('div'); host.className = 'fdoc-host'; document.body.appendChild(host);
   try {
-    host.innerHTML = formPage(d, { pdf: true, wmk: opt.preview }) + appendixPages(d).join('') + doaPage(d) + (opt.vt ? certPage(d, opt.vt) : summaryPage(d));
+    host.innerHTML = formPage(d, { pdf: true, wmk: opt.preview }) + appendixPages(d).join('') + specsPages(d).join('') + doaPage(d) + (opt.vt ? certPage(d, opt.vt) : summaryPage(d));
     const pages = [...host.querySelectorAll('.fpage')];
     pages.forEach((pg, i) => { const pn = pg.querySelector('.f-foot span:last-child'); if (pn) pn.textContent = 'صفحة ' + (i + 1) + ' من ' + pages.length; if (opt.preview && !pg.querySelector('.f-wmk')) pg.insertAdjacentHTML('beforeend', '<div class="f-wmk">نسخة معاينة</div>'); });
     await Promise.all([...host.querySelectorAll('img')].map(i => i.complete ? 0 : new Promise(r => { i.onload = i.onerror = r; })));
@@ -1546,7 +1645,8 @@ function previewPdf() { previewPO(CUR.d.meta.id); }
   if (!P.sign) $('#btnSigs').hidden = true;
   wirePad();
   const p = BOOT.params || {};
-  if (p.po && !location.hash) history.replaceState(null, '', '#po/' + p.po);
+  if (p.po && p.page && ROUTES[p.page] && !location.hash) history.replaceState(null, '', '#' + p.page + '/' + p.po);
+  else if (p.po && !location.hash) history.replaceState(null, '', '#po/' + p.po);
   else if (p.verify && !location.hash) history.replaceState(null, '', '#verify/' + p.verify);
   else if (p.page && ROUTES[p.page] && !location.hash) history.replaceState(null, '', '#' + p.page);
   loadDepartments().finally(route); loadNotif(); setInterval(loadNotif, 120000);
