@@ -234,6 +234,17 @@ with sync_playwright() as p:
     open(f'{OUT}/specs-preview.pdf', 'wb').write(open(dl.value.path(), 'rb').read())
     pr.click('#dlgPdf .dlg-h button:has-text("إغلاق")')
 
+    print('\nB3 · notifications bell')
+    pr.goto(f'{BASE}/?as={PROC}#home'); pr.reload(); pr.wait_for_selector('#view h2', timeout=20000)
+    pr.click('#btnBell'); pr.wait_for_selector('#notif:not([hidden]) .n', timeout=20000)
+    top = pr.evaluate("""() => { const n = document.getElementById('notif'), r = n.getBoundingClientRect();
+      const el = document.elementFromPoint(r.left + r.width / 2, r.top + 30);
+      return { onTop: n.contains(el), inView: r.top >= 0 && r.left >= 0 && r.right <= innerWidth, n: n.querySelectorAll('.n').length }; }""")
+    ok(top['onTop'] and top['inView'], 'bell opens the notifications panel on top of the header and logos (not clipped)')
+    ok(top['n'] >= 1, f'panel lists the notifications ({top["n"]})')
+    pr.screenshot(path=f'{OUT}/15-notifications.png')
+    pr.keyboard.press('Escape'); ok(pr.locator('#notif').is_hidden(), 'Esc closes the panel')
+
     print('\nC · access request screen')
     nu = 'new.staff@sr.edu.sa'
     ctx = br.new_context(viewport={'width': 1200, 'height': 900}); ctx.route('**/*', router); pg = ctx.new_page()

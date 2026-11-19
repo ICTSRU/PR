@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="1.9">
+<meta name="version" content="2.0">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -142,9 +142,14 @@ table.items input{padding:4px 6px}
 .slots{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.78rem;grid-column:2 / -1}
 .slots label{display:flex;align-items:center;gap:3px;font-weight:400}
 .slots input{width:auto}
-.notif{position:absolute;left:0;top:44px;width:360px;max-height:420px;overflow:auto;background:#fff;color:var(--ink);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.18);z-index:50;font-size:.84rem}
-.notif .n{padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer}.notif .n.u{background:#faf6ff;font-weight:700}
-.notif .n .at{font-size:.72rem;color:var(--muted);font-weight:400}
+.notif{position:fixed;z-index:1000;width:min(380px,94vw);max-height:min(70vh,520px);display:flex;flex-direction:column;background:#fff;color:var(--ink);border:1px solid var(--border);border-radius:6px;box-shadow:0 14px 40px rgba(36,20,54,.28);font-size:.84rem;overflow:hidden}
+.notif .nh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--purple);color:#fff;font-weight:700}
+.notif .nh button{background:#fff;color:var(--purple);border:0;border-radius:4px;padding:2px 8px;font:600 .75rem "Cairo",Tahoma;cursor:pointer}
+.notif .nl{overflow:auto;flex:1}
+.notif .n{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;align-items:flex-start}.notif .n:hover{background:#f7f3fd}
+.notif .n.u{background:#faf6ff;font-weight:700}.notif .n .dot{width:8px;height:8px;border-radius:50%;background:transparent;margin-top:7px;flex:none}.notif .n.u .dot{background:var(--purple)}
+.notif .n .at{font-size:.72rem;color:var(--muted);font-weight:400;display:block}
+.notif .ne{padding:22px;text-align:center;color:var(--muted)}
 
 /* dialogs */
 dialog{border:0;border-radius:6px;padding:0;width:min(640px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.3);color:var(--ink)}
@@ -263,8 +268,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
   <div class="who">
     <a class="hbtn glow" id="btnHowto" target="_blank" rel="noopener" title="فيديو وخطوات: كيف تسجّل توقيعك وتوقّع أو ترفض أمر الشراء"><i data-lucide="circle-play" class="icon"></i>كيفية التوقيع</a>
     <button class="hbtn" id="btnSigs" onclick="openSigs()" title="توقيعاتي المشفّرة في سجل توقيعات المنصة"><i data-lucide="signature" class="icon"></i>توقيعاتي</button>
-    <span style="position:relative"><button class="hbtn" id="btnBell" onclick="toggleNotif()" title="الإشعارات"><i data-lucide="bell" class="icon"></i><span class="badge" id="bellN" hidden>0</span></button>
-      <div class="notif" id="notif" hidden></div></span>
+    <span style="position:relative"><button class="hbtn" id="btnBell" onclick="toggleNotif()" title="الإشعارات"><i data-lucide="bell" class="icon"></i><span class="badge" id="bellN" hidden>0</span></button></span>
     <span class="chip-u"><span class="en" id="meMail"></span> · <b id="meRole"></b></span>
   </div>
 </div></header>
@@ -273,12 +277,13 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v1.9</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v2.0</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
   </div>
 </div></footer>
+<div class="notif" id="notif" hidden role="dialog" aria-label="الإشعارات"></div>
 <div class="toast" id="toast"></div>
 
 <!-- ======== signature register (policy-platform model) ======== -->
@@ -378,7 +383,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <script>
 /* =========================================================
-   POFlow v1.9 — Purchase Order Approval & Digital Signature Platform
+   POFlow v2.0 — Purchase Order Approval & Digital Signature Platform
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -1254,12 +1259,34 @@ async function remindNow() { try { const r = await call({ action: 'remindNow' })
    ===================================================================== */
 let NOTIF = [];
 async function loadNotif() { try { NOTIF = (await call({ action: 'notifications' })).items || []; const n = NOTIF.filter(x => !x.read).length; $('#bellN').hidden = !n; $('#bellN').textContent = n; } catch (e) {} }
-function toggleNotif() {
-  const b = $('#notif'); b.hidden = !b.hidden; if (b.hidden) return;
-  b.innerHTML = (NOTIF.length ? NOTIF.map(x => `<div class="n ${x.read ? '' : 'u'}" onclick="$('#notif').hidden=true;go('po/${esc(x.poId)}')">${esc(x.title)}<div class="at">${esc(fmtDT(x.at))}</div></div>`).join('') : '<div class="n">لا توجد إشعارات</div>') +
-    `<div class="n" style="text-align:center" onclick="markAll()"><b>تعليم الكل كمقروء</b></div>`;
+/** v2.0: the panel lives at page level (the header band clips overflow) and is anchored under the bell. */
+function placeNotif() {
+  const n = $('#notif'), b = $('#btnBell').getBoundingClientRect(), w = n.offsetWidth || 380;
+  n.style.top = Math.round(b.bottom + 8) + 'px';
+  n.style.left = Math.round(Math.min(Math.max(8, b.left), window.innerWidth - w - 8)) + 'px';
 }
-async function markAll() { try { await call({ action: 'markRead', all: true }); NOTIF.forEach(x => x.read = true); $('#bellN').hidden = true; $('#notif').hidden = true; } catch (e) {} }
+function renderNotif() {
+  const unread = NOTIF.filter(x => !x.read).length;
+  $('#notif').innerHTML = `<div class="nh"><span><i data-lucide="bell" class="icon"></i> الإشعارات${unread ? ` <span class="badge" style="position:static">${unread}</span>` : ''}</span>${unread ? '<button onclick="markAll()">تعليم الكل كمقروء</button>' : ''}</div>
+    <div class="nl">${NOTIF.length ? NOTIF.map(x => `<div class="n ${x.read ? '' : 'u'}" onclick="openNotif('${esc(x.nid)}','${esc(x.poId)}')"><span class="dot"></span><span>${esc(x.title)}<span class="at">${esc(fmtDT(x.at))}</span></span></div>`).join('') : '<div class="ne">لا توجد إشعارات</div>'}</div>`;
+  icons();
+}
+async function toggleNotif() {
+  const n = $('#notif');
+  if (!n.hidden) { n.hidden = true; return; }
+  renderNotif(); n.hidden = false; placeNotif();
+  await loadNotif(); if (!n.hidden) { renderNotif(); placeNotif(); }
+}
+async function openNotif(nid, poId) {
+  $('#notif').hidden = true;
+  const x = NOTIF.find(z => z.nid === nid);
+  if (x && !x.read) { x.read = true; try { await call({ action: 'markRead', ids: [nid] }); } catch (e) {} const u = NOTIF.filter(z => !z.read).length; $('#bellN').hidden = !u; $('#bellN').textContent = u; }
+  if (poId) go('po/' + poId);
+}
+window.addEventListener('resize', () => { if (!$('#notif').hidden) placeNotif(); });
+window.addEventListener('scroll', () => { if (!$('#notif').hidden) placeNotif(); }, { passive: true });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#notif').hidden = true; });
+async function markAll() { try { await call({ action: 'markRead', all: true }); NOTIF.forEach(x => x.read = true); $('#bellN').hidden = true; renderNotif(); } catch (e) { toast(e.message); } }
 
 /* =====================================================================
    11 · E-signatures — this platform's own encrypted register (policy-platform model)
@@ -1651,7 +1678,7 @@ function previewPdf() { previewPO(CUR.d.meta.id); }
   else if (p.page && ROUTES[p.page] && !location.hash) history.replaceState(null, '', '#' + p.page);
   loadDepartments().finally(route); loadNotif(); setInterval(loadNotif, 120000);
   if (P.sign) loadMySigs(true);
-  document.addEventListener('click', e => { const n = $('#notif'); if (!n.hidden && !e.target.closest('#notif') && !e.target.closest('#btnBell')) n.hidden = true; });
+  document.addEventListener('click', e => { const n = $('#notif'); if (n.hidden) return; const path = e.composedPath ? e.composedPath() : [e.target]; if (!path.some(el => el && (el.id === 'notif' || el.id === 'btnBell'))) n.hidden = true; });
 })();
 </script>
 </body>
