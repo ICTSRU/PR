@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- *  POFlow v2.1 — منصة أوامر الشراء
+ *  POFlow v2.2 — منصة أوامر الشراء
  *  Purchase Order Platform
  *  Built on SRU Secure Access Kit v1.4 — access limited to @sr.edu.sa accounts
  *  E-signature logic = the ICTD Policy Platform model (v3.4), applied to a sequential PO workflow:
@@ -29,7 +29,7 @@
 const APP_NAME       = 'منصة أوامر الشراء';
 const APP_NAME_EN    = 'Purchase Order Platform · POFlow';
 const APP_SHORT      = 'POFlow';
-const APP_VERSION    = '2.1';
+const APP_VERSION    = '2.2';
 const ALLOWED_DOMAIN = 'sr.edu.sa';
 const FAVICON_URL    = 'https://ictsru.github.io/ITOC/assets/itoc-logo.png';
 const TZ             = 'Asia/Riyadh';
@@ -160,7 +160,7 @@ function doGet(e) {
   const page = String(p.page || '').toLowerCase();
   if (page === 'howto') {
     const hh = HtmlService.createHtmlOutputFromFile('HowTo').getContent()
-      .replace('</head>', function () { return '<script>window.BOOT={params:' + safeJson_(uiPrefs_(p)) + '};</script>' + include('I18n') + '</head>'; });
+      .replace('</head>', function () { return '<script>window.BOOT={params:' + safeJson_(uiPrefs_(p)) + ',appUrl:' + safeJson_(ScriptApp.getService().getUrl() || '') + '};</script>' + include('I18n') + include('Flow') + '</head>'; });
     const h = HtmlService.createHtmlOutput(hh).setTitle('كيفية التوقيع | ' + APP_SHORT).addMetaTag('viewport', 'width=device-width, initial-scale=1');
     if (FAVICON_URL) h.setFaviconUrl(FAVICON_URL);
     return h;
@@ -176,7 +176,7 @@ function doGet(e) {
     pendingRequests: perms_(info.role).admin ? accessRequests_().filter(function (x) { return x.status === 'pending'; }).length : 0,
     sheetUrl: perms_(info.role).admin ? sheetUrl_() : '', folderUrl: perms_(info.role).admin && ROOT_FOLDER_ID ? 'https://drive.google.com/drive/folders/' + ROOT_FOLDER_ID : ''
   };
-  const inject = '<script>window.BOOT=' + safeJson_(boot) + ';</script>' + include('I18n') + include('Logos') + include('CompanyLogo') + include('PdfFont');
+  const inject = '<script>window.BOOT=' + safeJson_(boot) + ';</script>' + include('I18n') + include('Flow') + include('Logos') + include('CompanyLogo') + include('PdfFont');
   const html = HtmlService.createHtmlOutputFromFile('Index').getContent()
     .replace('<script src="config.js"></script>', function () { return inject; });
   const out = HtmlService.createHtmlOutput(html).setTitle(APP_NAME + ' | ' + APP_SHORT).addMetaTag('viewport', 'width=device-width, initial-scale=1');

@@ -245,6 +245,18 @@ with sync_playwright() as p:
     pr.screenshot(path=f'{OUT}/15-notifications.png')
     pr.keyboard.press('Escape'); ok(pr.locator('#notif').is_hidden(), 'Esc closes the panel')
 
+    print('\nB5 · «أين وصلت المعاملة؟» (v2.2)')
+    fm = page_as(br, PROC, f'po/{po3}'); fm.wait_for_selector('.flowcard .pfs', timeout=20000)
+    cur = fm.inner_text('.flowcard .pfs li.cur')
+    ok('الموقّع' in cur or 'مدير' in cur or 'المشتريات' in cur or 'الاعتماد' in cur or 'إصدار' in cur, f'PO page shows the stage strip with the current stage ({cur.splitlines()[-1] if cur else "-"})')
+    fm.click('.flowcard .btn.sm'); fm.wait_for_selector('#flowMap:not([hidden]) svg')
+    ok(fm.locator('#flowMap .nd.cur, #flowMap .nd.alert').count() >= 1 and fm.locator('#flowMap .nd.done').count() >= 2, 'full cycle map opens with done / current stages highlighted')
+    fm.screenshot(path=f'{OUT}/19-flow-map.png', full_page=False)
+    fm.goto(f'{BASE}/?as={PROC}&page=howto'); fm.wait_for_selector('#cycMap svg', timeout=20000)
+    ok(fm.locator('#cycMap .nd').count() == 16 + 4, 'How-to page shows the full cycle map (16 stages + legend)')
+    fm.fill('#trk', 'abc'); fm.click('.track button'); ok(fm.locator('#trkErr').is_visible(), 'track-your-request validates the number')
+    fm.context.close()
+
     print('\nB4 · English + dark mode (v2.1)')
     en = page_as(br, PROC, 'dash')
     en.click('#btnLang'); en.wait_for_function("document.documentElement.dir==='ltr'")

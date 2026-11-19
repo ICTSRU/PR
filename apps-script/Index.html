@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<meta name="version" content="2.1">
+<meta name="version" content="2.2">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -332,7 +332,7 @@ html[dir=ltr] [data-bidi]{unicode-bidi:plaintext;text-align:left}
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v2.1</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v2.2</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
@@ -438,7 +438,7 @@ html[dir=ltr] [data-bidi]{unicode-bidi:plaintext;text-align:left}
 
 <script>
 /* =========================================================
-   POFlow v2.1 — Purchase Order Platform (منصة أوامر الشراء)
+   POFlow v2.2 — Purchase Order Platform (منصة أوامر الشراء)
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -814,6 +814,7 @@ function renderPO() {
    ${m.status === 'approved' && !CUR.final ? `<div class="banner warn no-print">اكتملت التوقيعات — لم تصدر النسخة النهائية PDF بعد.</div>` : ''}
    ${m.status === 'tech_specs' && m.specs ? `<div class="banner info no-print"><i data-lucide="ruler" class="icon"></i><div><b>بانتظار المواصفات الفنية</b> لدى ${esc(m.specs.name || m.specs.email)} <span class="en">${esc(m.specs.email)}</span> منذ ${esc(fmtDT(m.specs.requestedAt))}${m.specs.due ? ' · الموعد المطلوب ' + esc(m.specs.due) : ''}${m.specs.note ? '<br>ملاحظة المشتريات: ' + esc(m.specs.note) : ''}${PRINC.includes(String(m.specs.email).toLowerCase()) ? `<br><a class="btn sm primary" style="margin-top:6px" href="#specs/${esc(m.id)}">إدخال المواصفات الفنية</a>` : ''}</div></div>` : ''}
    ${cur && stepMine(cur) ? `<div class="banner warn no-print"><i data-lucide="pen-line" class="icon"></i><div><b>دورك الآن:</b> ${esc(cur.title)} — راجع المستند ومرفقاته ثم وقّع في الموضع المحدد أو ارفض مع ذكر السبب.</div></div>` : ''}
+   ${flowCard(d)}
    <div class="po-wrap">
      <div><div class="paperbox"><div class="paperfit printarea" id="paper">${formPage(d, { screen: true })}</div></div></div>
      <div class="side no-print">
@@ -826,6 +827,27 @@ function renderPO() {
        <div class="card"><h3 class="s" style="margin-top:0;display:flex;justify-content:space-between">النسخ والإصدارات <button class="btn sm" onclick="loadVersions()">عرض</button></h3><div id="verBox" class="hint">—</div></div>
      </div></div>`;
   fitPaper(); icons();
+  try { if (localStorage.getItem('poflow_flowmap') === '1') { const b = $('.flowcard .btn.sm'); if (b) toggleFlowMap(b); } } catch (e) {}
+}
+/* v2.2: «أين وصلت المعاملة؟» — compact stage strip + the full cycle map with the current stage highlighted */
+function flowCard(d) {
+  if (!window.POFLOW_FLOW) return '';
+  const st = POFLOW_FLOW.stage(d, CUR.final), m = d.meta, cur = d.steps.find(s => s.state === 'current');
+  const who = m.status === 'signing' && cur ? `لدى <b>${esc(cur.name || cur.email)}</b> (${esc(cur.title || '')})${m.currentSince ? ' منذ ' + esc(fmtDT(m.currentSince)) : ''}`
+    : m.status === 'tech_specs' && m.specs ? `لدى <b>${esc(m.specs.name || m.specs.email)}</b> — المواصفات الفنية`
+    : m.status === 'proc_review' ? 'لدى <b>إدارة المشتريات</b>' : m.status === 'req_sign' ? 'لدى <b>مدير إدارة الجهة الطالبة</b>'
+    : ['draft', 'returned'].includes(m.status) ? 'لدى <b>الجهة الطالبة</b>' : m.status === 'rejected' ? 'لدى <b>الجهة الطالبة / المشتريات</b> لإنشاء إصدار جديد'
+    : m.status === 'approved' ? (CUR.final ? 'مكتملة ومعتمدة' : 'بانتظار إصدار النسخة النهائية PDF') : '';
+  return `<div class="card no-print flowcard"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+      <h3 class="s" style="margin:0"><i data-lucide="map-pin" class="icon"></i>أين وصلت المعاملة؟</h3>${who ? `<span class="hint">${who}</span>` : ''}
+      <span style="flex:1"></span><button class="btn sm" onclick="toggleFlowMap(this)" aria-expanded="false"><i data-lucide="workflow" class="icon"></i>عرض المخطط الكامل</button></div>
+    ${POFLOW_FLOW.strip(st, d)}
+    <div id="flowMap" hidden style="margin-top:12px">${POFLOW_FLOW.svg(st)}</div></div>`;
+}
+function toggleFlowMap(b) {
+  const m = $('#flowMap'); m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden));
+  b.lastChild.textContent = m.hidden ? 'عرض المخطط الكامل' : 'إخفاء المخطط';
+  try { localStorage.setItem('poflow_flowmap', m.hidden ? '0' : '1'); } catch (e) {}
 }
 function fitPaper() { const p = $('#paper'); if (!p) return; const w = p.parentElement.clientWidth - 4; p.style.width = '794px'; p.style.zoom = Math.min(1, w / 794); }
 window.addEventListener('resize', () => fitPaper());

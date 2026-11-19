@@ -50,10 +50,15 @@ html[data-theme=dark] .ic svg{color:#bb9af2}
 html[data-theme=dark] .sec{background:#2a2040}
 html[dir=ltr] .card ul{padding-inline-start:18px}
 html[dir=ltr] .arr{display:inline-block;transform:scaleX(-1)}
+.cyc{margin:18px 0}.cyc-h{color:var(--muted);font-size:.9rem;margin:4px 0 12px}
+.track{margin-top:14px;border-top:1px solid var(--border);padding-top:12px}.track label{display:block;font-size:.9rem;margin-bottom:6px}
+.track .row{display:flex;gap:8px;flex-wrap:wrap}.track input{flex:1;min-width:180px;font:inherit;padding:8px 10px;border:1px solid rgba(80,30,140,.25);border-radius:4px;background:transparent;color:inherit}
+.track .err{color:var(--bad);font-size:.82rem;margin-top:6px}
+html[data-theme=dark] .cyc{background:#1c1626}
 </style>
 </head>
 <body>
-<div class="hero"><div class="in" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1"><h1>كيفية التوقيع على أوامر الشراء</h1><p>منصة أوامر الشراء · <span class="en">POFlow v2.1</span> — نفس منطق التوقيع المعتمد في منصة السياسات</p></div><div class="tg"><button type="button" data-i18n-toggle onclick="I18N.toggleLang()"></button><button type="button" data-theme-toggle onclick="I18N.toggleTheme()"></button></div></div></div>
+<div class="hero"><div class="in" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1"><h1>كيفية التوقيع على أوامر الشراء</h1><p>منصة أوامر الشراء · <span class="en">POFlow v2.2</span> — نفس منطق التوقيع المعتمد في منصة السياسات</p></div><div class="tg"><button type="button" data-i18n-toggle onclick="I18N.toggleLang()"></button><button type="button" data-theme-toggle onclick="I18N.toggleTheme()"></button></div></div></div>
 <div class="wrap">
   <div class="frame"><div class="stage">
     <div class="flow" id="flow">
@@ -97,9 +102,19 @@ html[dir=ltr] .arr{display:inline-block;transform:scaleX(-1)}
       <li><b>نسيت الرقم السري؟</b> احذف التوقيع من «توقيعاتي» وأضفه من جديد.</li></ul></div>
   </div>
 
+  <div class="card cyc" id="cycle"><h3><span class="n">↻</span>الدورة الكاملة لأمر الشراء</h3>
+    <p class="cyc-h">كل المراحل ونقاط القرار من الإنشاء حتى الاعتماد والتحقق. داخل المنصة يظهر هذا المخطط في صفحة كل أمر شراء مع إبراز المرحلة التي وصل إليها.</p>
+    <div id="cycMap"></div>
+    <form class="track" onsubmit="return trackPO(event)">
+      <label for="trk"><b>تتبّع طلبك:</b> أدخل رقم الطلب لعرض المرحلة التي وصل إليها</label>
+      <div class="row"><input id="trk" dir="ltr" placeholder="PR-2026-0001" autocomplete="off" maxlength="20"><button class="btn" type="submit">عرض مرحلة الطلب</button></div>
+      <div class="err" id="trkErr" hidden>أدخل رقم الطلب بالشكل PR-2026-0001</div>
+    </form>
+  </div>
+
   <div class="sec"><b>كيف يُحمى توقيعك؟</b> صورة التوقيع مشفّرة دائمًا بـ <span class="en">AES-256-GCM</span> بمفتاح مشتق من رقمك السري (<span class="en">PBKDF2 · 310,000</span> تكرار) داخل متصفحك. يتحقق الخادم من رقمك السري عبر بصمة مشتقة لا تكفي لفك التشفير، ويتحقق من هويتك عبر حسابك الجامعي <span class="en">@sr.edu.sa</span>. كل توقيع يحمل بصمة <span class="en">SHA-256</span> لمحتوى أمر الشراء، فأي تعديل لاحق يُكشف فورًا. هذا <b>توقيع إلكتروني بسيط موثّق</b>؛ وعند الحاجة إلى توقيع رقمي معتمد قانونيًا يُستخدم مزود مرخّص.</div>
 </div>
-<footer>مركز العمليات التقنية ITOC — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · <span class="en">v2.1</span></footer>
+<footer>مركز العمليات التقنية ITOC — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · <span class="en">v2.2</span></footer>
 <script>
 const caps=['تنشئ الجهة الطالبة أمر الشراء وترفق المستندات الداعمة','يوقّع مدير إدارة الجهة الطالبة (يعد) فيُحال الطلب تلقائيًا إلى المشتريات','تراجع المشتريات الطلب، وتحدد الرقم التسلسلي والموقّعين وترتيبهم ومواضع توقيعهم','يصل الطلب للموقّع الأول فقط — يوقّع برقمه السري','بعد كل توقيع ينتقل الطلب للتالي دون تدخل يدوي','صاحب الاعتماد (يعتمد) يوقّع أخيرًا','تُنشأ نسخة PDF نهائية بكل التوقيعات وتُؤرشف وتُرسل للمشتريات'];
 const nodes=[...document.querySelectorAll('.node')],cap=document.getElementById('cap');let t=null;
@@ -109,6 +124,21 @@ function run(rej){reset();let i=0;t=setInterval(()=>{nodes.forEach((n,k)=>n.clas
   cap.textContent=caps[i]||'';if(++i>nodes.length){clearInterval(t);nodes.forEach(n=>n.className='node done');cap.textContent='✅ مكتمل ومعتمد';}},1700);}
 document.getElementById('play').onclick=()=>run(false);document.getElementById('rej').onclick=()=>run(true);
 if(!matchMedia('(prefers-reduced-motion:reduce)').matches)run(false);
+</script>
+<script>
+/* v2.2: full cycle map + «track your request» */
+(function () { var m = document.getElementById('cycMap'); if (m && window.POFLOW_FLOW) m.innerHTML = POFLOW_FLOW.svg({}); })();
+function trackPO(e) {
+  e.preventDefault();
+  var v = String(document.getElementById('trk').value || '').trim().toUpperCase(), err = document.getElementById('trkErr');
+  if (!/^PR-\d{4}-\d{4}$/.test(v)) { err.hidden = false; return false; }
+  err.hidden = true;
+  var base = (window.BOOT && BOOT.appUrl) || '';
+  var q = '?po=' + encodeURIComponent(v) + '&lang=' + (window.I18N ? I18N.lang : 'ar') + '&theme=' + (window.I18N ? I18N.theme : 'light');
+  window.open(base + q, '_top');
+  return false;
+}
+document.getElementById('trk').addEventListener('input', function () { document.getElementById('trkErr').hidden = true; });
 </script>
 </body>
 </html>

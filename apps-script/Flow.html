@@ -1,0 +1,146 @@
+<script>
+/* POFlow v2.2 · مخطط دورة أمر الشراء (Workflow map)
+   Shared by Index (PO page: highlights where each request is) and HowTo (the full cycle).
+   POFLOW_FLOW.svg(state)   → SVG markup; state = { done:[ids], cur:id, alert:[ids], live:[ids], sub:{id:text} }
+   POFLOW_FLOW.stage(d, f)  → state for a PO object d (meta/steps/items) and its final record f */
+(function () {
+  var N = {
+    create:  { x: 230, y: 30,  w: 220, t: 'إنشاء أمر الشراء',        s: 'الجهة الطالبة · مسودة ومرفقات' },
+    mgr:     { x: 230, y: 126, w: 220, t: 'توقيع مدير الإدارة',       s: 'يعد · بالرقم السري' },
+    proc:    { x: 230, y: 222, w: 220, t: 'مراجعة إدارة المشتريات',   s: 'إحالة · إعادة · إلغاء · متابعة' },
+    specs:   { x: 30,  y: 222, w: 170, t: 'المواصفات الفنية',          s: 'جهة فنية · مواصفات كل بند' },
+    ret:     { x: 480, y: 196, w: 170, t: 'إعادة للاستكمال',           s: 'إصدار جديد · يعود للبداية' },
+    cancel:  { x: 480, y: 268, w: 170, h: 44, t: 'إلغاء الطلب · ملغى' },
+    route:   { x: 230, y: 330, w: 220, t: 'تحديد مسار التوقيعات',     s: 'الرقم التسلسلي · الموقّعون · المواضع' },
+    suggest: { x: 30,  y: 330, w: 170, t: 'اقتراح تلقائي',             s: 'من مصفوفة الصلاحيات' },
+    sign:    { x: 230, y: 426, w: 220, t: 'توقيع الموقّع التالي',      s: 'إشعار تلقائي · الرقم السري' },
+    remind:  { x: 30,  y: 426, w: 170, t: 'تذكير · تصعيد · تفويض',    s: 'أثناء انتظار التوقيع' },
+    decide:  { x: 230, y: 522, w: 220, t: 'هل وافق الموقّع؟',          s: 'قرار عند كل خطوة' },
+    reject:  { x: 480, y: 522, w: 170, t: 'رفض بسبب إلزامي',           s: 'تتوقف الدورة · إشعار' },
+    newver:  { x: 480, y: 618, w: 170, t: 'إصدار جديد',                s: '↻ يعود إلى البداية' },
+    final:   { x: 230, y: 618, w: 220, t: 'الاعتماد النهائي',          s: 'PDF نهائي · شهادة · رمز QR' },
+    archive: { x: 230, y: 714, w: 220, t: 'أرشفة وإرسال',              s: 'Drive · المشتريات · الجهة · الموقّعون' },
+    verify:  { x: 230, y: 810, w: 220, h: 44, t: 'التحقق برمز التحقق أو الملف' }
+  };
+  var A = [ /* [path, dashed?] */
+    ['M340 86 L340 122'], ['M340 182 L340 218'], ['M230 238 L204 238'], ['M200 262 L226 262'],
+    ['M450 236 L464 236 L464 224 L476 224'], ['M450 264 L464 264 L464 290 L476 290'],
+    ['M340 278 L340 326'], ['M200 358 L226 358'], ['M340 386 L340 422'], ['M200 454 L228 454', 1],
+    ['M340 482 L340 518'], ['M230 562 L214 562 L214 470 L226 470'], ['M450 550 L476 550'],
+    ['M565 578 L565 614'], ['M340 578 L340 614'], ['M340 674 L340 710'], ['M340 770 L340 806']
+  ];
+  var LBL = [[140, 530, 'نعم · يوجد موقّع تالٍ'], [464, 538, 'لا'], [400, 600, 'نعم · آخر موقّع']];
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var CSS = '<style>' +
+    '.pfw{font-family:"Cairo",Tahoma,sans-serif;max-width:680px;margin:0 auto}.pfw svg{display:block;width:100%;height:auto}' +
+    '.pfw .nd rect{fill:#fff;stroke:#cdbfe6;stroke-width:1}.pfw .nd .t{font:700 13.5px "Cairo",Tahoma,sans-serif;fill:#2d1b47}.pfw .nd .s{font:400 11.5px "Cairo",Tahoma,sans-serif;fill:#6b5a80}' +
+    '.pfw .nd.done rect{fill:#e8f5ee;stroke:#1f8a4c}.pfw .nd.done .t{fill:#14532d}.pfw .nd.done .s{fill:#2f6b47}' +
+    '.pfw .nd.cur rect{fill:#501e8c;stroke:#501e8c;stroke-width:2}.pfw .nd.cur .t,.pfw .nd.cur .s{fill:#fff}' +
+    '.pfw .nd.alert rect{fill:#fdecea;stroke:#c0392b;stroke-width:1.6}.pfw .nd.alert .t{fill:#7f1d1d}.pfw .nd.alert .s{fill:#a13a2e}' +
+    '.pfw .nd.live rect{stroke:#501e8c;stroke-dasharray:5 4;stroke-width:1.4}' +
+    '.pfw .nd.off{opacity:.42}' +
+    '.pfw .ar{fill:none;stroke:#9a8bb5;stroke-width:1.2}.pfw .ar.d{stroke-dasharray:4 4}.pfw .lb{font:400 11.5px "Cairo",Tahoma,sans-serif;fill:#6b5a80}' +
+    '.pfw .lg{font:400 12px "Cairo",Tahoma,sans-serif;fill:#4a3a60}' +
+    '@media (prefers-reduced-motion:no-preference){.pfw .nd.cur rect{animation:pfwPulse 1.8s ease-in-out infinite}}' +
+    '@keyframes pfwPulse{0%,100%{stroke-opacity:1;stroke-width:2}50%{stroke-opacity:.35;stroke-width:6}}' +
+    'html[data-theme=dark] .pfw .nd rect{fill:#1c1626;stroke:#4a3d63}html[data-theme=dark] .pfw .nd .t{fill:#ece6f6}html[data-theme=dark] .pfw .nd .s{fill:#a99cbf}' +
+    'html[data-theme=dark] .pfw .nd.done rect{fill:#0f2a1b;stroke:#4cc38a}html[data-theme=dark] .pfw .nd.done .t{fill:#bdf0d4}html[data-theme=dark] .pfw .nd.done .s{fill:#7fcba3}' +
+    'html[data-theme=dark] .pfw .nd.cur rect{fill:#6b3dba;stroke:#bb9af2}' +
+    'html[data-theme=dark] .pfw .nd.alert rect{fill:#371a1d;stroke:#f2786d}html[data-theme=dark] .pfw .nd.alert .t{fill:#ffd2cc}html[data-theme=dark] .pfw .nd.alert .s{fill:#f2a59c}' +
+    'html[data-theme=dark] .pfw .nd.live rect{stroke:#bb9af2}html[data-theme=dark] .pfw .ar{stroke:#6f6287}html[data-theme=dark] .pfw .lb,html[data-theme=dark] .pfw .lg{fill:#a99cbf}' +
+'.pfs{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 0;counter-reset:x}' +
+    '.pfs li{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;position:relative;font-size:.8rem;color:#6b5a80}' +
+    '.pfs li:not(:last-child)::after{content:"";width:18px;height:2px;background:#d9cdee;margin-inline-start:6px}' +
+    '.pfs .b{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#efeaf7;color:#6b5a80;font:700 .75rem Cairo,Tahoma,sans-serif}' +
+    '.pfs .l{display:flex;flex-direction:column;line-height:1.25;font-weight:600}.pfs small{font-weight:400;font-size:.7rem;color:inherit;opacity:.85}' +
+    '.pfs li.done{color:#1f6b40}.pfs li.done .b{background:#1f8a4c;color:#fff}.pfs li.done::after{background:#1f8a4c}' +
+    '.pfs li.cur{color:#501e8c}.pfs li.cur .b{background:#501e8c;color:#fff;box-shadow:0 0 0 4px rgba(80,30,140,.18)}' +
+    '.pfs li.alert{color:#a12d22}.pfs li.alert .b{background:#c0392b;color:#fff}' +
+    'html[data-theme=dark] .pfs li{color:#a99cbf}html[data-theme=dark] .pfs .b{background:#2a2040;color:#cfc3e4}html[data-theme=dark] .pfs li:not(:last-child)::after{background:#3a3050}' +
+    'html[data-theme=dark] .pfs li.done{color:#7fcba3}html[data-theme=dark] .pfs li.done .b{background:#1f7a4a}html[data-theme=dark] .pfs li.cur{color:#cdb8f7}html[data-theme=dark] .pfs li.cur .b{background:#6b3dba}html[data-theme=dark] .pfs li.alert{color:#f2a59c}' +
+    '</style>';
+  function svg(st) {
+    st = st || {};
+    var done = st.done || [], alert = st.alert || [], live = st.live || [], off = st.off || [], sub = st.sub || {};
+    var mid = 'pfwA' + Math.random().toString(36).slice(2, 7);
+    var o = [CSS, '<div class="pfw"><svg viewBox="0 0 680 905" role="img" aria-label="مخطط دورة أمر الشراء" style="direction:rtl">',
+      '<defs><marker id="' + mid + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>'];
+    A.forEach(function (a) { o.push('<path class="ar' + (a[1] ? ' d' : '') + '" d="' + a[0] + '"' + (a[1] ? '' : ' marker-end="url(#' + mid + ')"') + '/>'); });
+    LBL.forEach(function (l) { o.push('<text class="lb" x="' + l[0] + '" y="' + l[1] + '" text-anchor="middle">' + esc(l[2]) + '</text>'); });
+    Object.keys(N).forEach(function (k) {
+      var n = N[k], h = n.h || 56, cx = n.x + n.w / 2;
+      var cls = st.cur === k ? 'cur' : alert.indexOf(k) > -1 ? 'alert' : done.indexOf(k) > -1 ? 'done' : off.indexOf(k) > -1 ? 'off' : '';
+      if (live.indexOf(k) > -1 && cls !== 'cur') cls += ' live';
+      var s = sub[k] != null ? sub[k] : n.s;
+      var mark = cls.indexOf('done') === 0 ? '✔ ' : cls.indexOf('alert') === 0 ? '✖ ' : '';
+      o.push('<g class="nd ' + cls + '" data-k="' + k + '"><rect x="' + n.x + '" y="' + n.y + '" width="' + n.w + '" height="' + h + '" rx="8"/>');
+      if (s) o.push('<text class="t" x="' + cx + '" y="' + (n.y + 19) + '" text-anchor="middle" dominant-baseline="central">' + esc(mark + n.t) + '</text><text class="s" x="' + cx + '" y="' + (n.y + 38) + '" text-anchor="middle" dominant-baseline="central">' + esc(s) + '</text>');
+      else o.push('<text class="t" x="' + cx + '" y="' + (n.y + h / 2) + '" text-anchor="middle" dominant-baseline="central">' + esc(mark + n.t) + '</text>');
+      o.push('</g>');
+    });
+    var L = [['done', 'مكتملة'], ['cur', 'المرحلة الحالية'], ['', 'لم تبدأ بعد'], ['alert', 'رفض · إعادة · إلغاء']];
+    L.forEach(function (l, i) {
+      var x = 40 + i * 160;
+      o.push('<g class="nd ' + l[0] + '"><rect x="' + x + '" y="874" width="16" height="16" rx="3" style="animation:none"/></g><text class="lg" x="' + (x + 90) + '" y="886" text-anchor="middle">' + esc(l[1]) + '</text>');
+    });
+    o.push('</svg></div>');
+    return o.join('');
+  }
+  /* where is this PO? */
+  var MAIN = ['create', 'mgr', 'proc', 'route', 'sign', 'decide', 'final', 'archive', 'verify'];
+  function upTo(id) { return MAIN.slice(0, MAIN.indexOf(id)); }
+  function stage(d, fin) {
+    var m = (d && d.meta) || {}, steps = (d && d.steps) || [], st = { done: [], alert: [], live: [], off: [], sub: {} };
+    var items = [].concat(d.consumables || [], d.assets || []);
+    var specsDone = !!m.specs && m.status !== 'tech_specs' && (items.some(function (r) { return r.spec; }) || !!m.specs.general);
+    var signers = steps.filter(function (s) { return s.kind !== 'inform' && s.phase !== 'requester'; });
+    var signed = signers.filter(function (s) { return s.state === 'signed'; }).length;
+    var add = function (a) { st.done = st.done.concat(a); };
+    switch (m.status) {
+      case 'draft': st.cur = 'create'; break;
+      case 'req_sign': add(['create']); st.cur = 'mgr'; break;
+      case 'proc_review': add(['create', 'mgr']); st.cur = 'proc'; break;
+      case 'tech_specs': add(['create', 'mgr', 'proc']); st.cur = 'specs'; break;
+      case 'returned': add(['create', 'mgr', 'proc']); st.alert.push('ret'); st.sub.ret = 'بانتظار الاستكمال والإرسال'; break;
+      case 'cancelled': add(m.submittedAt ? ['create', 'mgr', 'proc'] : ['create']); st.alert.push('cancel'); break;
+      case 'signing':
+        add(upTo('sign').concat(['suggest'])); st.cur = 'sign'; st.live.push('remind');
+        st.sub.sign = 'التوقيع ' + (signed + 1) + ' من ' + signers.length; break;
+      case 'rejected':
+        add(upTo('decide').concat(['suggest'])); st.alert.push('reject'); st.cur = 'newver';
+        st.sub.sign = 'وُقّع ' + signed + ' من ' + signers.length; break;
+      case 'approved':
+        add(upTo('final').concat(['suggest']));
+        if (fin) { add(['final', 'archive']); } else { st.cur = 'final'; st.sub.final = 'بانتظار إصدار PDF النهائي'; }
+        break;
+      default: break;
+    }
+    if (specsDone) st.done.push('specs');
+    ['ret', 'cancel', 'reject', 'newver'].forEach(function (k) { if (st.cur !== k && st.alert.indexOf(k) < 0) st.off.push(k); });
+    if (!m.specs && st.cur !== 'specs') st.off.push('specs');
+    return st;
+  }
+  /* compact «where is my request» strip (main path) */
+  function strip(st, d) {
+    var m = (d && d.meta) || {}, keys = ['create', 'mgr', 'proc'];
+    if (m.specs) keys.push('specs');
+    keys = keys.concat(['route', 'sign', 'final', 'archive']);
+    var alertAt = {}, extra = null;
+    if (st.alert.indexOf('ret') > -1) alertAt.proc = 'معاد للاستكمال';
+    if (st.alert.indexOf('reject') > -1) { alertAt.sign = 'مرفوض'; extra = 'إصدار جديد'; }
+    if (st.alert.indexOf('cancel') > -1) { var nx = keys.filter(function (k) { return st.done.indexOf(k) < 0; })[0] || 'route'; alertAt[nx] = 'ملغى'; }
+    var o = ['<ol class="pfs">'];
+    keys.forEach(function (k, i) {
+      var cls = alertAt[k] ? 'alert' : st.cur === k ? 'cur' : st.done.indexOf(k) > -1 ? 'done' : '';
+      var sub = alertAt[k] || (st.cur === k && st.sub[k]) || (k === 'sign' && st.sub.sign) || '';
+      o.push('<li class="' + cls + '"><span class="b">' + (cls === 'done' ? '✔' : cls === 'alert' ? '✖' : (i + 1)) + '</span><span class="l">' + esc(LABEL[k]) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></li>');
+    });
+    if (extra) o.push('<li class="cur"><span class="b">↻</span><span class="l">' + esc(extra) + '<small>الخطوة التالية</small></span></li>');
+    o.push('</ol>');
+    return o.join('');
+  }
+  var LABEL = { create: 'إنشاء أمر الشراء', mgr: 'توقيع مدير الإدارة', proc: 'مراجعة إدارة المشتريات', specs: 'المواصفات الفنية', route: 'تحديد مسار التوقيعات',
+    sign: 'توقيع الموقّع التالي', final: 'الاعتماد النهائي', newver: 'إصدار جديد', ret: 'إعادة للاستكمال', cancel: 'إلغاء الطلب', archive: 'أرشفة وإرسال' };
+  window.POFLOW_FLOW = { svg: svg, stage: stage, strip: strip, label: function (k) { return LABEL[k] || ''; } };
+})();
+</script>

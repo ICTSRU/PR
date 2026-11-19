@@ -2,7 +2,7 @@
 # Push to main ─┬─ GitHub Pages republishes the ITOC sign-in page (index.html + assets/) — built in
 #               └─ this workflow (when apps-script/** changes):
 #                    1. version guard  — every edit must carry a NEW version (tools/bump_version.py), same in every file
-#                    2. clasp push     — replaces the Apps Script project's code (Code, Demo, Index, HowTo, Logos, CompanyLogo, PdfFont, Denied, I18n)
+#                    2. clasp push     — replaces the Apps Script project's code (Code, Demo, Index, HowTo, Logos, CompanyLogo, PdfFont, Denied, I18n, Flow)
 #                    3. clasp deploy   — moves the EXISTING web-app deployment to the new version (same /exec URL)
 #                    4. Google Sheet   — updated by the app itself on the first visit after the deploy (ensureInstalled_)
 # Secrets (Settings ▸ Secrets and variables ▸ Actions): CLASPRC_JSON · SCRIPT_ID · DEPLOYMENT_ID
