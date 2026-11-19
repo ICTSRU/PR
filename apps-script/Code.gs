@@ -1,7 +1,7 @@
 /**
  * =====================================================================
- *  POFlow v2.0 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
- *  Purchase Order Approval & Digital Signature Platform
+ *  POFlow v2.1 — منصة أوامر الشراء
+ *  Purchase Order Platform
  *  Built on SRU Secure Access Kit v1.4 — access limited to @sr.edu.sa accounts
  *  E-signature logic = the ICTD Policy Platform model (v3.4), applied to a sequential PO workflow:
  *    · an independent, encrypted signature register for this platform only (sheet «Signers» + private Drive folder)
@@ -27,9 +27,9 @@
 
 /* ▼▼▼ CONFIG ▼▼▼ */
 const APP_NAME       = 'منصة أوامر الشراء';
-const APP_NAME_EN    = 'POFlow — Purchase Order Approval & Digital Signature Platform';
+const APP_NAME_EN    = 'Purchase Order Platform · POFlow';
 const APP_SHORT      = 'POFlow';
-const APP_VERSION    = '2.0';
+const APP_VERSION    = '2.1';
 const ALLOWED_DOMAIN = 'sr.edu.sa';
 const FAVICON_URL    = 'https://ictsru.github.io/ITOC/assets/itoc-logo.png';
 const TZ             = 'Asia/Riyadh';
@@ -150,7 +150,7 @@ function doGet(e) {
     const deny = { app: APP_NAME, appEn: APP_NAME_EN, version: APP_VERSION, email: email || '', reason: status, admin: ACCESS_ADMIN_EMAIL,
                    pending: status === 'list' ? !!pendingRequestOf_(email) : false };
     const dh = HtmlService.createHtmlOutputFromFile('Denied').getContent()
-      .replace('<script src="config.js"></script>', function () { return '<script>window.DENY=' + safeJson_(deny) + ';</script>' + include('Logos'); });
+      .replace('<script src="config.js"></script>', function () { return '<script>window.DENY=' + safeJson_(deny) + ';window.BOOT={params:' + safeJson_(uiPrefs_(p)) + '};</script>' + include('I18n') + include('Logos'); });
     const dOut = HtmlService.createHtmlOutput(dh).setTitle(APP_NAME + ' | طلب صلاحية الدخول').addMetaTag('viewport', 'width=device-width, initial-scale=1');
     if (FAVICON_URL) dOut.setFaviconUrl(FAVICON_URL);
     return dOut;
@@ -159,13 +159,15 @@ function doGet(e) {
   setup_();
   const page = String(p.page || '').toLowerCase();
   if (page === 'howto') {
-    const h = HtmlService.createHtmlOutputFromFile('HowTo').setTitle('كيفية التوقيع | ' + APP_SHORT).addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    const hh = HtmlService.createHtmlOutputFromFile('HowTo').getContent()
+      .replace('</head>', function () { return '<script>window.BOOT={params:' + safeJson_(uiPrefs_(p)) + '};</script>' + include('I18n') + '</head>'; });
+    const h = HtmlService.createHtmlOutput(hh).setTitle('كيفية التوقيع | ' + APP_SHORT).addMetaTag('viewport', 'width=device-width, initial-scale=1');
     if (FAVICON_URL) h.setFaviconUrl(FAVICON_URL);
     return h;
   }
   const info = userInfo_(email);
   const params = {};
-  ['po', 'page', 'verify', 'version'].forEach(function (k) { if (p[k] != null) params[k] = String(p[k]).slice(0, 60); });
+  ['po', 'page', 'verify', 'version', 'lang', 'theme'].forEach(function (k) { if (p[k] != null) params[k] = String(p[k]).slice(0, 60); });
   const boot = {
     gas: true, app: APP_NAME, appEn: APP_NAME_EN, short: APP_SHORT, version: APP_VERSION,
     user: email, name: info.name, role: info.role, roleAr: ROLE_AR[info.role], perms: perms_(info.role),
@@ -174,7 +176,7 @@ function doGet(e) {
     pendingRequests: perms_(info.role).admin ? accessRequests_().filter(function (x) { return x.status === 'pending'; }).length : 0,
     sheetUrl: perms_(info.role).admin ? sheetUrl_() : '', folderUrl: perms_(info.role).admin && ROOT_FOLDER_ID ? 'https://drive.google.com/drive/folders/' + ROOT_FOLDER_ID : ''
   };
-  const inject = '<script>window.BOOT=' + safeJson_(boot) + ';</script>' + include('Logos') + include('CompanyLogo') + include('PdfFont');
+  const inject = '<script>window.BOOT=' + safeJson_(boot) + ';</script>' + include('I18n') + include('Logos') + include('CompanyLogo') + include('PdfFont');
   const html = HtmlService.createHtmlOutputFromFile('Index').getContent()
     .replace('<script src="config.js"></script>', function () { return inject; });
   const out = HtmlService.createHtmlOutput(html).setTitle(APP_NAME + ' | ' + APP_SHORT).addMetaTag('viewport', 'width=device-width, initial-scale=1');
@@ -1193,8 +1195,8 @@ function buildMail_(o) {
     '<td align="left" valign="middle"><img src="' + MAIL_ASSETS + 'ictd-logo.png" height="40" alt="الإدارة التنفيذية للاتصالات وتقنية المعلومات" style="display:block;height:40px;border:0"></td></tr></table></td></tr>' +
     // platform band
     '<tr><td bgcolor="#501e8c" style="background:#501e8c;background-image:linear-gradient(110deg,#501e8c 0%,#4a1f8a 50%,#2b3f9e 100%);padding:16px 22px;color:#ffffff">' +
-    '<div style="font-size:18px;font-weight:bold;line-height:1.4">' + esc_(APP_NAME) + ' والتوقيعات الإلكترونية</div>' +
-    '<div dir="ltr" style="font-size:12px;color:#d9cdee;text-align:right;line-height:1.5">POFlow — Purchase Order Approval &amp; Digital Signature Platform</div></td></tr>' +
+    '<div style="font-size:18px;font-weight:bold;line-height:1.4">' + esc_(APP_NAME) + '</div>' +
+    '<div dir="ltr" style="font-size:12px;color:#d9cdee;text-align:right;line-height:1.5">Purchase Order Platform · POFlow</div></td></tr>' +
     '<tr><td style="height:4px;line-height:4px;font-size:0;background:' + tn.c + '">&nbsp;</td></tr>' +
     // title
     '<tr><td style="padding:24px 28px 6px">' +
@@ -1637,6 +1639,8 @@ function verifyByHash_(email, hash) {
 
 /* =============================== Helpers =============================== */
 
+/** v2.1: UI language / theme passed on from the login page (?lang=en|ar&theme=dark|light). */
+function uiPrefs_(p) { const o = {}; if (/^(ar|en)$/.test(p.lang || '')) o.lang = p.lang; if (/^(dark|light)$/.test(p.theme || '')) o.theme = p.theme; return o; }
 function include(name) { return HtmlService.createHtmlOutputFromFile(name).getContent(); }
 function safeJson_(o) { return JSON.stringify(o).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
 function norm_(s) { return String(s || '').trim().toLowerCase(); }

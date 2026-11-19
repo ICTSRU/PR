@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="2.0">
+<meta name="color-scheme" content="light">
+<meta name="version" content="2.1">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="icon" type="image/png" href="assets/itoc-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,9 +15,9 @@
   var CONFIG = {
     WEB_APP_URL: "https://script.google.com/macros/s/AKfycbyri6uknwOxquUaXBhE5Q4oqDUuaTYWMlqpRkDewHwl7PUeWGrCJUTuJxmbWGqv7FC6/exec", // Apps Script Web App URL (…/exec)
     TITLE:       "الدخول إلى منصة أوامر الشراء",        // main heading
-    SUBTITLE:    "POFlow — إنشاء أوامر الشراء والتوقيعات والموافقات الإلكترونية المتسلسلة والأرشفة — لمنسوبي جامعة سليمان الراجحي فقط",
+    SUBTITLE:    "POFlow — إنشاء أوامر الشراء واعتمادها بالتوقيع الإلكتروني المتسلسل وأرشفتها — لمنسوبي جامعة سليمان الراجحي فقط",
     LOGO:        "assets/itoc-logo.png",             // platform logo (or keep ITOC)
-    VERSION:     "2.0",
+    VERSION:     "2.1",
     KEY:         "poflow"                            // short unique id (used for "skip next time")
   };
   /* ▲▲▲ CONFIG ▲▲▲ */
@@ -28,7 +29,7 @@
       /* ITOC single sign-on: one shared flag for every landing page on ictsru.github.io (valid 30 days; #sso-off clears it) */
       var ssoOk = location.hash === "#itoc" || (Date.now() - (+localStorage.getItem("itoc_sso") || 0)) < 2592000000;   /* #itoc = opened from the ITOC index (already signed in) */
       if (location.hash === "#sso-off") { localStorage.removeItem("itoc_sso"); ssoOk = false; }
-      if (location.hash !== "#login" && location.hash !== "#sso-off" && (localStorage.getItem(CONFIG.KEY + "_skip_intro") === "1" || ssoOk) && /^https:\/\/script\.google\.com\//.test(WEB_APP_URL)) { localStorage.setItem("itoc_sso", String(Date.now())); location.replace(WEB_APP_URL); }
+      if (location.hash !== "#login" && location.hash !== "#sso-off" && (localStorage.getItem(CONFIG.KEY + "_skip_intro") === "1" || ssoOk) && /^https:\/\/script\.google\.com\//.test(WEB_APP_URL)) { localStorage.setItem("itoc_sso", String(Date.now())); location.replace(WEB_APP_URL + "?lang=" + (localStorage.getItem("poflow_lang") || "ar") + "&theme=" + (localStorage.getItem("poflow_theme") || "light")); }
     } catch (e) {}
   })();
 </script>
@@ -87,6 +88,24 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.12);paddin
   .card .logo{height:62px}
   h1{font-size:1.25rem}
 }
+
+/* v2.1 · language + dark mode */
+.tg{position:absolute;top:12px;inset-inline-end:14px;display:flex;gap:6px}
+.card{position:relative}
+.tg button{display:inline-flex;align-items:center;gap:5px;background:var(--purple-light);color:var(--purple);border:1px solid rgba(80,30,140,.25);border-radius:4px;padding:3px 9px;font:700 .78rem Arial,sans-serif;cursor:pointer}
+.tg .icon{width:15px;height:15px}
+html[data-theme=dark]{color-scheme:dark;--bg:#120e19;--ink:#ece6f6;--muted:#a99cbf;--border:rgba(190,165,240,.15);--purple-light:#2a2040;--purple-dark:#d4c0f7}
+html[data-theme=dark] .card{background:#1c1626}
+html[data-theme=dark] .band{background:#f4f1f9}
+html[data-theme=dark] .btn{background:#6b3dba}
+html[data-theme=dark] .btn:hover{background:#7d4fcc}
+html[data-theme=dark] .alt{background:#1c1626;color:#d4c0f7;border-color:#bb9af2}
+html[data-theme=dark] .alt:hover{background:#2a2040}
+html[data-theme=dark] .domain svg,html[data-theme=dark] .tg button{color:#d4c0f7}
+html[data-theme=dark] .steps .n{color:#d4c0f7}
+html[dir=ltr] .domain,html[dir=ltr] .steps{text-align:left}
+html[lang=en] .en{display:none}
+html[data-theme=dark] footer{background:#241040}
 </style>
 </head>
 <body>
@@ -101,6 +120,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.12);paddin
 
 <main>
   <div class="card">
+    <div class="tg"><button type="button" data-i18n-toggle onclick="I18N.toggleLang()"></button><button type="button" data-theme-toggle onclick="I18N.toggleTheme()"></button></div>
     <img class="logo" id="appLogo" src="assets/itoc-logo.png" alt="">
     <h1 id="appTitle"></h1>
     <p class="sub" id="appSub"></p>
@@ -142,6 +162,9 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.12);paddin
 
 <script>
   var go = document.getElementById("go"), skip = document.getElementById("skip");
+  /* v2.1: pass the chosen language / theme on to the platform */
+  function prefs() { return "?lang=" + (window.I18N ? I18N.lang : "ar") + "&theme=" + (window.I18N ? I18N.theme : "light"); }
+  function links() { go.href = WEB_APP_URL + prefs(); document.getElementById("goLib").href = WEB_APP_URL + prefs() + "#sign"; }
   go.href = WEB_APP_URL;
   go.addEventListener("click", function () { try { localStorage.setItem("itoc_sso", String(Date.now())); } catch (e) {} });
   document.getElementById("goLib").href = WEB_APP_URL + "#sign";
@@ -151,11 +174,13 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.12);paddin
   document.getElementById("appSub").textContent = CONFIG.SUBTITLE;
   document.getElementById("appLogo").src = CONFIG.LOGO;
   document.getElementById("appVer").textContent = "v" + CONFIG.VERSION;
+  window.addEventListener("DOMContentLoaded", function () { links(); if (window.I18N) I18N.onChange(links); });
   var SKIP_KEY = CONFIG.KEY + "_skip_intro";
   try { skip.checked = localStorage.getItem(SKIP_KEY) === "1"; } catch (e) {}
   skip.addEventListener("change", function () {
     try { skip.checked ? localStorage.setItem(SKIP_KEY, "1") : localStorage.removeItem(SKIP_KEY); } catch (e) {}
   });
 </script>
+<script src="assets/i18n.js?v=2.1"></script>
 </body>
 </html>

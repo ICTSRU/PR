@@ -36,10 +36,24 @@
 .en{direction:ltr;unicode-bidi:isolate}
 a{color:var(--blue)}
 footer{background:#3a1464;color:#e6dcf5;font-size:.82rem;text-align:center;padding:12px;margin-top:20px}
+
+/* v2.1 · language + dark mode */
+.tg{display:flex;gap:6px;margin-inline-start:auto}.tg button{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:4px;padding:3px 10px;font:700 .8rem Arial,sans-serif;cursor:pointer}.tg button:hover{background:rgba(255,255,255,.25)}.tg .icon{width:16px;height:16px}
+html[data-theme=dark]{color-scheme:dark;--bg:#120e19;--ink:#ece6f6;--muted:#a99cbf;--border:rgba(190,165,240,.15);--purple-light:#2a2040;--purple-dark:#d4c0f7;--ok:#4cc38a;--bad:#f2786d;--warn:#e7ab52;--blue:#62b6ea}
+html[data-theme=dark] .card,html[data-theme=dark] .stage,html[data-theme=dark] .node{background:#1c1626}
+html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] textarea{background:#120e19;border-color:rgba(190,165,240,.28)}
+html[data-theme=dark] .bb{background:#f4f1f9}
+html[data-theme=dark] .btn.s{background:#1c1626;color:#d4c0f7;border-color:#bb9af2}
+html[data-theme=dark] .node.done{background:#0f2a1b}html[data-theme=dark] .node.rej{background:#371a1d}
+html[data-theme=dark] .msg.ok{background:#0f2a1b}html[data-theme=dark] .msg.bad{background:#371a1d}html[data-theme=dark] .msg.warn{background:#2e2310}
+html[data-theme=dark] .ic svg{color:#bb9af2}
+html[data-theme=dark] .sec{background:#2a2040}
+html[dir=ltr] .card ul{padding-inline-start:18px}
+html[dir=ltr] .arr{display:inline-block;transform:scaleX(-1)}
 </style>
 </head>
 <body>
-<div class="hero"><div class="in"><h1>كيفية التوقيع على أوامر الشراء</h1><p>منصة أوامر الشراء والتوقيعات الإلكترونية · <span class="en">POFlow v2.0</span> — نفس منطق التوقيع المعتمد في منصة السياسات</p></div></div>
+<div class="hero"><div class="in" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1"><h1>كيفية التوقيع على أوامر الشراء</h1><p>منصة أوامر الشراء · <span class="en">POFlow v2.1</span> — نفس منطق التوقيع المعتمد في منصة السياسات</p></div><div class="tg"><button type="button" data-i18n-toggle onclick="I18N.toggleLang()"></button><button type="button" data-theme-toggle onclick="I18N.toggleTheme()"></button></div></div></div>
 <div class="wrap">
   <div class="frame"><div class="stage">
     <div class="flow" id="flow">
@@ -85,7 +99,7 @@ footer{background:#3a1464;color:#e6dcf5;font-size:.82rem;text-align:center;paddi
 
   <div class="sec"><b>كيف يُحمى توقيعك؟</b> صورة التوقيع مشفّرة دائمًا بـ <span class="en">AES-256-GCM</span> بمفتاح مشتق من رقمك السري (<span class="en">PBKDF2 · 310,000</span> تكرار) داخل متصفحك. يتحقق الخادم من رقمك السري عبر بصمة مشتقة لا تكفي لفك التشفير، ويتحقق من هويتك عبر حسابك الجامعي <span class="en">@sr.edu.sa</span>. كل توقيع يحمل بصمة <span class="en">SHA-256</span> لمحتوى أمر الشراء، فأي تعديل لاحق يُكشف فورًا. هذا <b>توقيع إلكتروني بسيط موثّق</b>؛ وعند الحاجة إلى توقيع رقمي معتمد قانونيًا يُستخدم مزود مرخّص.</div>
 </div>
-<footer>مركز العمليات التقنية ITOC — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · <span class="en">v2.0</span></footer>
+<footer>مركز العمليات التقنية ITOC — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · <span class="en">v2.1</span></footer>
 <script>
 const caps=['تنشئ الجهة الطالبة أمر الشراء وترفق المستندات الداعمة','يوقّع مدير إدارة الجهة الطالبة (يعد) فيُحال الطلب تلقائيًا إلى المشتريات','تراجع المشتريات الطلب، وتحدد الرقم التسلسلي والموقّعين وترتيبهم ومواضع توقيعهم','يصل الطلب للموقّع الأول فقط — يوقّع برقمه السري','بعد كل توقيع ينتقل الطلب للتالي دون تدخل يدوي','صاحب الاعتماد (يعتمد) يوقّع أخيرًا','تُنشأ نسخة PDF نهائية بكل التوقيعات وتُؤرشف وتُرسل للمشتريات'];
 const nodes=[...document.querySelectorAll('.node')],cap=document.getElementById('cap');let t=null;

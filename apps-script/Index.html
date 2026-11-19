@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="version" content="2.0">
+<meta name="color-scheme" content="light">
+<meta name="version" content="2.1">
 <title>منصة أوامر الشراء | POFlow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -11,7 +12,7 @@
 <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"></script>
 <style>
 /* ===== SRU identity (SRU_IDENTITY.md) + Brand Kit v1.1 inlined (Apps Script standard) ===== */
-:root{--purple:#501e8c;--purple-dark:#3a1464;--purple-light:#f0ebf8;--blue:#0a6eaa;--blue-light:#e6f3fa;--bg:#f7f5fb;--ink:#241436;--muted:#6b5a80;
+:root{--surface:#fff;--surface-2:#faf8fd;--accent:#501e8c;--purple:#501e8c;--purple-dark:#3a1464;--purple-light:#f0ebf8;--blue:#0a6eaa;--blue-light:#e6f3fa;--bg:#f7f5fb;--ink:#241436;--muted:#6b5a80;
   --border:rgba(80,30,140,.12);--radius:4px;--ok:#1d7a46;--ok-bg:#e8f5ee;--warn:#9a5b00;--warn-bg:#fff4e0;--bad:#b42318;--bad-bg:#fdecea;--info-bg:#eef4fb}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -41,7 +42,7 @@ header.hero .sub{font-size:.82rem;color:#d9cdee}
 header.hero .grow{flex:1;min-width:200px}
 .who{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .chip-u{background:rgba(255,255,255,.14);border-radius:20px;padding:2px 12px;font-size:.82rem}
-.hbtn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--purple);border:1px solid #fff;border-radius:var(--radius);padding:5px 12px;font:600 .85rem "Cairo",Tahoma,sans-serif;cursor:pointer;text-decoration:none;position:relative}
+.hbtn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);color:var(--purple);border:1px solid #fff;border-radius:var(--radius);padding:5px 12px;font:600 .85rem "Cairo",Tahoma,sans-serif;cursor:pointer;text-decoration:none;position:relative}
 .hbtn:hover{background:var(--purple-light)}
 @keyframes howtoGlow{0%,100%{box-shadow:0 0 0 0 rgba(143,211,255,0),0 0 6px 1px rgba(255,255,255,.35)}50%{box-shadow:0 0 0 4px rgba(143,211,255,.35),0 0 18px 6px rgba(143,211,255,.75)}}
 .glow{animation:howtoGlow 2.2s ease-in-out infinite;border-color:#8fd3ff!important}
@@ -50,7 +51,7 @@ header.hero .grow{flex:1;min-width:200px}
 .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font-size:.7rem;padding:0 5px;font-family:Arial,sans-serif}
 .hbtn .badge{position:absolute;top:-7px;left:-7px}
 
-nav.tabs{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+nav.tabs{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
 nav.tabs .in{max-width:1360px;margin:0 auto;padding:0 10px;display:flex;gap:2px;overflow-x:auto}
 nav.tabs a{display:flex;align-items:center;gap:6px;padding:10px 12px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.9rem;border-bottom:3px solid transparent;white-space:nowrap}
 nav.tabs a:hover{color:var(--purple)}
@@ -58,12 +59,12 @@ nav.tabs a.on{color:var(--purple);border-bottom-color:var(--purple)}
 main{flex:1;width:100%;max-width:1360px;margin:0 auto;padding:16px}
 h2.t{margin:0 0 12px;color:var(--purple-dark);font-size:1.2rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 h3.s{margin:14px 0 8px;color:var(--purple-dark);font-size:1rem}
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
 .card.err{border-color:var(--bad);color:var(--bad)}
 .grid{display:grid;gap:14px}
 .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
 @media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
-.btn{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--purple);border:1px solid var(--purple);border-radius:var(--radius);padding:6px 12px;font:600 .88rem "Cairo",Tahoma,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);color:var(--purple);border:1px solid var(--purple);border-radius:var(--radius);padding:6px 12px;font:600 .88rem "Cairo",Tahoma,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
 .btn:hover{background:var(--purple-light)}
 .btn.primary{background:var(--purple);color:#fff}.btn.primary:hover{background:var(--purple-dark)}
 .btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
@@ -72,7 +73,7 @@ h3.s{margin:14px 0 8px;color:var(--purple-dark);font-size:1rem}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 label.f{display:flex;flex-direction:column;gap:3px;font-size:.85rem;font-weight:600;color:var(--purple-dark)}
-input,select,textarea{font:inherit;font-weight:400;color:var(--ink);border:1px solid rgba(80,30,140,.25);border-radius:var(--radius);padding:6px 8px;background:#fff;width:100%}
+input,select,textarea{font:inherit;font-weight:400;color:var(--ink);border:1px solid var(--field-border,rgba(80,30,140,.25));border-radius:var(--radius);padding:6px 8px;background:var(--surface);width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid rgba(10,110,170,.35);border-color:var(--blue)}
 textarea{min-height:70px;resize:vertical}
 .hint{color:var(--muted);font-size:.82rem;font-weight:400}
@@ -84,11 +85,11 @@ table.reg tr.click{cursor:pointer}table.reg tr.click:hover td{background:#faf8fd
 .num{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;white-space:nowrap}
 .st{display:inline-flex;align-items:center;gap:4px;border-radius:12px;padding:1px 9px;font-size:.76rem;font-weight:700;white-space:nowrap}
 .st-tech_specs{background:#efe6fb;color:#5b2aa0}.spc{font-size:8.5px;color:#5b2aa0;font-weight:700;margin-top:1px}.screen .spc{font-size:9px}
-.spitem{border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:10px;background:#fff}.spitem .h{display:flex;gap:8px;align-items:center;margin-bottom:6px}.spitem .n{min-width:34px;height:24px;border-radius:12px;background:var(--purple-light);color:var(--purple);display:grid;place-items:center;font-weight:800;font-size:.78rem;font-family:Arial}.spitem textarea{min-height:90px}
+.spitem{border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:10px;background:var(--surface)}.spitem .h{display:flex;gap:8px;align-items:center;margin-bottom:6px}.spitem .n{min-width:34px;height:24px;border-radius:12px;background:var(--purple-light);color:var(--purple);display:grid;place-items:center;font-weight:800;font-size:.78rem;font-family:Arial}.spitem textarea{min-height:90px}
 .st-draft{background:#eee;color:#555}.st-req_sign,.st-signing{background:var(--warn-bg);color:var(--warn)}.st-proc_review{background:var(--info-bg);color:var(--blue)}
 .st-returned{background:#fff0f6;color:#a3195b}.st-rejected{background:var(--bad-bg);color:var(--bad)}.st-approved{background:var(--ok-bg);color:var(--ok)}.st-cancelled{background:#eee;color:#777;text-decoration:line-through}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
-.tile{background:#fff;border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:var(--radius);padding:10px 12px;cursor:pointer}
+.tile{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:var(--radius);padding:10px 12px;cursor:pointer}
 .tile .k{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:5px}
 .tile .v{font-size:1.6rem;font-weight:800;color:var(--purple-dark);font-family:Arial,sans-serif;line-height:1.3}
 .tile.warn{border-top-color:var(--warn)}.tile.bad{border-top-color:var(--bad)}.tile.ok{border-top-color:var(--ok)}.tile.info{border-top-color:var(--blue)}
@@ -96,7 +97,7 @@ table.reg tr.click{cursor:pointer}table.reg tr.click:hover td{background:#faf8fd
 .bar{display:grid;grid-template-columns:minmax(110px,32%) 1fr;gap:8px;align-items:center;font-size:.83rem}
 .bar .lb{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar .tr{position:relative;height:20px}
-.bar .fl{position:absolute;inset-block:2px;right:0;background:var(--purple);border-radius:2px 4px 4px 2px;min-width:2px}
+.bar .fl{position:absolute;inset-block:2px;inset-inline-start:0;background:var(--purple);border-radius:2px 4px 4px 2px;min-width:2px}
 .bar .vl{position:absolute;top:0;font-size:.78rem;color:var(--ink);font-family:Arial,sans-serif;white-space:nowrap}
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
 .filters label.f{min-width:140px}
@@ -134,17 +135,17 @@ table.items input{padding:4px 6px}
 .cons-h th{background:#4f6fae}.asset-h th{background:#4e8a3a}
 .tot{font-weight:800;color:var(--purple-dark)}
 .doa{font-size:.82rem;background:var(--purple-light);border-radius:var(--radius);padding:6px 10px;margin-top:6px}
-.steprow{display:grid;grid-template-columns:30px 1fr 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:#fff}
-@keyframes flashIn{from{background:#fff4c2}to{background:#fff}}.steprow input.flash{animation:flashIn 1.2s ease-out}
+.steprow{display:grid;grid-template-columns:30px 1fr 1fr auto;gap:6px;align-items:center;padding:8px;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;background:var(--surface)}
+@keyframes flashIn{from{background:#fff4c2}to{background:var(--surface)}}.steprow input.flash{animation:flashIn 1.2s ease-out}
 .steprow .ti{grid-column:2 / 5}.steprow .nmi{grid-column:2}.steprow .emi{grid-column:3 / 5}
 .steprow.locked{background:#f6f4f9;opacity:.85}
 .steprow .n{width:26px;height:26px;border-radius:50%;background:var(--purple);color:#fff;display:grid;place-items:center;font-weight:800;font-family:Arial,sans-serif;font-size:.8rem}
 .slots{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.78rem;grid-column:2 / -1}
 .slots label{display:flex;align-items:center;gap:3px;font-weight:400}
 .slots input{width:auto}
-.notif{position:fixed;z-index:1000;width:min(380px,94vw);max-height:min(70vh,520px);display:flex;flex-direction:column;background:#fff;color:var(--ink);border:1px solid var(--border);border-radius:6px;box-shadow:0 14px 40px rgba(36,20,54,.28);font-size:.84rem;overflow:hidden}
+.notif{position:fixed;z-index:1000;width:min(380px,94vw);max-height:min(70vh,520px);display:flex;flex-direction:column;background:var(--surface);color:var(--ink);border:1px solid var(--border);border-radius:6px;box-shadow:0 14px 40px rgba(36,20,54,.28);font-size:.84rem;overflow:hidden}
 .notif .nh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;background:var(--purple);color:#fff;font-weight:700}
-.notif .nh button{background:#fff;color:var(--purple);border:0;border-radius:4px;padding:2px 8px;font:600 .75rem "Cairo",Tahoma;cursor:pointer}
+.notif .nh button{background:var(--surface);color:var(--purple);border:0;border-radius:4px;padding:2px 8px;font:600 .75rem "Cairo",Tahoma;cursor:pointer}
 .notif .nl{overflow:auto;flex:1}
 .notif .n{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;align-items:flex-start}.notif .n:hover{background:#f7f3fd}
 .notif .n.u{background:#faf6ff;font-weight:700}.notif .n .dot{width:8px;height:8px;border-radius:50%;background:transparent;margin-top:7px;flex:none}.notif .n.u .dot{background:var(--purple)}
@@ -156,7 +157,7 @@ dialog{border:0;border-radius:6px;padding:0;width:min(640px,94vw);box-shadow:0 2
 dialog::backdrop{background:rgba(36,20,54,.45)}
 .dlg-h{background:var(--purple);color:#fff;padding:10px 14px;display:flex;gap:8px;align-items:center}
 .dlg-h .grow{flex:1;font-weight:700}
-.dlg-h .btn{background:#fff}
+.dlg-h .btn{background:var(--surface)}
 .dlg-b{padding:14px;display:flex;flex-direction:column;gap:10px;max-height:78vh;overflow:auto}
 .ms-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 @media (max-width:640px){.ms-grid{grid-template-columns:1fr}}
@@ -184,6 +185,59 @@ footer.sru-footer .in{max-width:1360px;margin:0 auto;padding:12px 16px;display:f
 .sru-itoc img{height:32px;display:block}
 footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);padding:0 8px;border-radius:3px}
 
+
+/* ===== v2.1 · Dark mode (html[data-theme=dark]) — the official paper form and PDF stay white ===== */
+html[data-theme=dark]{color-scheme:dark;--bg:#120e19;--surface:#1c1626;--surface-2:#241c31;--ink:#ece6f6;--muted:#a99cbf;--border:rgba(190,165,240,.15);--field-border:rgba(190,165,240,.28);
+  --purple-light:#2a2040;--blue-light:#13293b;--info-bg:#132637;--ok-bg:#0f2a1b;--warn-bg:#2e2310;--bad-bg:#371a1d;--ok:#4cc38a;--warn:#e7ab52;--bad:#f2786d;--blue:#62b6ea;--purple-dark:#d4c0f7;--accent:#bb9af2}
+html[data-theme=dark] .sru-brandbar{background:#f4f1f9;border-bottom-color:#2a2040}
+html[data-theme=dark] .hbtn{background:#241c31;color:#e8ddfb;border-color:rgba(255,255,255,.28)}
+html[data-theme=dark] .hbtn:hover{background:#30264a}
+html[data-theme=dark] nav.tabs a:hover,html[data-theme=dark] nav.tabs a.on{color:var(--accent)}
+html[data-theme=dark] nav.tabs a.on{border-bottom-color:var(--accent)}
+html[data-theme=dark] .btn{color:var(--accent);border-color:rgba(187,154,242,.55)}
+html[data-theme=dark] .btn.primary{background:#6b3dba;border-color:#6b3dba;color:#fff}
+html[data-theme=dark] .btn.primary:hover{background:#7d4fcc}
+html[data-theme=dark] .btn.ok{background:#1f7a4a;border-color:#1f7a4a;color:#fff}
+html[data-theme=dark] .btn.danger{color:var(--bad);border-color:rgba(242,120,109,.6)}
+html[data-theme=dark] .dlg-h{background:#3e2170}
+html[data-theme=dark] .dlg-h .btn{background:#241c31;color:#e8ddfb}
+html[data-theme=dark] dialog{background:var(--surface);color:var(--ink)}
+html[data-theme=dark] dialog::backdrop{background:rgba(0,0,0,.6)}
+html[data-theme=dark] .toast{background:#3e2170}
+html[data-theme=dark] h2.t,html[data-theme=dark] h3.s{color:var(--purple-dark)}
+html[data-theme=dark] .tile{border-top-color:var(--accent)}
+html[data-theme=dark] .bar .fl{background:#8a5fe0}
+html[data-theme=dark] table.reg tr.click:hover td{background:var(--surface-2)}
+html[data-theme=dark] .paperbox,html[data-theme=dark] .pvbody{background:#0d0a12}
+html[data-theme=dark] .steprow.locked{background:var(--surface-2)}
+html[data-theme=dark] .seq .it:not(:last-child)::after{background:#3a3050}
+html[data-theme=dark] .seq .dot{background:#2e2540;color:#cfc3e4}
+html[data-theme=dark] .st-draft,html[data-theme=dark] .st-cancelled{background:#2e2838;color:#c9bfd8}
+html[data-theme=dark] .st-returned{background:#3a1a2b;color:#f29ac4}
+html[data-theme=dark] .st-tech_specs{background:#2f2148;color:#c9aef6}
+html[data-theme=dark] .notif .nh{background:#3e2170}
+html[data-theme=dark] .notif .nh button{background:#241c31;color:#e8ddfb}
+html[data-theme=dark] .notif .n:hover{background:var(--surface-2)}
+html[data-theme=dark] .notif .n.u{background:#251c35}
+html[data-theme=dark] .notif .n.u .dot{background:var(--accent)}
+html[data-theme=dark] .chip-u{background:rgba(255,255,255,.12)}
+html[data-theme=dark] .drop{border-color:rgba(187,154,242,.4)}
+html[data-theme=dark] .spitem .n,html[data-theme=dark] .steprow .n{background:#6b3dba}
+html[data-theme=dark] a{color:var(--blue)}
+html[data-theme=dark] ::-webkit-scrollbar{width:10px;height:10px}html[data-theme=dark] ::-webkit-scrollbar-thumb{background:#3a3050;border-radius:6px}html[data-theme=dark] ::-webkit-scrollbar-track{background:#16111e}
+
+/* ===== v2.1 · English (dir=ltr) — mirror the few physical (left/right) rules ===== */
+html[dir=ltr] body{font-family:"Cairo",Arial,sans-serif}
+html[dir=ltr] table.reg th,html[dir=ltr] table.items th{text-align:left}
+html[dir=ltr] .hbtn .badge{left:auto;right:-7px}
+html[dir=ltr] .bar .fl{border-radius:4px 2px 2px 4px}
+html[dir=ltr] .seq .it:not(:last-child)::after{right:auto;left:13px}
+html[dir=ltr] .tl li{border-right:0;border-left:2px solid var(--purple-light)}
+html[dir=ltr] .tl li::before{right:auto;left:-6px}
+html[dir=ltr] .num{text-align:right}
+html[lang=en] header.hero .sub,html[lang=en] .ar-only{display:none}
+html[dir=ltr] [data-bidi]{unicode-bidi:plaintext;text-align:left}
+.lt{font-family:Arial,sans-serif;font-weight:700;font-size:.8rem;min-width:62px;justify-content:center}
 /* ===== The official Purchase Requisition form (screen + PDF) ===== */
 .fpage{width:794px;height:1123px;box-sizing:border-box;padding:26px 30px 40px 40px;background:#fff;color:#111;position:relative;overflow:hidden;direction:rtl;font-family:'PdfCairo',"Cairo",Tahoma,Arial,sans-serif;font-size:11px;line-height:1.35}
 .fpage.screen{height:auto;min-height:1123px}
@@ -263,11 +317,12 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <header class="hero sru-tech-bg no-print"><div class="in">
   <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h5"/><path d="M8 17c1.5-1.5 2.5 1 4 0s2-2 4-.5"/></svg></div>
-  <div class="grow"><h1>منصة أوامر الشراء والتوقيعات الإلكترونية</h1>
-    <div class="sub en">POFlow — Purchase Order Approval &amp; Digital Signature Platform</div></div>
+  <div class="grow"><h1>منصة أوامر الشراء</h1>
+    <div class="sub en">Purchase Order Platform · POFlow</div></div>
   <div class="who">
     <a class="hbtn glow" id="btnHowto" target="_blank" rel="noopener" title="فيديو وخطوات: كيف تسجّل توقيعك وتوقّع أو ترفض أمر الشراء"><i data-lucide="circle-play" class="icon"></i>كيفية التوقيع</a>
     <button class="hbtn" id="btnSigs" onclick="openSigs()" title="توقيعاتي المشفّرة في سجل توقيعات المنصة"><i data-lucide="signature" class="icon"></i>توقيعاتي</button>
+    <button class="hbtn lt" id="btnLang" data-i18n-toggle onclick="I18N.toggleLang()"></button><button class="hbtn" id="btnTheme" data-theme-toggle onclick="I18N.toggleTheme()"></button>
     <span style="position:relative"><button class="hbtn" id="btnBell" onclick="toggleNotif()" title="الإشعارات"><i data-lucide="bell" class="icon"></i><span class="badge" id="bellN" hidden>0</span></button></span>
     <span class="chip-u"><span class="en" id="meMail"></span> · <b id="meRole"></b></span>
   </div>
@@ -277,7 +332,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 <main><div id="view"><div class="loading">جارٍ التحميل…</div></div></main>
 
 <footer class="sru-footer sru-tech-bg-dark no-print"><div class="in">
-  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v2.0</span></div>
+  <div>مركز العمليات التقنية <b class="en">ITOC</b> — الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي © 2026 · الإصدار <span class="ver en" id="appVer">v2.1</span></div>
   <div class="toolbar">
     <div class="sru-support"><b>For Support:</b> Dial <span class="star">*</span> or Send email to: <a href="mailto:servicedesk@sr.edu.sa">servicedesk@sr.edu.sa</a></div>
     <a class="sru-itoc" href="https://ictsru.github.io/ITOC/#forms" target="_blank" rel="noopener"><img id="lgItoc" alt="ITOC — IT Operations Center"></a>
@@ -383,7 +438,7 @@ footer .ver{font-family:Arial,sans-serif;background:rgba(255,255,255,.14);paddin
 
 <script>
 /* =========================================================
-   POFlow v2.0 — Purchase Order Approval & Digital Signature Platform
+   POFlow v2.1 — Purchase Order Platform (منصة أوامر الشراء)
    Single-page app served by Apps Script (BOOT injected by doGet). Every call goes to poApi(),
    which re-checks the @sr.edu.sa account and the role on the server.
    E-signatures follow the ICTD Policy Platform model (v3.4).
@@ -395,8 +450,12 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons = () => { try { window.lucide && lucide.createIcons(); } catch (e) {} };
 const fmtN = n => (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const fmtDT = d => { const x = new Date(d); return !d || isNaN(x) ? '' : x.toLocaleString('ar-SA-u-ca-gregory-nu-latn', { dateStyle: 'medium', timeStyle: 'short' }); };
-const fmtD = d => { const x = new Date(d); return !d || isNaN(x) ? '' : x.toLocaleDateString('ar-SA-u-ca-gregory-nu-latn', { dateStyle: 'medium' }); };
+/* v2.1: UI dates follow the chosen language; the official form/PDF always uses Arabic (FORM_CTX) */
+let FORM_CTX = 0;
+const LOC = () => (FORM_CTX || !window.I18N) ? 'ar-SA-u-ca-gregory-nu-latn' : I18N.locale();
+const fmtDT = d => { const x = new Date(d); return !d || isNaN(x) ? '' : x.toLocaleString(LOC(), { dateStyle: 'medium', timeStyle: 'short' }); };
+const fmtD = d => { const x = new Date(d); return !d || isNaN(x) ? '' : x.toLocaleDateString(LOC(), { dateStyle: 'medium' }); };
+const inForm = f => function () { FORM_CTX++; try { return f.apply(this, arguments); } finally { FORM_CTX--; } };
 const today = () => new Date().toLocaleDateString('en-CA');
 const addDays = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
 const stChip = s => `<span class="st st-${esc(s)}">${esc(SA[s] || s)}</span>`;
@@ -469,7 +528,7 @@ function overdue(x) {
 function bars(rows, fmt) {
   if (!rows.length) return '<div class="empty">لا توجد بيانات</div>';
   const mx = Math.max(...rows.map(r => r.v), 1);
-  return '<div class="bars">' + rows.map(r => `<div class="bar" title="${esc(r.l)}: ${esc((fmt || String)(r.v))}"><span class="lb">${esc(r.l)}</span><span class="tr"><span class="fl" style="width:${Math.max(1, r.v / mx * 82)}%"></span><span class="vl" style="right:calc(${Math.max(1, r.v / mx * 82)}% + 6px)">${esc((fmt || String)(r.v))}</span></span></div>`).join('') + '</div>';
+  return '<div class="bars">' + rows.map(r => `<div class="bar" title="${esc(r.l)}: ${esc((fmt || String)(r.v))}"><span class="lb">${esc(r.l)}</span><span class="tr"><span class="fl" style="width:${Math.max(1, r.v / mx * 82)}%"></span><span class="vl" style="inset-inline-start:calc(${Math.max(1, r.v / mx * 82)}% + 6px)">${esc((fmt || String)(r.v))}</span></span></div>`).join('') + '</div>';
 }
 const groupBy = (arr, f) => arr.reduce((m, x) => { const k = f(x); (m[k] = m[k] || []).push(x); return m; }, {});
 
@@ -599,7 +658,7 @@ function renderEditor() {
   bindItems(); icons();
 }
 function itemsCard(key, ar, en, cls) {
-  return `<div class="card"><h3 class="s" style="margin-top:0">${ar} <span class="en hint">${en}</span></h3>
+  return `<div class="card"><h3 class="s" style="margin-top:0">${ar} <span class="en hint ar-only">${en}</span></h3>
    <div style="overflow-x:auto"><table class="items"><thead class="${cls}"><tr><th style="width:34px">م</th><th>البيان Item Description</th><th style="width:110px">الوحدة Unit</th><th style="width:90px">الكمية QTY</th><th style="width:130px">السعر التقديري</th><th style="width:140px">الإجمالي التقديري</th><th style="width:40px"></th></tr></thead>
    <tbody id="tb-${key}"></tbody><tfoot><tr><td colspan="5" class="tot">الإجمالي التقديري</td><td class="num tot" id="tot-${key}"></td><td></td></tr></tfoot></table></div>
    <div class="toolbar" style="margin-top:6px"><button class="btn sm" onclick="addItem('${key}')"><i data-lucide="plus" class="icon"></i>إضافة صنف</button></div>
@@ -1665,10 +1724,19 @@ async function downloadFinal() { try { const r = await call({ action: 'finalPdf'
 function previewPdf() { previewPO(CUR.d.meta.id); }
 
 /* ---------- init ---------- */
+/* v2.1: the official form builders always render Arabic dates (the paper is the official bilingual form) */
+specsPages = inForm(specsPages); formPage = inForm(formPage); appendixPages = inForm(appendixPages);
+doaPage = inForm(doaPage); certPage = inForm(certPage); summaryPage = inForm(summaryPage);
+/* v2.1: language / theme switch → re-render the current view (dates, charts, notifications) */
+function howtoUrl() { return HOWTO + '&lang=' + (window.I18N ? I18N.lang : 'ar') + '&theme=' + (window.I18N ? I18N.theme : 'light'); }
+if (window.I18N) I18N.onChange(k => {
+  $('#btnHowto').href = howtoUrl(); $$('.howto').forEach(a => a.href = howtoUrl());
+  if (k === 'lang') { route(); if (!$('#notif').hidden) { renderNotif(); placeNotif(); } }
+});
 (function init() {
   try { $('#lgSru').src = ITOC_LOGOS.sru; $('#lgIctd').src = ITOC_LOGOS.ictd; $('#lgItoc').src = ITOC_LOGOS.itoc; } catch (e) {}
   $('#meMail').textContent = ME; $('#meRole').textContent = BOOT.roleAr || ''; $('#appVer').textContent = 'v' + (BOOT.version || '1.0');
-  $('#btnHowto').href = HOWTO; $$('.howto').forEach(a => a.href = HOWTO);
+  $('#btnHowto').href = howtoUrl(); $$('.howto').forEach(a => a.href = howtoUrl());
   if (!P.sign) $('#btnSigs').hidden = true;
   wirePad();
   const p = BOOT.params || {};

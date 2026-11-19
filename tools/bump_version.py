@@ -22,13 +22,14 @@ TARGETS = [
     ('apps-script/Code.gs', r"POFlow v(\d+\.\d) — منصة"),
     ('apps-script/Index.html', r'<meta name="version" content="(\d+\.\d)">'),
     ('apps-script/Index.html', r'id="appVer">v(\d+\.\d)</span>'),
-    ('apps-script/Index.html', r'POFlow v(\d+\.\d) — Purchase Order Approval'),
+    ('apps-script/Index.html', r'POFlow v(\d+\.\d) — Purchase Order Platform'),
+    ('index.html', r'assets/i18n\.js\?v=(\d+\.\d)'),
     ('apps-script/Denied.html', r'<meta name="version" content="(\d+\.\d)">'),
     ('apps-script/HowTo.html', r'POFlow v(\d+\.\d)</span>'),
     ('apps-script/HowTo.html', r'<span class="en">v(\d+\.\d)</span></footer>'),
     ('index.html', r'<meta name="version" content="(\d+\.\d)">'),
     ('index.html', r'VERSION:\s*"(\d+\.\d)"'),
-    ('README.md', r'POFlow — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية · v(\d+\.\d)'),
+    ('README.md', r'POFlow — منصة أوامر الشراء · v(\d+\.\d)'),
 ]
 
 def found():

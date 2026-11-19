@@ -2,7 +2,7 @@
 # Push to main ─┬─ GitHub Pages republishes the ITOC sign-in page (index.html + assets/) — built in
 #               └─ this workflow (when apps-script/** changes):
 #                    1. version guard  — every edit must carry a NEW version (tools/bump_version.py), same in every file
-#                    2. clasp push     — replaces the Apps Script project's code (Code, Demo, Index, HowTo, Logos, CompanyLogo, PdfFont, Denied)
+#                    2. clasp push     — replaces the Apps Script project's code (Code, Demo, Index, HowTo, Logos, CompanyLogo, PdfFont, Denied, I18n)
 #                    3. clasp deploy   — moves the EXISTING web-app deployment to the new version (same /exec URL)
 #                    4. Google Sheet   — updated by the app itself on the first visit after the deploy (ensureInstalled_)
 # Secrets (Settings ▸ Secrets and variables ▸ Actions): CLASPRC_JSON · SCRIPT_ID · DEPLOYMENT_ID
@@ -11,7 +11,7 @@ name: Deploy Apps Script
 on:
   push:
     branches: [main]
-    paths: ['apps-script/**', 'index.html', 'CHANGELOG.md', '.github/workflows/deploy-apps-script.yml']
+    paths: ['apps-script/**', 'index.html', 'tools/i18n/**', 'CHANGELOG.md', '.github/workflows/deploy-apps-script.yml']
   workflow_dispatch:
 
 concurrency: apps-script-deploy
@@ -38,6 +38,9 @@ jobs:
               || { echo "::error::apps-script changed but the version is still v$NEW (was v$OLD). Run: python3 tools/bump_version.py \"وصف التغيير\""; exit 1; }
           fi
           echo "VER=$NEW" >> "$GITHUB_ENV"
+
+      - name: Translation bundle is up to date (tools/build_i18n.py)
+        run: python3 tools/build_i18n.py --check
 
       - name: Acceptance tests (Code.gs on the Apps Script emulator)
         run: node tests/acceptance.test.js

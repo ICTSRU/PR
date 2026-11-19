@@ -245,6 +245,27 @@ with sync_playwright() as p:
     pr.screenshot(path=f'{OUT}/15-notifications.png')
     pr.keyboard.press('Escape'); ok(pr.locator('#notif').is_hidden(), 'Esc closes the panel')
 
+    print('\nB4 · English + dark mode (v2.1)')
+    en = page_as(br, PROC, 'dash')
+    en.click('#btnLang'); en.wait_for_function("document.documentElement.dir==='ltr'")
+    nav = en.inner_text('#nav')
+    ok('Dashboard' in nav and 'Procurement inbox' in nav and not any('\u0600' <= ch <= '\u06ff' for ch in nav), 'English: the toggle switches the UI to English (LTR, nav fully translated)')
+    en.goto(f'{BASE}/?as={PROC}#po/{po3}'); en.reload(); en.wait_for_selector('.fpage', timeout=20000); en.wait_for_timeout(600)
+    ok(en.evaluate("document.documentElement.lang")=='en' and 'الجهة الطالبة' in en.inner_text('.fpage'), 'English is remembered, and the official bilingual form stays unchanged')
+    left = en.evaluate(r"""() => { const AR=/[\u0600-\u06FF]/;
+      return [...document.querySelectorAll('.side h3, .side .btn, .side label, .side .hint, nav, header')].filter(e => AR.test(e.innerText.replace(/عربي/g,''))).map(e => e.innerText); }""")
+    ok(not left, 'English: every UI label on the PO page is translated (only user data stays Arabic)')
+    en.screenshot(path=f'{OUT}/16-english.png')
+    en.click('#btnTheme'); en.wait_for_function("document.documentElement.dataset.theme==='dark'")
+    bg = en.evaluate("getComputedStyle(document.body).backgroundColor"); paper = en.evaluate("getComputedStyle(document.querySelector('.fpage')).backgroundColor")
+    ok(bg == 'rgb(18, 14, 25)' and paper == 'rgb(255, 255, 255)', 'dark mode: dark page, the official paper stays white')
+    en.screenshot(path=f'{OUT}/17-english-dark.png')
+    en.click('#btnLang'); en.wait_for_function("document.documentElement.dir==='rtl'"); en.wait_for_timeout(400)
+    ok('لوحة التحكم' in en.inner_text('#nav') and en.evaluate("document.documentElement.dataset.theme")=='dark', 'back to Arabic (RTL restored), dark mode kept')
+    en.screenshot(path=f'{OUT}/18-arabic-dark.png')
+    en.click('#btnTheme'); en.wait_for_function("document.documentElement.dataset.theme==='light'")
+    en.context.close()
+
     print('\nC · access request screen')
     nu = 'new.staff@sr.edu.sa'
     ctx = br.new_context(viewport={'width': 1200, 'height': 900}); ctx.route('**/*', router); pg = ctx.new_page()
