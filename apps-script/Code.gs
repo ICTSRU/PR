@@ -1,6 +1,6 @@
 /**
  * =====================================================================
- *  POFlow v1.7 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
+ *  POFlow v1.8 — منصة أوامر الشراء والتوقيعات والموافقات الإلكترونية
  *  Purchase Order Approval & Digital Signature Platform
  *  Built on SRU Secure Access Kit v1.4 — access limited to @sr.edu.sa accounts
  *  E-signature logic = the ICTD Policy Platform model (v3.4), applied to a sequential PO workflow:
@@ -29,7 +29,7 @@
 const APP_NAME       = 'منصة أوامر الشراء';
 const APP_NAME_EN    = 'POFlow — Purchase Order Approval & Digital Signature Platform';
 const APP_SHORT      = 'POFlow';
-const APP_VERSION    = '1.7';
+const APP_VERSION    = '1.8';
 const ALLOWED_DOMAIN = 'sr.edu.sa';
 const FAVICON_URL    = 'https://ictsru.github.io/ITOC/assets/itoc-logo.png';
 const TZ             = 'Asia/Riyadh';
@@ -511,14 +511,10 @@ function requestAccess(p) {
     sheet_(SH_ACCREQ).appendRow([rid, now.toISOString(), fmt_(now, 'yyyy-MM-dd'), fmt_(now, 'HH:mm:ss'), email, name, role, reason, 'pending', '', '', '']);
     audit_log_(email, { action: 'access-request', detail: role + ' · ' + reason });
     const url = ScriptApp.getService().getUrl() + '?page=users';
-    const html = '<div dir="rtl" style="font-family:Tahoma,Arial;color:#241436;max-width:600px;border:1px solid #e3dcef">' +
-      '<div style="background:#501e8c;color:#fff;padding:12px 16px;font-size:16px"><b>' + esc_(APP_NAME) + '</b> · <span dir="ltr">' + APP_SHORT + '</span></div>' +
-      '<div style="padding:14px 16px"><h3 style="color:#3a1464;margin:0 0 8px">طلب صلاحية الدخول إلى المنصة</h3><table style="border-collapse:collapse;font-size:13px;width:100%">' +
-      [['الاسم', name], ['البريد', email], ['الصلاحية المطلوبة', ROLE_AR[role]], ['السبب', reason], ['التاريخ', fmt_(now, 'yyyy-MM-dd HH:mm')]]
-        .map(function (r) { return '<tr><td style="padding:5px;border:1px solid #eee;background:#f7f5fb;width:30%"><b>' + r[0] + '</b></td><td style="padding:5px;border:1px solid #eee">' + esc_(r[1]) + '</td></tr>'; }).join('') +
-      '</table><p><a href="' + url + '" style="display:inline-block;background:#501e8c;color:#fff;padding:9px 18px;border-radius:4px;text-decoration:none">مراجعة الطلب في «المستخدمون»</a></p>' +
-      '<p style="font-size:12px;color:#6b5a80">الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · مركز العمليات التقنية ITOC</p></div></div>';
-    sendMail_([ACCESS_ADMIN_EMAIL], 'طلب صلاحية دخول — ' + name + ' | ' + APP_SHORT, html);
+    const mail = buildMail_({ type: 'access', title: 'طلب صلاحية دخول إلى منصة أوامر الشراء', intro: 'طلب المستخدم التالي صلاحية الدخول إلى المنصة. يمكنكم الموافقة مع اختيار الصلاحية، أو الرفض مع ذكر السبب، من شاشة «المستخدمون والصلاحيات».',
+      box: { label: 'سبب الطلب', text: reason, tone: 'brand' }, cta: { label: 'مراجعة الطلب في «المستخدمون والصلاحيات»', url: url },
+      codes: [{ label: 'البريد الجامعي', value: email }], foot: 'الاسم: ' + name + ' · الصلاحية المطلوبة: ' + ROLE_AR[role] + ' · ' + fmt_(now, 'yyyy-MM-dd HH:mm') });
+    sendMail_([ACCESS_ADMIN_EMAIL], 'طلب صلاحية دخول — ' + name + ' | POFlow', mail.html, null, mail.text);
     return { ok: true, sent: true, rid: rid };
   } finally { lock.releaseLock(); }
 }
@@ -532,10 +528,11 @@ function accessDecide_(email, p) {
   sh.getRange(i + 2, 9, 1, 4).setValues([[approve ? 'approved' : 'rejected', email, new Date().toISOString(), note]]);
   audit_log_(email, { action: approve ? 'access-approve' : 'access-reject', detail: r.email + (approve ? ' → ' + role : '') + (note ? ' · ' + note : '') });
   const url = ScriptApp.getService().getUrl();
-  sendMail_([r.email], (approve ? 'تمت الموافقة على صلاحية الدخول' : 'تعذّرت الموافقة على طلب صلاحية الدخول') + ' | ' + APP_SHORT,
-    '<div dir="rtl" style="font-family:Tahoma,Arial;color:#241436"><h3 style="color:#3a1464">' + esc_(APP_NAME) + '</h3>' +
-    (approve ? '<p>تمت الموافقة على طلبك بصلاحية <b>' + esc_(ROLE_AR[role === 'editor' && p.procurement ? 'editor_proc' : role]) + '</b>.</p><p><a href="' + url + '">الدخول إلى المنصة</a></p>'
-             : '<p>لم تتم الموافقة على طلب صلاحية الدخول.' + (note ? '<br>الملاحظة: ' + esc_(note) : '') + '</p>') + '</div>');
+  const roleTx = ROLE_AR[role === 'editor' && p.procurement ? 'editor_proc' : role];
+  const dm = approve
+    ? buildMail_({ type: 'access-ok', title: 'تمت الموافقة على صلاحية الدخول', intro: 'مرحبًا ' + r.name + '،\nتمت الموافقة على طلبكم، ويمكنكم الآن الدخول إلى منصة أوامر الشراء بحسابكم الجامعي من الرابط نفسه.', box: { label: 'الصلاحية الممنوحة', text: roleTx, tone: 'ok' }, cta: { label: 'الدخول إلى المنصة', url: url }, link2: { label: 'كيفية التوقيع', url: url + '?page=howto' } })
+    : buildMail_({ type: 'access-no', title: 'لم تتم الموافقة على طلب صلاحية الدخول', intro: 'مرحبًا ' + r.name + '،\nنفيدكم بأنه لم تتم الموافقة على طلب صلاحية الدخول إلى منصة أوامر الشراء.', box: note ? { label: 'الملاحظة', text: note, tone: 'grey' } : null, foot: 'للاستفسار تواصلوا مع مدير المنصة ' + ACCESS_ADMIN_EMAIL + '.' });
+  sendMail_([r.email], (approve ? 'تمت الموافقة على صلاحية الدخول' : 'لم تتم الموافقة على طلب صلاحية الدخول') + ' | POFlow', dm.html, null, dm.text);
   return { ok: true, items: accessRequests_(), users: usersList_() };
 }
 
@@ -767,7 +764,7 @@ function cancel_(email, role, p) {
     d.meta.status = 'cancelled'; hist_(d, email, 'cancel', reason);
     const at = persist_(d, email, { snapshot: true, reason: 'cancelled' });
     audit_log_(email, { action: 'cancel', poId: d.meta.id, version: d.meta.version, detail: reason });
-    notify_([d.meta.requesterEmail], d, 'cancel', 'أُلغي طلب الشراء ' + d.meta.id, 'سبب الإلغاء: ' + reason);
+    notify_([d.meta.requesterEmail], d, 'cancel', 'أُلغي طلب الشراء', { intro: 'نحيطكم علمًا بإلغاء طلب الشراء التالي، ولن يُستكمل مسار اعتماده.', box: { label: 'سبب الإلغاء', text: reason }, rows: [['أُلغي بواسطة', ltr_(email)]] });
     return { ok: true, data: d, updatedAt: at };
   } finally { lock.releaseLock(); }
 }
@@ -787,7 +784,7 @@ function return_(email, role, p) {
     hist_(d, email, 'return', note);
     const at = persist_(d, email, { snapshot: false });
     audit_log_(email, { action: 'return', poId: d.meta.id, version: d.meta.version, detail: note });
-    notify_([d.meta.requesterEmail, d.meta.createdBy], d, 'return', 'أُعيد طلب الشراء ' + d.meta.id + ' لاستكمال البيانات', note);
+    notify_([d.meta.requesterEmail, d.meta.createdBy], d, 'return', 'أُعيد طلب الشراء لاستكمال البيانات', { intro: 'راجعت إدارة المشتريات طلبكم، ويلزم استكمال ما يلي قبل تحديد مسار التوقيعات. أُنشئ الإصدار ' + d.meta.version + ' للتعديل، وسيُعاد توقيع مدير الإدارة بعد الإرسال.', box: { label: 'المطلوب استكماله', text: note } });
     return { ok: true, data: d, updatedAt: at };
   } finally { lock.releaseLock(); }
 }
@@ -912,8 +909,8 @@ function signStep_(email, role, p) {
     const at = persist_(d, email, { snapshot: s.phase === 'requester' || all, reason: s.phase === 'requester' ? 'requester-signed' : (all ? 'approved' : '') });
     // notifications
     if (s.phase === 'requester') {
-      notify_(procEmails_(), d, 'submitted', 'طلب شراء جديد للمراجعة: ' + d.meta.id, (d.meta.dept || '') + ' — ' + (d.meta.subject || ''));
-      notify_([d.meta.requesterEmail], d, 'submitted', 'أُحيل طلبك ' + d.meta.id + ' إلى إدارة المشتريات', 'وُقّع من ' + sg.name);
+      notify_(procEmails_(), d, 'submitted', 'طلب شراء جديد بانتظار مراجعة المشتريات', { intro: 'وقّع مدير الإدارة الطالبة على الطلب التالي، وهو الآن بانتظار مراجعتكم وتحديد الرقم التسلسلي ومسار التوقيعات.', rows: [['وقّعه', esc_(sg.name) + ' — ' + esc_(s.title || '')], ['المرفقات', String((d.attachments || []).length)]] });
+      notify_([d.meta.requesterEmail], d, 'forwarded', 'أُحيل طلبكم إلى إدارة المشتريات', { intro: 'اكتمل توقيع الجهة الطالبة، وأُحيل الطلب تلقائيًا إلى إدارة المشتريات للمراجعة وتحديد مسار التوقيعات. ستصلكم رسالة عند أي إجراء.', rows: [['وقّعه', esc_(sg.name)]] });
     } else {
       notify_([d.meta.requesterEmail].concat(procEmails_()), d, 'step-signed', 'وُقّع طلب الشراء ' + d.meta.id + ' — ' + (s.title || s.name || ''), sg.name, true);
       if (next) notifyStep_(d, next, 'request');
@@ -935,8 +932,7 @@ function rejectStep_(email, role, p) {
     hist_(d, email, 'reject', (s.title || s.name || '') + ' — ' + reason);
     const at = persist_(d, email, { snapshot: true, reason: 'rejected' });
     audit_log_(email, { action: 'reject', poId: d.meta.id, version: d.meta.version, step: s.key, detail: reason });
-    notify_(procEmails_().concat([d.meta.requesterEmail]), d, 'rejected', '⛔ رُفض طلب الشراء ' + d.meta.id,
-      'رفضه: ' + (s.name || email) + ' (' + (s.title || '') + ')\nسبب الرفض: ' + reason);
+    notify_(procEmails_().concat([d.meta.requesterEmail]), d, 'rejected', 'رُفض أمر الشراء — توقفت دورة التوقيعات', { intro: 'نحيطكم علمًا بأن أمر الشراء التالي رُفض أثناء دورة الاعتماد، وتوقفت الدورة فلن يُرسل الطلب لبقية الموقّعين. يمكن إنشاء نسخة جديدة معدّلة من الطلب ثم إعادة المسار.', box: { label: 'سبب الرفض', text: reason }, rows: [['رفضه', '<b>' + esc_(s.name || email) + '</b> — ' + esc_(s.title || '') + (who.onBehalf ? ' (بالنيابة عن ' + esc_(who.onBehalf) + ')' : '')], ['تاريخ الرفض', ltr_(fmtWhen_(s.rejectedAt))]], signers: true });
     return { ok: true, data: d, updatedAt: at };
   } finally { lock.releaseLock(); }
 }
@@ -1042,49 +1038,162 @@ function procEmails_() {
 }
 function poUrl_(id) { return ScriptApp.getService().getUrl() + '?po=' + encodeURIComponent(id); }
 function esc_(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-function mailHtml_(title, d, body, cta) {
-  const t = totals_(d);
-  return '<div dir="rtl" style="font-family:Tahoma,Arial;color:#241436;max-width:640px;border:1px solid #e3dcef">' +
-    '<div style="background:#501e8c;color:#fff;padding:12px 16px;font-size:16px"><b>' + esc_(APP_NAME) + '</b> · <span dir="ltr">' + APP_SHORT + '</span></div>' +
-    '<div style="padding:14px 16px"><h3 style="color:#3a1464;margin:0 0 8px">' + esc_(title) + '</h3>' +
-    '<table style="border-collapse:collapse;font-size:13px;width:100%">' +
-    [['رقم الطلب', d.meta.id + (d.meta.serial ? ' · ' + d.meta.serial : '') + ' · الإصدار ' + d.meta.version], ['الجهة الطالبة', d.meta.dept], ['الموضوع', d.meta.subject],
-     ['الإجمالي التقديري', t.all.toLocaleString('en-US') + ' ' + d.meta.currency], ['الحالة', STATUS_AR[d.meta.status]]]
-      .map(function (r) { return '<tr><td style="padding:5px;border:1px solid #eee;background:#f7f5fb;width:32%"><b>' + r[0] + '</b></td><td style="padding:5px;border:1px solid #eee">' + esc_(r[1]) + '</td></tr>'; }).join('') +
-    '</table>' + (body ? '<p style="white-space:pre-line">' + esc_(body) + '</p>' : '') +
-    '<p><a href="' + poUrl_(d.meta.id) + '" style="display:inline-block;background:#501e8c;color:#fff;padding:9px 18px;border-radius:4px;text-decoration:none">' + (cta || 'فتح الطلب في المنصة') + '</a></p>' +
-    '<p style="font-size:12px;color:#6b5a80">الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي · مركز العمليات التقنية ITOC</p></div></div>';
+/* ======================= E-mail template (v1.8) =======================
+ *  One professional, branded layout for every notification: brand bar (SRU · ICTD), platform band, status strip
+ *  and badge per type, PO data card, highlighted note, left-to-right code boxes (verify code · SHA-256),
+ *  bulletproof button, ITOC footer. Table-based with inline styles for Gmail / Outlook; plain-text part included.
+ * ===================================================================== */
+const MAIL_ASSETS = 'https://ictsru.github.io/PR/assets/';   // hosted logos (e-mail clients do not show embedded data: images)
+const TONES_ = {
+  info:    { c: '#0a6eaa', bg: '#e6f3fa' }, warn: { c: '#9a5b00', bg: '#fff4e0' }, ok: { c: '#1d7a46', bg: '#e8f5ee' },
+  bad:     { c: '#b42318', bg: '#fdecea' }, back: { c: '#a3195b', bg: '#fff0f6' }, brand: { c: '#501e8c', bg: '#f0ebf8' }, grey: { c: '#5f5670', bg: '#efedf2' }
+};
+const MAIL_TYPES_ = {
+  request:      { tone: 'warn',  badge: 'مطلوب توقيعك',           cta: 'مراجعة الطلب والتوقيع' },
+  reminder:     { tone: 'warn',  badge: 'تذكير بالتوقيع',          cta: 'مراجعة الطلب والتوقيع' },
+  submitted:    { tone: 'info',  badge: 'طلب جديد للمراجعة',       cta: 'مراجعة الطلب وتحديد المسار' },
+  forwarded:    { tone: 'info',  badge: 'أُحيل إلى المشتريات',      cta: 'متابعة الطلب' },
+  'step-signed':{ tone: 'ok',    badge: 'تم التوقيع',              cta: 'متابعة الطلب' },
+  approved:     { tone: 'ok',    badge: 'مكتمل ومعتمد',            cta: 'فتح أمر الشراء المعتمد' },
+  rejected:     { tone: 'bad',   badge: 'مرفوض',                   cta: 'فتح الطلب' },
+  'return':     { tone: 'back',  badge: 'معاد للاستكمال',           cta: 'استكمال الطلب' },
+  cancel:       { tone: 'grey',  badge: 'ملغى',                    cta: 'فتح الطلب' },
+  escalation:   { tone: 'bad',   badge: 'تصعيد — تأخر التوقيع',     cta: 'متابعة الطلب' },
+  access:       { tone: 'brand', badge: 'طلب صلاحية دخول',          cta: 'مراجعة الطلب' },
+  'access-ok':  { tone: 'ok',    badge: 'تمت الموافقة',            cta: 'الدخول إلى المنصة' },
+  'access-no':  { tone: 'grey',  badge: 'لم تتم الموافقة',          cta: '' }
+};
+function slotAr_(k) { const p = String(k).split('.'); return ({ R: 'يعد', C: 'يقترح / يوصي', A: 'يعتمد', I: 'يعلم' })[p[1]] + ' — ' + (p[0] === 'cons' ? 'المستهلكات أو الخدمات' : 'الأصول'); }
+function ltr_(v) { return '<span dir="ltr" style="unicode-bidi:isolate;font-family:Consolas,\'Courier New\',monospace">' + esc_(v) + '</span>'; }
+function fmtMoney_(n) { return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtWhen_(iso) { try { return fmt_(new Date(iso), 'yyyy-MM-dd · HH:mm'); } catch (e) { return ''; } }
+/**
+ * o = { type, title, intro, d?, rows?[[label, html]], box?{label,text,tone}, codes?[{label,value}], signers?bool,
+ *       cta?{label,url}, link2?{label,url}, attach?name, foot? }
+ * returns { html, text }
+ */
+function buildMail_(o) {
+  const T = MAIL_TYPES_[o.type] || { tone: 'brand', badge: '', cta: 'فتح المنصة' }, tn = TONES_[T.tone];
+  const F = 'font-family:Tahoma,\'Segoe UI\',Arial,sans-serif;', d = o.d, text = [];
+  const ctaUrl = (o.cta && o.cta.url) || (d ? poUrl_(d.meta.id) : ScriptApp.getService().getUrl()), ctaLabel = (o.cta && o.cta.label) || T.cta;
+  let h = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + esc_(o.title) + '</title></head>' +
+    '<body style="margin:0;padding:0;background:#f2eff7">' +
+    '<div style="display:none;max-height:0;overflow:hidden;opacity:0">' + esc_((o.intro || o.title).slice(0, 140)) + '</div>' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f2eff7"><tr><td align="center" style="padding:24px 10px">' +
+    '<table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" dir="rtl" style="width:640px;max-width:100%;background:#ffffff;border:1px solid #e3dcef;border-radius:8px;overflow:hidden;' + F + 'color:#241436">' +
+    // brand bar
+    '<tr><td style="padding:12px 22px;background:#ffffff;border-bottom:1px solid #efeaf6"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
+    '<td align="right" valign="middle"><img src="' + MAIL_ASSETS + 'sru-logo.png" height="40" alt="جامعة سليمان الراجحي" style="display:block;height:40px;border:0"></td>' +
+    '<td align="left" valign="middle"><img src="' + MAIL_ASSETS + 'ictd-logo.png" height="40" alt="الإدارة التنفيذية للاتصالات وتقنية المعلومات" style="display:block;height:40px;border:0"></td></tr></table></td></tr>' +
+    // platform band
+    '<tr><td bgcolor="#501e8c" style="background:#501e8c;background-image:linear-gradient(110deg,#501e8c 0%,#4a1f8a 50%,#2b3f9e 100%);padding:16px 22px;color:#ffffff">' +
+    '<div style="font-size:18px;font-weight:bold;line-height:1.4">' + esc_(APP_NAME) + ' والتوقيعات الإلكترونية</div>' +
+    '<div dir="ltr" style="font-size:12px;color:#d9cdee;text-align:right;line-height:1.5">POFlow — Purchase Order Approval &amp; Digital Signature Platform</div></td></tr>' +
+    '<tr><td style="height:4px;line-height:4px;font-size:0;background:' + tn.c + '">&nbsp;</td></tr>' +
+    // title
+    '<tr><td style="padding:24px 28px 6px">' +
+    (T.badge ? '<span style="display:inline-block;background:' + tn.bg + ';color:' + tn.c + ';border:1px solid ' + tn.c + '33;border-radius:14px;padding:3px 12px;font-size:12px;font-weight:bold">' + esc_(T.badge) + '</span>' : '') +
+    '<h1 style="margin:10px 0 6px;font-size:21px;line-height:1.5;color:#3a1464;font-weight:bold">' + esc_(o.title) + '</h1>' +
+    (o.intro ? '<p style="margin:0 0 6px;font-size:14px;line-height:1.9;color:#3d3150">' + esc_(o.intro).replace(/\n/g, '<br>') + '</p>' : '') + '</td></tr>';
+  text.push(o.title, '', o.intro || '');
+  // highlighted box
+  if (o.box && o.box.text) {
+    const bt = TONES_[o.box.tone || T.tone];
+    h += '<tr><td style="padding:10px 28px 4px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="background:' + bt.bg + ';border-right:4px solid ' + bt.c + ';border-radius:4px;padding:12px 14px;font-size:14px;line-height:1.8;color:#241436">' +
+      (o.box.label ? '<div style="font-weight:bold;color:' + bt.c + ';margin-bottom:2px">' + esc_(o.box.label) + '</div>' : '') + esc_(o.box.text).replace(/\n/g, '<br>') + '</td></tr></table></td></tr>';
+    text.push('', (o.box.label ? o.box.label + ': ' : '') + o.box.text);
+  }
+  // PO card
+  if (d) {
+    const t = totals_(d), m = d.meta;
+    const rows = [['رقم الطلب', ltr_(m.id)], m.serial ? ['الرقم التسلسلي', ltr_(m.serial)] : null, ['الإصدار', ltr_('v' + m.version)], ['الجهة الطالبة', esc_(m.dept)],
+      ['الموضوع', '<b>' + esc_(m.subject) + '</b>'], m.supplier ? ['المورد', esc_(m.supplier)] : null,
+      ['الإجمالي التقديري', '<b dir="ltr" style="unicode-bidi:isolate">' + fmtMoney_(t.all) + ' ' + esc_(m.currency) + '</b>'],
+      ['الحالة', '<span style="color:' + tn.c + ';font-weight:bold">' + esc_(STATUS_AR[m.status] || m.status) + '</span>']].concat(o.rows || []).filter(Boolean);
+    h += '<tr><td style="padding:14px 28px 4px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e3dcef;border-radius:6px;border-collapse:separate;overflow:hidden">' +
+      '<tr><td colspan="2" style="background:#f7f5fb;padding:9px 14px;font-size:13px;font-weight:bold;color:#501e8c;border-bottom:1px solid #e3dcef">بيانات أمر الشراء</td></tr>' +
+      rows.map(function (r, i) { return '<tr><td width="34%" style="padding:9px 14px;font-size:13px;color:#6b5a80;vertical-align:top;' + (i ? 'border-top:1px solid #f0ecf6;' : '') + '">' + r[0] + '</td><td style="padding:9px 14px;font-size:14px;color:#241436;' + (i ? 'border-top:1px solid #f0ecf6;' : '') + '">' + r[1] + '</td></tr>'; }).join('') +
+      '</table></td></tr>';
+    text.push('', 'رقم الطلب: ' + m.id + (m.serial ? ' · ' + m.serial : '') + ' · v' + m.version, 'الجهة الطالبة: ' + m.dept, 'الموضوع: ' + m.subject, 'الإجمالي: ' + fmtMoney_(t.all) + ' ' + m.currency, 'الحالة: ' + (STATUS_AR[m.status] || ''));
+  }
+  // signers progress
+  if (d && o.signers) {
+    const sg = (d.steps || []).filter(function (s) { return s.kind === 'sign'; });
+    const st = { signed: ['✔', '#1d7a46'], current: ['⏳', '#9a5b00'], rejected: ['✖', '#b42318'], pending: ['•', '#9a90a8'] };
+    h += '<tr><td style="padding:12px 28px 4px"><div style="font-size:13px;font-weight:bold;color:#501e8c;margin-bottom:6px">تسلسل التوقيعات</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px">' +
+      sg.map(function (s) { const k = st[s.state] || st.pending, g = s.sig || {};
+        return '<tr><td width="24" style="padding:5px 0;color:' + k[1] + ';font-weight:bold;vertical-align:top">' + k[0] + '</td><td style="padding:5px 4px;vertical-align:top"><b>' + esc_(g.signerName || s.name || s.email) + '</b><br><span style="color:#6b5a80;font-size:12px">' + esc_(s.title || '') + (g.onBehalfOf ? ' · بالنيابة عن ' + esc_(g.onBehalfOf) : '') + '</span></td>' +
+          '<td align="left" style="padding:5px 0;color:#6b5a80;font-size:12px;white-space:nowrap;vertical-align:top" dir="ltr">' + esc_(g.at ? fmtWhen_(g.at) : (s.rejectedAt ? fmtWhen_(s.rejectedAt) : '')) + '</td></tr>'; }).join('') + '</table></td></tr>';
+  }
+  // code boxes
+  (o.codes || []).forEach(function (c) {
+    h += '<tr><td style="padding:10px 28px 0"><div style="font-size:12px;color:#6b5a80;margin-bottom:3px">' + esc_(c.label) + '</div>' +
+      '<div dir="ltr" style="background:#f7f5fb;border:1px solid #e3dcef;border-radius:4px;padding:9px 12px;font-family:Consolas,\'Courier New\',monospace;font-size:' + (c.big ? '18px;font-weight:bold;letter-spacing:1px;color:#1d7a46' : '12px;color:#241436') + ';text-align:left;word-break:break-all">' + esc_(c.value) + '</div></td></tr>';
+    text.push(c.label + ': ' + c.value);
+  });
+  if (o.attach) h += '<tr><td style="padding:12px 28px 0;font-size:13px;color:#241436">📎 مرفق: ' + ltr_(o.attach) + '</td></tr>';
+  // button
+  if (ctaLabel) {
+    h += '<tr><td align="right" style="padding:22px 28px 6px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td bgcolor="#501e8c" style="border-radius:4px;background:#501e8c">' +
+      '<a href="' + ctaUrl + '" target="_blank" style="display:inline-block;padding:12px 26px;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:4px;' + F + '">' + esc_(ctaLabel) + '</a></td>' +
+      (o.link2 ? '<td style="padding-right:10px"><a href="' + o.link2.url + '" target="_blank" style="display:inline-block;padding:11px 18px;font-size:14px;color:#501e8c;text-decoration:none;border:1px solid #501e8c;border-radius:4px;' + F + '">' + esc_(o.link2.label) + '</a></td>' : '') +
+      '</tr></table>' +
+      '<div style="font-size:11px;color:#9a90a8;margin-top:10px;line-height:1.6">إذا لم يعمل الزر، انسخ الرابط التالي: <span dir="ltr" style="unicode-bidi:isolate;word-break:break-all">' + esc_(ctaUrl) + '</span></div></td></tr>';
+    text.push('', ctaLabel + ': ' + ctaUrl);
+  }
+  if (o.foot) h += '<tr><td style="padding:10px 28px 0;font-size:12px;color:#6b5a80;line-height:1.7">' + esc_(o.foot) + '</td></tr>';
+  // footer
+  h += '<tr><td style="padding:22px 28px 0"><div style="border-top:1px solid #efeaf6;font-size:0;line-height:0">&nbsp;</div></td></tr>' +
+    '<tr><td style="padding:12px 28px 20px;font-size:12px;color:#6b5a80;line-height:1.8">مع التحية،<br><b style="color:#3a1464">مركز العمليات التقنية ITOC</b><br>الإدارة التنفيذية للاتصالات وتقنية المعلومات — جامعة سليمان الراجحي</td></tr>' +
+    '<tr><td bgcolor="#3a1464" style="background:#3a1464;background-image:linear-gradient(110deg,#3a1464 0%,#2e2a80 100%);padding:14px 22px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>' +
+    '<td valign="middle" style="font-size:11px;color:#e6dcf5;line-height:1.7;' + F + '">رسالة آلية من منصة أوامر الشراء — يُرجى عدم الرد عليها.<br><span dir="ltr" style="unicode-bidi:isolate">For Support: Dial <b style="color:#8fd3ff">*</b> or e-mail <a href="mailto:servicedesk@sr.edu.sa" style="color:#ffffff">servicedesk@sr.edu.sa</a> · POFlow v' + APP_VERSION + '</span></td>' +
+    '<td align="left" valign="middle" width="110"><a href="https://ictsru.github.io/ITOC/#forms" target="_blank" style="display:inline-block;background:#ffffff;border-radius:4px;padding:4px 8px"><img src="' + MAIL_ASSETS + 'itoc-logo.png" height="28" alt="ITOC" style="display:block;height:28px;border:0"></a></td></tr></table></td></tr>' +
+    '</table></td></tr></table></body></html>';
+  text.push('', '— مركز العمليات التقنية ITOC · الإدارة التنفيذية للاتصالات وتقنية المعلومات · جامعة سليمان الراجحي', 'رسالة آلية — POFlow v' + APP_VERSION);
+  return { html: h, text: text.join('\n') };
 }
-/** In-app notification for each recipient + e-mail (unless quiet). */
+/** In-app notification for each recipient + e-mail (unless quiet). body = text or {intro, box, codes, rows, signers, cta, link2, attach, foot}. */
 function notify_(to, d, type, title, body, quiet, attachments) {
   to = (to || []).map(norm_).filter(isAllowed_).filter(function (x, i, a) { return a.indexOf(x) === i; });
   if (!to.length) return 0;
   const sh = sheet_(SH_NOTIFY), now = new Date().toISOString();
   to.forEach(function (e) { sh.appendRow([Utilities.getUuid().slice(0, 10), now, e, d.meta.id, type, title, 'FALSE']); });
   if (quiet) return to.length;
-  sendMail_(to, title + ' | ' + APP_SHORT, mailHtml_(title, d, body, type === 'request' ? 'فتح الطلب للتوقيع' : ''), attachments);
+  const o = Object.assign({ type: type, title: title, d: d }, typeof body === 'object' && body ? body : { intro: body || '' });
+  const mail = buildMail_(o);
+  sendMail_(to, mailSubject_(title, d), mail.html, attachments, mail.text);
   return to.length;
 }
+function mailSubject_(title, d) { return title + (d ? ' — ' + d.meta.id + (d.meta.subject ? ' · ' + String(d.meta.subject).slice(0, 60) : '') : '') + ' | POFlow'; }
 function notifyStep_(d, s, type) {
   if (!s) return;
-  const pr = [s.email].concat(delegatesOf_(s.email));
+  const pr = [s.email].concat(delegatesOf_(s.email)), rem = type === 'reminder';
   s.notifiedAt = new Date().toISOString();
-  notify_(pr, d, type, (type === 'reminder' ? '⏰ تذكير: ' : '✍️ ') + 'طلب توقيع على أمر الشراء ' + d.meta.id,
-    'المطلوب منك: ' + (s.title || 'التوقيع') + (s.phase === 'requester' ? ' (توقيع الجهة الطالبة)' : '') +
-    (d.meta.targetDate ? '\nالموعد المستهدف لاستكمال الاعتماد: ' + d.meta.targetDate : ''));
+  const prev = (d.steps || []).filter(function (x) { return x.sig; }).pop();
+  notify_(pr, d, type, rem ? 'تذكير: أمر الشراء بانتظار توقيعك' : 'مطلوب توقيعك على أمر شراء', {
+    intro: 'السلام عليكم،\n' + (rem ? 'نذكّركم بأن أمر الشراء التالي ما زال بانتظار توقيعكم منذ ' + fmtWhen_(s.since) + '.' : 'وصلكم أمر الشراء التالي للتوقيع إلكترونيًا ضمن تسلسل الاعتماد المعتمد.') +
+           ' يُرجى مراجعة المستند ومرفقاته، ثم التوقيع في الموضع المحدد لكم أو الرفض مع ذكر السبب.',
+    rows: [['المطلوب منكم', '<b>' + esc_(s.title || 'التوقيع') + '</b>' + (s.phase === 'requester' ? ' <span style="color:#6b5a80">(توقيع الجهة الطالبة)</span>' : '')],
+           ['موضع التوقيع', esc_((s.slots || []).map(slotAr_).join('، '))],
+           prev ? ['آخر توقيع', esc_(prev.sig.signerName + ' — ' + (prev.title || '')) + ' <span dir="ltr" style="color:#6b5a80">' + esc_(fmtWhen_(prev.sig.at)) + '</span>'] : null,
+           d.meta.targetDate ? ['الموعد المستهدف', '<b style="color:#9a5b00">' + ltr_(d.meta.targetDate) + '</b>'] : null].filter(Boolean),
+    box: d.meta.procNote && s.phase !== 'requester' ? { label: 'توجيه إدارة المشتريات', text: d.meta.procNote, tone: 'brand' } : null,
+    foot: 'تحتاج إلى توقيعك المشفّر ورقمك السري. أول مرة؟ سجّل توقيعك من «توقيعاتي» داخل المنصة، أو افتح «كيفية التوقيع».',
+    link2: { label: 'كيفية التوقيع', url: ScriptApp.getService().getUrl() + '?page=howto' }
+  });
 }
 function delegatesOf_(email) {
   const today = fmt_(new Date(), 'yyyy-MM-dd');
   try { return delegations_().filter(function (x) { return x.active && norm_(x.fromEmail) === norm_(email) && x.start <= today && x.end >= today; }).map(function (x) { return norm_(x.toEmail); }); }
   catch (e) { return []; }
 }
-function sendMail_(to, subject, html, attachments) {
+function sendMail_(to, subject, html, attachments, text) {
   try {
     const from = norm_(setting_('MAIL_FROM'));
     let aliases = []; try { aliases = GmailApp.getAliases().map(norm_); } catch (e) {}
     const o = { htmlBody: html, name: APP_NAME + ' — ITOC' }; if (attachments) o.attachments = attachments;
-    if (from && aliases.indexOf(from) > -1) { o.from = from; GmailApp.sendEmail(to.join(','), subject, '', o); }
-    else MailApp.sendEmail(Object.assign({ to: to.join(','), subject: subject }, o));
+    if (from && aliases.indexOf(from) > -1) { o.from = from; GmailApp.sendEmail(to.join(','), subject, text || '', o); }
+    else MailApp.sendEmail(Object.assign({ to: to.join(','), subject: subject, body: text || '' }, o));
   } catch (e) { console.error('mail failed: ' + e); }
 }
 function notifications_(email) {
@@ -1115,8 +1224,7 @@ function remindPending() {
     if (now - last >= H * 36e5) { notifyStep_(d, s, 'reminder'); sent++; changed = true; }
     const late = (now - since >= D * 864e5) || (d.meta.targetDate && d.meta.targetDate < today);
     if (late && esc && s.escalatedOn !== today) {
-      notify_([esc].concat(procEmails_()), d, 'escalation', '🚩 تصعيد: تأخر توقيع أمر الشراء ' + d.meta.id,
-        'الخطوة الحالية: ' + (s.title || '') + ' — ' + (s.name || s.email) + '\nبانتظار منذ: ' + fmt_(new Date(since), 'yyyy-MM-dd HH:mm') + (d.meta.targetDate ? '\nالموعد المستهدف: ' + d.meta.targetDate : ''));
+      notify_([esc].concat(procEmails_()), d, 'escalation', 'تصعيد: تأخر توقيع أمر الشراء', { intro: 'تجاوز أمر الشراء التالي المدة المستهدفة لدى أحد الموقّعين. يُرجى المتابعة، أو تفعيل تفويض مؤقت، أو تعديل المسار عند الحاجة.', rows: [['الخطوة الحالية', '<b>' + esc_(s.title || '') + '</b> — ' + esc_(s.name || s.email)], ['بانتظار منذ', ltr_(fmtWhen_(new Date(since).toISOString()))], d.meta.targetDate ? ['الموعد المستهدف', ltr_(d.meta.targetDate)] : null].filter(Boolean), signers: true });
       s.escalatedOn = today; sent++; changed = true;
       audit_log_('system', { action: 'escalate', poId: d.meta.id, version: d.meta.version, step: s.key, detail: esc });
     }
@@ -1367,8 +1475,9 @@ function finalize_(email, role, p) {
     d.meta.finalizedAt = now; hist_(d, email, 'finalized', 'نسخة PDF نهائية · رمز التحقق ' + vid);
     persist_(d, email, { snapshot: true, reason: 'finalized' });
     sheet_(SH_SIGNED).appendRow([d.meta.id, ver, d.meta.serial, d.meta.subject, ch, fh, file.getId(), pdfHash, now, email, to.join(','), vid]);
-    notify_(to, d, 'approved', '✅ اعتماد نهائي لأمر الشراء ' + d.meta.id + ' — النسخة النهائية الموقّعة',
-      'اكتملت جميع التوقيعات. مرفق النسخة النهائية بصيغة PDF، وهي محفوظة في الأرشيف الإلكتروني.\nرمز التحقق: ' + vid + '\nبصمة الملف SHA-256: ' + pdfHash, false, [blob]);
+    notify_(to, d, 'approved', 'اعتماد نهائي لأمر الشراء — النسخة الموقّعة مرفقة', { intro: 'اكتملت جميع التوقيعات على أمر الشراء التالي، وصدرت النسخة النهائية المعتمدة بصيغة PDF وهي مرفقة بهذه الرسالة ومحفوظة في الأرشيف الإلكتروني للمنصة.', rows: [['تاريخ الاعتماد', ltr_(fmtWhen_(d.meta.approvedAt || now))]], signers: true,
+      codes: [{ label: 'رمز التحقق — يُدخل في صفحة «التحقق» أو بمسح رمز QR في الشهادة', value: vid, big: true }, { label: 'بصمة الملف SHA-256', value: pdfHash }], attach: name,
+      link2: { label: 'التحقق من المستند', url: verifyUrl_(vid) } }, false, [blob]);
     audit_log_(email, { action: 'finalized', poId: d.meta.id, version: ver, detail: 'pdf ' + pdfHash.slice(0, 16) + ' · ' + vid + ' · sent ' + to.length });
     return { ok: true, at: now, pdfHash: pdfHash, fullHash: fh, verifyId: vid, sentTo: to };
   } finally { lock.releaseLock(); }
